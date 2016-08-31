@@ -325,34 +325,77 @@ function Game(params) {
 
 }
 
+function ExploreExploitTask(params) {
+    "use strict";
+    var responseFn,
+        firstRun = true,
+        postChoiceFn = params.callback;
+
+    responseFn = function (choiceId) {
+        var card = $("#" + choiceId),
+            reward;
+        if (!card.hasClass("clicked")) {
+            card.css("background", "white")
+                .addClass("clicked");
+            if (Math.random() > .5) {
+                card.html((Math.ceil(Math.random() * 40)).toFixed());
+            } else {
+                card.html("-1").css("color", "red");
+            }
+        }
+        reward = parseFloat(card.html());
+        $(".card").off("click");
+        setTimeout(function () {postChoiceFn(reward); }, 1000);
+    };
+
+    this.run = function() {
+        var i;
+        if (firstRun) {
+            firstRun = false;
+            for (i = 0; i < params.cards; i++) {
+                $("#carddiv").append("<div class=\"card\" id=\"card" + i + "\"></div>");
+            }
+            $(".card").css("background", "gray");
+        }
+        $(".card").click(function () {responseFn(this.id); });
+    };
+}
+
 function experimentDriver() {
     "use strict";
     var game,
-        next,
-        hideGame;
+        explore,
+        nextChoice,
+        nextGame;
 
-    hideGame = function () {
+    nextChoice = function () {
         $("#game").hide();
-        setTimeout(next, 2000);
+        $("#carddiv").show();
+        explore.run();
     };
 
-    next = function () {
-        var bonus;
+    // hideGame = function () {
+    //     $("#carddiv").hide();
+    //     setTimeout(next, 2000);
+    // };
+
+    nextGame = function (bonus) {
+        $("#carddiv").hide();
         $("#game").show();
-        if (Math.random() > .8) {
-            bonus = -1;
-        } else {
-            bonus = Math.ceil(Math.random() * 40);
-        }
         game.run({bonus: bonus});
     };
 
-    game = new Game({postGameFn: hideGame});
-
     $("#game").hide();
+    game = new Game({postGameFn: nextChoice});
     game.setup();
 
-    setTimeout(next, 1000);
+    explore = new ExploreExploitTask({cards: 15, callback: nextGame});
+
+    nextChoice();
+
+    // game.setup();
+
+    // setTimeout(next, 1000);
 }
 
 $(window).load(function () {
