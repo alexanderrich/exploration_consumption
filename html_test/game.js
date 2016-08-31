@@ -54,6 +54,12 @@ function Game(params) {
             this.cursors = game.input.keyboard.createCursorKeys();
             this.spacebar = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
             this.enter = game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
+            this.enter.onDown.add(function () {
+                    if (this.pressEnter && this.pressEnter.exists) {
+                        this.pressEnter.destroy();
+                    }
+            }, this);
+
             this.score = 0;
             this.labelScore = game.add.text(120, 20, "score: 0",
                                             {font: "20px Arial",
@@ -62,33 +68,22 @@ function Game(params) {
                                             {font: "20px Arial",
                                              fill: "#000000"});
             this.labelPower.visible = false;
-            this.obstacleEvents = this.obstacleTimer.loop(500,
-                                                          this.createObstacleWave,
-                                                          this);
-
-            this.stopGame(function () {});
-            // game.paused = true;
-            // this.startPowerUp(20000);
-            // this.multiRespawn(1);
-            // game.time.events.add(5000, function() {
-            //     this.pausemotion();
-            //     this.multiRespawn(2);
-            // }, this);
+            game.paused = true;
 
         },
         update: function () {
             if (!this.waiting) {
                 if (this.cursors.left.isDown) {
-                    this.player.body.velocity.x = -300;
+                    this.player.body.velocity.x = -250;
                 } else if (this.cursors.right.isDown) {
-                    this.player.body.velocity.x = 300;
+                    this.player.body.velocity.x = 250;
                 } else {
                     this.player.body.velocity.x = 0;
                 }
                 if (this.cursors.up.isDown) {
-                    this.player.body.velocity.y = -300;
+                    this.player.body.velocity.y = -250;
                 } else if (this.cursors.down.isDown) {
-                    this.player.body.velocity.y = 300;
+                    this.player.body.velocity.y = 250;
                 } else {
                     this.player.body.velocity.y = 0;
                 }
@@ -106,44 +101,21 @@ function Game(params) {
                                             this.bulletHit,
                                             null,
                                             this);
-            } else {
-                if (this.enter.isDown) {
-                    this.pressEnter.destroy();
-                }
             }
         },
         clearGame: function () {
             this.player.x = 300;
+            this.player.y = game.height - 20;
             this.obstacles.callAll('kill');
             this.bullets.callAll('kill');
         },
         restart: function () {
             this.waiting = false;
+            this.obstacleInfo.obstacleType = 1;
+            this.obstacleInfo.waveNumber = 1;
             this.obstacleEvents = this.obstacleTimer.loop(500,
                                                           this.createObstacleWave,
                                                           this);
-        },
-        pausemotion: function () {
-            this.waiting = true;
-            this.obstacleTimer.pause();
-            this.player.body.velocity.x = 0;
-            this.player.body.velocity.y = 0;
-            this.obstacles.forEach(function (obstacle) {
-                obstacle.body.velocity.y = 0;
-            }, this);
-            this.bullets.forEach(function (bullet) {
-                bullet.body.velocity.y = 0;
-            }, this);
-        },
-        resumemotion: function () {
-            this.waiting = false;
-            this.obstacles.forEach(function (obstacle) {
-                obstacle.body.velocity.y = 200;
-            }, this);
-            this.bullets.forEach(function (bullet) {
-                bullet.body.velocity.y = -320;
-            }, this);
-            this.obstacleTimer.resume();
         },
         createObstacleWave: function () {
             var hole, i;
@@ -252,8 +224,6 @@ function Game(params) {
         collide: function () {
             this.waiting = true;
             this.dead = true;
-            this.obstacleInfo.obstacleType = 1;
-            this.obstacleInfo.waveNumber = 1;
             this.player.body.velocity.x = 0;
             this.player.body.velocity.y = 0;
             this.obstacles.forEach(function (obstacle) {
@@ -276,11 +246,12 @@ function Game(params) {
             this.labelScore.text = "score: " + this.score;
         },
         multiRespawn: function (number=null) {
+            this.waiting = true;
             if (number != null) {
                 this.respawnsLeft = number;
             }
             if (this.respawnsLeft === 1) {
-                this.respawn(this.resumemotion);
+                this.respawn(this.restart);
             } else {
                 this.respawnsLeft--;
                 this.respawn(this.multiRespawn);
@@ -311,61 +282,37 @@ function Game(params) {
             }, this);
         },
         stopGame: function (callback) {
+            this.obstacleTimer.remove(this.obstacleEvents);
             if (this.dead) {
                 game.time.events.remove(this.respawnEvent);
                 this.pressEnter.destroy();
                 this.respawnLabel.destroy();
                 game.time.events.remove(this.respawnLoop);
-                this.clearGame();
-            } else {
-                this.pausemotion();
             }
+            this.clearGame();
+            // } else {
+            //     this.pausemotion();
+            // }
             game.paused = true;
             callback();
         },
         resumeGame: function (length=60, bonus=0) {
-            var prepareLength = 3;
             game.paused = false;
-            this.prepare = prepareLength;
-            this.preparelabel = game.add.text(260, 200,
-                                              this.prepare.toString(),
-                                              {font: "60px Arial",
-                                               fill: "#000000"});
-            this.prepareLoop = game.time.events.loop(1000, function () {
-                if (this.prepare > 0) {
-                    this.prepare--;
-                }
-                this.preparelabel.text = this.prepare.toString();
-            }, this);
-            game.time.events.add(prepareLength * 1000, function () {
-                this.preparelabel.destroy();
-                game.time.events.remove(this.prepareLoop);
-                if (this.dead) {
-                    this.dead = false;
-                    this.restart();
-                } else {
-                    this.resumemotion();
-                }
-                if (bonus < 0) {
-                    this.pausemotion();
-                    this.multiRespawn(6);
-                } else if (bonus > 0) {
+            if (bonus < 0) {
+                this.multiRespawn(6);
+            } else {
+                this.restart();
+                if (bonus > 0) {
                     this.startPowerUp(bonus * 1000);
                 }
-                game.time.events.add(length * 1000, this.stopGame, this, postGameFn);
-            }, this);
+            }
+            game.time.events.add(length * 1000, this.stopGame, this, postGameFn);
         }
 
     };
 
     this.run = function (params) {
-        var bonus;
-        if (Math.random() > .8) {
-            bonus = -1;
-        } else {
-            bonus = Math.ceil(Math.random() * 40);
-        }
-        state.resumeGame.call(state, 60, bonus);
+        state.resumeGame.call(state, 60, params.bonus);
 
         // setTimeout(60000, callback);
     };
@@ -388,12 +335,19 @@ function experimentDriver() {
     };
 
     next = function () {
+        var bonus;
         $("#game").show();
-        game.run({});
+        if (Math.random() > .8) {
+            bonus = -1;
+        } else {
+            bonus = Math.ceil(Math.random() * 40);
+        }
+        game.run({bonus: bonus});
     };
 
     game = new Game({postGameFn: hideGame});
 
+    $("#game").hide();
     game.setup();
 
     setTimeout(next, 1000);
