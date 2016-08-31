@@ -6,13 +6,11 @@
 /*jslint browser: true*/
 /*global $, Phaser, window, setTimeout, console*/
 
-var game;
 
 function Game(params) {
     "use strict";
     var game,
         state,
-        firstRun = true,
         respawnLength = 5000,
         postGameFn = params.postGameFn;
 
@@ -33,7 +31,12 @@ function Game(params) {
             this.powerup = false;
             this.waiting = false;
             this.obstacleTimer = game.time.create(false);
+            this.obstacleEvents = this.obstacleTimer.loop(500,
+                                                          this.createObstacleWave,
+                                                          this);
             this.obstacleTimer.start();
+            this.obstacleTimer.pause();
+            this.alternator = 0;
             this.obstacleInfo = {obstacleType: 1,
                                  waveNumber: 1};
             this.player = game.add.graphics(300, game.height - 20);
@@ -104,6 +107,8 @@ function Game(params) {
             }
         },
         clearGame: function () {
+            this.player.body.velocity.x = 0;
+            this.player.body.velocity.y = 0;
             this.player.x = 300;
             this.player.y = game.height - 20;
             this.obstacles.callAll('kill');
@@ -111,15 +116,25 @@ function Game(params) {
         },
         restart: function () {
             this.waiting = false;
-            this.obstacleInfo.obstacleType = 1;
+            if (this.obstacleInfo.obstacleType > 1) {
+                this.obstacleInfo.obstacleType = 1;
+            }
             this.obstacleInfo.waveNumber = 1;
-            this.obstacleEvents = this.obstacleTimer.loop(500,
-                                                          this.createObstacleWave,
-                                                          this);
+            this.obstacleTimer.resume();
         },
         createObstacleWave: function () {
             var hole, i;
+            this.alternator = (this.alternator + 1) % 2;
+            if (this.alternator === 0) {
+                this.score++;
+                this.labelScore.text = "score: " + this.score;
+            }
             switch (this.obstacleInfo.obstacleType) {
+            case 0:
+                for (i = 0; i < 5; i++) {
+                    this.createObstacle(80 * i);
+                }
+                break;
             case 1:
                 if(Math.random() > .9) {
                     this.obstacleInfo.obstacleType = Math.floor(Math.random() * 3) + 2;
@@ -173,10 +188,8 @@ function Game(params) {
             game.physics.arcade.enable(obstacle);
             obstacle.body.velocity.y = 200;
             obstacle.checkWorldBounds = true;
-            obstacle.events.onOutOfBounds.add(function() {
-                obstacle.kill();
-                this.score++;
-                this.labelScore.text = "score: " + this.score;
+            obstacle.outOfBoundsKill = true;
+        },
             }, this);
         },
         startPowerUp: function (length) {
@@ -232,7 +245,7 @@ function Game(params) {
             this.bullets.forEach(function (bullet) {
                 bullet.body.velocity.y = 0;
             }, this);
-            this.obstacleTimer.remove(this.obstacleEvents);
+            this.obstacleTimer.pause();
             this.respawn(function () {
                 this.clearGame();
                 this.restart();
@@ -244,18 +257,6 @@ function Game(params) {
             bullet.kill();
             this.score += 2;
             this.labelScore.text = "score: " + this.score;
-        },
-        multiRespawn: function (number=null) {
-            this.waiting = true;
-            if (number != null) {
-                this.respawnsLeft = number;
-            }
-            if (this.respawnsLeft === 1) {
-                this.respawn(this.restart);
-            } else {
-                this.respawnsLeft--;
-                this.respawn(this.multiRespawn);
-            }
         },
         respawn: function (callback) {
             this.pressEnter = game.add.text(30, 130,
@@ -282,7 +283,7 @@ function Game(params) {
             }, this);
         },
         stopGame: function (callback) {
-            this.obstacleTimer.remove(this.obstacleEvents);
+            this.obstacleTimer.pause();
             if (this.dead) {
                 game.time.events.remove(this.respawnEvent);
                 this.pressEnter.destroy();
@@ -290,16 +291,17 @@ function Game(params) {
                 game.time.events.remove(this.respawnLoop);
             }
             this.clearGame();
-            // } else {
-            //     this.pausemotion();
-            // }
             game.paused = true;
             callback();
         },
-        resumeGame: function (length=60, bonus=0) {
+        resumeGame: function (length, bonus) {
+            length = length || 60;
+            bonus = bonus || 0;
+            this.obstacleInfo.obstacleType = 1;
             game.paused = false;
             if (bonus < 0) {
-                this.multiRespawn(6);
+                this.restart();
+                this.obstacleInfo.obstacleType = 0;
             } else {
                 this.restart();
                 if (bonus > 0) {
@@ -312,7 +314,7 @@ function Game(params) {
     };
 
     this.run = function (params) {
-        state.resumeGame.call(state, 60, params.bonus);
+        state.resumeGame.call(state, 40, params.bonus);
 
         // setTimeout(60000, callback);
     };
