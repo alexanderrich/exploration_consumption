@@ -11,7 +11,7 @@ function Game(params) {
     "use strict";
     var game,
         state,
-        respawnLength = 5000,
+        respawnLength = 2000,
         postGameFn = params.postGameFn;
 
     state = {
@@ -26,6 +26,8 @@ function Game(params) {
 
             this.obstacles = game.add.group();
             this.bullets = game.add.group();
+            this.tokens = game.add.group();
+            this.targets = game.add.group();
             this.borders = game.add.group();
 
             this.powerup = false;
@@ -39,7 +41,7 @@ function Game(params) {
             this.alternator = 0;
             this.obstacleInfo = {obstacleType: 1,
                                  waveNumber: 1};
-            this.player = game.add.graphics(300, game.height - 20);
+            this.player = game.add.graphics(300, game.height - 120);
             this.player.beginFill(0x0000ff);
             this.player.drawRect(0, 0, 20, 20);
             this.player.endFill();
@@ -64,13 +66,16 @@ function Game(params) {
             }, this);
 
             this.score = 0;
-            this.labelScore = game.add.text(120, 20, "score: 0",
+            this.labelScore = game.add.text(110, 470, "score: 0",
                                             {font: "20px Arial",
                                              fill: "#000000"});
-            this.labelPower = game.add.text(330, 20, "powerup time: 0",
+            this.time = 0;
+            this.labelTime = game.add.text(230, 470, "time: 0",
                                             {font: "20px Arial",
                                              fill: "#000000"});
-            this.labelPower.visible = false;
+            this.labelPower = game.add.text(330, 470, "powerup: 0",
+                                            {font: "20px Arial",
+                                             fill: "#000000"});
             game.paused = true;
 
         },
@@ -90,7 +95,7 @@ function Game(params) {
                 } else {
                     this.player.body.velocity.y = 0;
                 }
-                if (this.spacebar.isDown && this.powerup) {
+                if (this.spacebar.isDown) {
                     this.fireBullet();
                 }
                 game.physics.arcade.collide(this.player, this.borders);
@@ -101,7 +106,19 @@ function Game(params) {
                                             this);
                 game.physics.arcade.overlap(this.bullets,
                                             this.obstacles,
+                                            function (bullet, obstacle) {
+                                                bullet.kill();
+                                            },
+                                            null,
+                                            this);
+                game.physics.arcade.overlap(this.bullets,
+                                            this.targets,
                                             this.bulletHit,
+                                            null,
+                                            this);
+                game.physics.arcade.overlap(this.player,
+                                            this.tokens,
+                                            this.tokenHit,
                                             null,
                                             this);
             }
@@ -109,13 +126,16 @@ function Game(params) {
         clearGame: function () {
             this.player.body.velocity.x = 0;
             this.player.body.velocity.y = 0;
-            this.player.x = 300;
-            this.player.y = game.height - 20;
-            this.obstacles.callAll('kill');
-            this.bullets.callAll('kill');
+            // this.player.x = 300;
+            // this.player.y = game.height - 120;
+            this.obstacles.callAll("kill");
+            this.tokens.callAll("kill");
+            this.bullets.callAll("kill");
+            this.targets.callAll("kill");
         },
         restart: function () {
             this.waiting = false;
+            this.dead = false;
             if (this.obstacleInfo.obstacleType > 1) {
                 this.obstacleInfo.obstacleType = 1;
             }
@@ -177,10 +197,19 @@ function Game(params) {
                     }
                 }
             }
+            if (Math.random() > .6 && this.powerup) {
+                if (Math.random() > .5) {
+                    game.time.events.add(250,
+                                         this.createToken, this);
+                } else {
+                    game.time.events.add(250,
+                                         this.createTarget, this);
+                }
+            }
         },
         createObstacle: function (x) {
             var obstacle;
-            obstacle = game.add.graphics(100 + x, 0);
+            obstacle = game.add.graphics(100 + x, -20);
             obstacle.beginFill(0xff0000);
             obstacle.drawRect(0, 0, 80, 20);
             obstacle.endFill();
@@ -190,29 +219,61 @@ function Game(params) {
             obstacle.checkWorldBounds = true;
             obstacle.outOfBoundsKill = true;
         },
+        createToken: function () {
+            if (this.dead) {
+                return;
+            }
+            var token;
+            token = game.add.graphics(100 + 10 * Math.floor(Math.random() * 36), -20);
+            token.beginFill(0xdddd00);
+            token.drawRect(0, 0, 20, 20);
+            token.endFill();
+            this.tokens.add(token);
+            game.physics.arcade.enable(token);
+            token.body.velocity.y = 200;
+            token.checkWorldBounds = true;
+            token.events.onOutOfBounds.add(function() {
+                token.kill();
             }, this);
+        },
+        createTarget: function () {
+            var target,
+                startSide;
+            if (this.dead) {
+                return;
+            }
+            startSide = Math.floor(Math.random() * 2);
+            target = game.add.graphics(100 + 320 * startSide, -20);
+            target.beginFill(0xcc00cc);
+            target.drawRect(0, 0, 80, 20);
+            target.endFill();
+            this.targets.add(target);
+            game.physics.arcade.enable(target);
+            target.body.velocity.y = 200;
+            game.add.tween(target).to({x: 420 - 320 * startSide}, 2000, Phaser.Easing.Linear.None,
+                                      true, 0, -1, true);
+            target.checkWorldBounds = true;
+            target.outOfBoundsKill = true;
         },
         startPowerUp: function (length) {
             this.powerup = true;
-            this.powerupLeft = length/1000;
+            this.powerupLeft = length / 1000;
             this.labelPower.text = "powerup time: " +
                 this.powerupLeft.toString();
-            this.labelPower.visible = true;
             this.labelPower.fill = "#000000";
             this.bulletTimer = 0;
-            this.bulletSpacing = 300;
+            this.bulletSpacing = 500;
             this.powerupLoop = game.time.events.loop(1000, function () {
                 if (this.powerupLeft > 0) {
                     this.powerupLeft--;
                 } if (this.powerupLeft < 4) {
                     this.labelPower.fill = "#FF0000";
                 }
-                this.labelPower.text = "powerup time: " +
+                this.labelPower.text = "powerup: " +
                     this.powerupLeft.toString();
             }, this);
             game.time.events.add(length, function () {
                 this.powerup = false;
-                this.labelPower.visible = false;
                 game.time.events.remove(this.powerupLoop);
             },
                                  this);
@@ -235,27 +296,39 @@ function Game(params) {
             }
         },
         collide: function () {
-            this.waiting = true;
-            this.dead = true;
-            this.player.body.velocity.x = 0;
-            this.player.body.velocity.y = 0;
-            this.obstacles.forEach(function (obstacle) {
-                obstacle.body.velocity.y = 0;
-            }, this);
-            this.bullets.forEach(function (bullet) {
-                bullet.body.velocity.y = 0;
-            }, this);
-            this.obstacleTimer.pause();
-            this.respawn(function () {
-                this.clearGame();
-                this.restart();
+            if (!this.dead) {
+                this.waiting = true;
+                this.dead = true;
+                this.player.body.velocity.x = 0;
+                this.player.body.velocity.y = 0;
+                game.tweens.removeAll();
+                this.obstacles.forEach(function (obstacle) {
+                    obstacle.body.velocity.y = 0;
+                }, this);
+                this.tokens.forEach(function (token) {
+                    token.body.velocity.y = 0;
+                }, this);
+                this.bullets.forEach(function (bullet) {
+                    bullet.body.velocity.y = 0;
+                    bullet.body.velocity.x = 0;
+                }, this);
+                this.targets.forEach(function (target) {
+                    target.body.velocity.x = 0;
+                    target.body.velocity.y = 0;
+                }, this);
+                this.obstacleTimer.pause();
+                this.respawn();
             }
-                        );
         },
-        bulletHit: function (bullet, obstacle) {
-            obstacle.kill();
+        bulletHit: function (bullet, target) {
+            target.kill();
             bullet.kill();
-            this.score += 2;
+            this.score += 5;
+            this.labelScore.text = "score: " + this.score;
+        },
+        tokenHit: function (player, token) {
+            token.kill();
+            this.score += 5;
             this.labelScore.text = "score: " + this.score;
         },
         respawn: function (callback) {
@@ -279,7 +352,8 @@ function Game(params) {
                 this.respawnLabel.destroy();
                 game.time.events.remove(this.respawnLoop);
                 this.dead = false;
-                callback.call(this);
+                this.clearGame();
+                this.restart();
             }, this);
         },
         stopGame: function (callback) {
@@ -302,6 +376,9 @@ function Game(params) {
             if (bonus < 0) {
                 this.restart();
                 this.obstacleInfo.obstacleType = 0;
+                game.time.events.add(30000, function () {
+                    this.obstacleInfo.obstacleType = 1;
+                }, this);
             } else {
                 this.restart();
                 if (bonus > 0) {
@@ -314,7 +391,7 @@ function Game(params) {
     };
 
     this.run = function (params) {
-        state.resumeGame.call(state, 40, params.bonus);
+        state.resumeGame.call(state, 20, params.bonus);
 
         // setTimeout(60000, callback);
     };
@@ -337,7 +414,7 @@ function ExploreExploitTask(params) {
         if (!card.hasClass("clicked")) {
             card.css("background", "white")
                 .addClass("clicked");
-            if (Math.random() > .5) {
+            if (Math.random() > .25) {
                 card.html((Math.ceil(Math.random() * 40)).toFixed());
             } else {
                 card.html("-1").css("color", "red");
@@ -350,8 +427,9 @@ function ExploreExploitTask(params) {
 
     this.run = function() {
         var i;
-        if (firstRun) {
+        if (firstRun || Math.random() > .8) {
             firstRun = false;
+            $("#carddiv").html("");
             for (i = 0; i < params.cards; i++) {
                 $("#carddiv").append("<div class=\"card\" id=\"card" + i + "\"></div>");
             }
@@ -369,7 +447,7 @@ function experimentDriver() {
         nextGame;
 
     nextChoice = function () {
-        $("#game").hide();
+        // $("#game").hide();
         $("#carddiv").show();
         explore.run();
     };
@@ -381,11 +459,11 @@ function experimentDriver() {
 
     nextGame = function (bonus) {
         $("#carddiv").hide();
-        $("#game").show();
+        // $("#game").show();
         game.run({bonus: bonus});
     };
 
-    $("#game").hide();
+    // $("#game").hide();
     game = new Game({postGameFn: nextChoice});
     game.setup();
 
