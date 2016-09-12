@@ -4,7 +4,7 @@
  */
 
 /*jslint browser: true*/
-/*global $, Phaser, window, setTimeout, setInterval, clearInterval, console*/
+/*global $, Phaser, window, setTimeout, setInterval, clearInterval*/
 
 function Game(popupCreator) {
     "use strict";
@@ -24,8 +24,7 @@ function Game(popupCreator) {
         ballOnPaddle = true,
         score = 0,
         dead = false,
-        scoreText,
-        introText;
+        scoreText;
 
     preload = function () {
         var graphicBase;
@@ -89,10 +88,9 @@ function Game(popupCreator) {
         ball.events.onOutOfBounds.add(ballLost, this);
 
         scoreText = game.add.text(32, 550, "score: 0", { font: "20px Arial", fill: "#ffffff", align: "left" });
-        introText = game.add.text(game.world.centerX, 400, "- click to start -", { font: "40px Arial", fill: "#ffffff", align: "center" });
-        introText.anchor.setTo(0.5, 0.5);
 
         game.input.onDown.add(releaseBall, this);
+        game.time.events.add(1000, releaseBall, this);
 
         game.paused = true;
 
@@ -130,7 +128,6 @@ function Game(popupCreator) {
             ballOnPaddle = false;
             ball.body.velocity.y = -300;
             ball.body.velocity.x = -75;
-            introText.visible = false;
         }
 
     };
@@ -142,6 +139,7 @@ function Game(popupCreator) {
             game.paused = false;
             ballOnPaddle = true;
             ball.reset(paddle.body.x + 16, paddle.y - 16);
+            game.time.events.add(1000, releaseBall, this);
             dead = false;
         });
     };
@@ -155,12 +153,11 @@ function Game(popupCreator) {
         scoreText.text = "score: " + score;
 
         //  Are they any bricks left?
-        if (bricks.countLiving() == 0)
+        if (bricks.countLiving() === 0)
         {
             //  New level starts
             score += 1000;
             scoreText.text = "score: " + score;
-            introText.text = "- Next Level -";
 
             //  Let's move the ball back to the paddle
             ballOnPaddle = true;
@@ -187,7 +184,7 @@ function Game(popupCreator) {
         else if (_ball.x > _paddle.x)
         {
             //  Ball is on the right-hand side of the paddle
-            diff = _ball.x -_paddle.x;
+            diff = _ball.x - _paddle.x;
             _ball.body.velocity.x = (10 * diff);
         }
         else
@@ -208,6 +205,7 @@ function Game(popupCreator) {
         if (dead) {
             ballOnPaddle = true;
             ball.reset(paddle.body.x + 16, paddle.y - 16);
+            game.time.events.add(1000, releaseBall, this);
             dead = false;
         }
         setTimeout(function () {
@@ -239,10 +237,15 @@ function ExploreExploitTask(params, callback) {
         }
         reward = parseFloat(card.html());
         $(".card").off("click");
-        setTimeout(function () {callback(reward); }, 1000);
+        setTimeout(function () {
+            $("#carddiv").hide();
+            callback(reward);
+        },
+                   1000);
     };
 
     this.run = function() {
+        $("#carddiv").show();
         var i;
         if (firstRun || Math.random() > .8) {
             firstRun = false;
@@ -337,31 +340,21 @@ function PopupCreator (length, clicksneeded) {
         next();
     };
 
+    $("#game").append("<div id=\"popup\"> <div id=\"popupinstruct\"></div> <div id=\"popupcountdown\"></div> </div> ");
+    $("#popup").hide();
 }
 
-function experimentDriver() {
+function ConsumptionRewards(baselength, maxReward, callback) {
     "use strict";
     var game,
-        explore,
         popupCreator,
-        nextChoice,
-        setReward,
         nextReward,
-        nextPunishment,
-        rewardAmount,
-        maxReward = 12,
-        baselength = 3;
+        nextPunishment;
 
-    nextChoice = function () {
-        $("#carddiv").show();
-        explore.run();
-    };
+    popupCreator = new PopupCreator(baselength, 1);
 
-    setReward = function (reward) {
-        $("#carddiv").hide();
-        rewardAmount = reward;
-        nextReward(rewardAmount);
-    };
+    game = new Game(popupCreator);
+    game.setup();
 
     nextReward = function (length) {
         game.run(baselength * length, function () {
@@ -371,18 +364,32 @@ function experimentDriver() {
 
     nextPunishment = function (penalty) {
         popupCreator.runMultiple(penalty, function () {
-            nextChoice();
+            callback();
         });
     };
 
-    $("#popup").hide();
+    this.setReward = function(reward) {
+        nextReward(reward);
+    };
 
-    popupCreator = new PopupCreator(baselength, 1);
 
-    game = new Game(popupCreator);
-    game.setup();
+}
 
-    explore = new ExploreExploitTask({cards: 15}, setReward);
+function experimentDriver() {
+    "use strict";
+    var explore,
+        nextChoice,
+        consumptionRewards,
+        maxReward = 12,
+        baselength = 3;
+
+    nextChoice = function () {
+        explore.run();
+    };
+
+    consumptionRewards = new ConsumptionRewards(baselength, maxReward, nextChoice);
+
+    explore = new ExploreExploitTask({cards: 15}, consumptionRewards.setReward);
 
 
     nextChoice();
