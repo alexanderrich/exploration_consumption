@@ -21,7 +21,7 @@ function Game(params) {
             var i,
                 border;
             game.stage.backgroundColor = "#00c5cf";
-            // game.stage.disableVisibilityChange = true;
+            game.stage.disableVisibilityChange = true;
             game.physics.startSystem(Phaser.Physics.ARCADE);
 
             this.obstacles = game.add.group();
@@ -30,14 +30,21 @@ function Game(params) {
             this.targets = game.add.group();
             this.borders = game.add.group();
 
-            this.powerup = false;
-            this.waiting = false;
+            graphicBase = game.add.graphics(0, 0);
+            graphicBase.beginFill(0xff0000);
+            graphicBase.drawRect(0, 0, 80, 20);
+            graphicBase.endFill();
+            this.obstacleTexture = graphicBase.generateTexture();
+            graphicBase.destroy();
+
+
             this.obstacleTimer = game.time.create(false);
             this.obstacleEvents = this.obstacleTimer.loop(500,
                                                           this.createObstacleWave,
                                                           this);
+            this.bulletTimer = 0;
+            this.bulletSpacing = 500;
             this.obstacleTimer.start();
-            this.obstacleTimer.pause();
             this.alternator = 0;
             this.obstacleInfo = {obstacleType: 1,
                                  waveNumber: 1};
@@ -60,9 +67,9 @@ function Game(params) {
             this.spacebar = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
             this.enter = game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
             this.enter.onDown.add(function () {
-                    if (this.pressEnter && this.pressEnter.exists) {
-                        this.pressEnter.destroy();
-                    }
+                if (this.pressEnter && this.pressEnter.exists) {
+                    this.pressEnter.destroy();
+                }
             }, this);
 
             this.score = 0;
@@ -71,76 +78,65 @@ function Game(params) {
                                              fill: "#000000"});
             this.time = 0;
             this.labelTime = game.add.text(230, 470, "time: 0",
-                                            {font: "20px Arial",
-                                             fill: "#000000"});
-            this.labelPower = game.add.text(330, 470, "powerup: 0",
-                                            {font: "20px Arial",
-                                             fill: "#000000"});
+                                           {font: "20px Arial",
+                                            fill: "#000000"});
             game.paused = true;
 
         },
         update: function () {
-            if (!this.waiting) {
-                if (this.cursors.left.isDown) {
-                    this.player.body.velocity.x = -250;
-                } else if (this.cursors.right.isDown) {
-                    this.player.body.velocity.x = 250;
-                } else {
-                    this.player.body.velocity.x = 0;
-                }
-                if (this.cursors.up.isDown) {
-                    this.player.body.velocity.y = -250;
-                } else if (this.cursors.down.isDown) {
-                    this.player.body.velocity.y = 250;
-                } else {
-                    this.player.body.velocity.y = 0;
-                }
-                if (this.spacebar.isDown) {
-                    this.fireBullet();
-                }
-                game.physics.arcade.collide(this.player, this.borders);
-                game.physics.arcade.overlap(this.player,
-                                            this.obstacles,
-                                            this.collide,
-                                            null,
-                                            this);
-                game.physics.arcade.overlap(this.bullets,
-                                            this.obstacles,
-                                            function (bullet, obstacle) {
-                                                bullet.kill();
-                                            },
-                                            null,
-                                            this);
-                game.physics.arcade.overlap(this.bullets,
-                                            this.targets,
-                                            this.bulletHit,
-                                            null,
-                                            this);
-                game.physics.arcade.overlap(this.player,
-                                            this.tokens,
-                                            this.tokenHit,
-                                            null,
-                                            this);
+            if (this.cursors.left.isDown) {
+                this.player.body.velocity.x = -250;
+            } else if (this.cursors.right.isDown) {
+                this.player.body.velocity.x = 250;
+            } else {
+                this.player.body.velocity.x = 0;
             }
+            if (this.cursors.up.isDown) {
+                this.player.body.velocity.y = -250;
+            } else if (this.cursors.down.isDown) {
+                this.player.body.velocity.y = 250;
+            } else {
+                this.player.body.velocity.y = 0;
+            }
+            if (this.spacebar.isDown) {
+                this.fireBullet();
+            }
+            game.physics.arcade.collide(this.player, this.borders);
+            game.physics.arcade.overlap(this.player,
+                                        this.obstacles,
+                                        this.collide,
+                                        null,
+                                        this);
+            game.physics.arcade.overlap(this.bullets,
+                                        this.obstacles,
+                                        function (bullet, obstacle) {
+                                            bullet.kill();
+                                        },
+                                        null,
+                                        this);
+            game.physics.arcade.overlap(this.bullets,
+                                        this.targets,
+                                        this.bulletHit,
+                                        null,
+                                        this);
+            game.physics.arcade.overlap(this.player,
+                                        this.tokens,
+                                        this.tokenHit,
+                                        null,
+                                        this);
         },
         clearGame: function () {
             this.player.body.velocity.x = 0;
             this.player.body.velocity.y = 0;
-            // this.player.x = 300;
-            // this.player.y = game.height - 120;
             this.obstacles.callAll("kill");
             this.tokens.callAll("kill");
             this.bullets.callAll("kill");
             this.targets.callAll("kill");
         },
         restart: function () {
-            this.waiting = false;
             this.dead = false;
-            if (this.obstacleInfo.obstacleType > 1) {
-                this.obstacleInfo.obstacleType = 1;
-            }
+            this.obstacleInfo.obstacleType = 1;
             this.obstacleInfo.waveNumber = 1;
-            this.obstacleTimer.resume();
         },
         createObstacleWave: function () {
             var hole, i;
@@ -150,11 +146,6 @@ function Game(params) {
                 this.labelScore.text = "score: " + this.score;
             }
             switch (this.obstacleInfo.obstacleType) {
-            case 0:
-                for (i = 0; i < 5; i++) {
-                    this.createObstacle(80 * i);
-                }
-                break;
             case 1:
                 if(Math.random() > .9) {
                     this.obstacleInfo.obstacleType = Math.floor(Math.random() * 3) + 2;
@@ -197,7 +188,7 @@ function Game(params) {
                     }
                 }
             }
-            if (Math.random() > .6 && this.powerup) {
+            if (Math.random() > .6) {
                 if (Math.random() > .5) {
                     game.time.events.add(250,
                                          this.createToken, this);
@@ -209,10 +200,7 @@ function Game(params) {
         },
         createObstacle: function (x) {
             var obstacle;
-            obstacle = game.add.graphics(100 + x, -20);
-            obstacle.beginFill(0xff0000);
-            obstacle.drawRect(0, 0, 80, 20);
-            obstacle.endFill();
+            obstacle = game.add.sprite(100 + x, -20, this.obstacleTexture);
             this.obstacles.add(obstacle);
             game.physics.arcade.enable(obstacle);
             obstacle.body.velocity.y = 200;
@@ -220,9 +208,6 @@ function Game(params) {
             obstacle.outOfBoundsKill = true;
         },
         createToken: function () {
-            if (this.dead) {
-                return;
-            }
             var token;
             token = game.add.graphics(100 + 10 * Math.floor(Math.random() * 36), -20);
             token.beginFill(0xdddd00);
@@ -239,9 +224,6 @@ function Game(params) {
         createTarget: function () {
             var target,
                 startSide;
-            if (this.dead) {
-                return;
-            }
             startSide = Math.floor(Math.random() * 2);
             target = game.add.graphics(100 + 320 * startSide, -20);
             target.beginFill(0xcc00cc);
@@ -254,29 +236,6 @@ function Game(params) {
                                       true, 0, -1, true);
             target.checkWorldBounds = true;
             target.outOfBoundsKill = true;
-        },
-        startPowerUp: function (length) {
-            this.powerup = true;
-            this.powerupLeft = length / 1000;
-            this.labelPower.text = "powerup time: " +
-                this.powerupLeft.toString();
-            this.labelPower.fill = "#000000";
-            this.bulletTimer = 0;
-            this.bulletSpacing = 500;
-            this.powerupLoop = game.time.events.loop(1000, function () {
-                if (this.powerupLeft > 0) {
-                    this.powerupLeft--;
-                } if (this.powerupLeft < 4) {
-                    this.labelPower.fill = "#FF0000";
-                }
-                this.labelPower.text = "powerup: " +
-                    this.powerupLeft.toString();
-            }, this);
-            game.time.events.add(length, function () {
-                this.powerup = false;
-                game.time.events.remove(this.powerupLoop);
-            },
-                                 this);
         },
         fireBullet: function () {
             var bullet;
@@ -296,29 +255,13 @@ function Game(params) {
             }
         },
         collide: function () {
-            if (!this.dead) {
-                this.waiting = true;
-                this.dead = true;
-                this.player.body.velocity.x = 0;
-                this.player.body.velocity.y = 0;
-                game.tweens.removeAll();
-                this.obstacles.forEach(function (obstacle) {
-                    obstacle.body.velocity.y = 0;
-                }, this);
-                this.tokens.forEach(function (token) {
-                    token.body.velocity.y = 0;
-                }, this);
-                this.bullets.forEach(function (bullet) {
-                    bullet.body.velocity.y = 0;
-                    bullet.body.velocity.x = 0;
-                }, this);
-                this.targets.forEach(function (target) {
-                    target.body.velocity.x = 0;
-                    target.body.velocity.y = 0;
-                }, this);
-                this.obstacleTimer.pause();
-                this.respawn();
-            }
+            game.paused = true;
+            this.dead = true;
+            this.popupEnder = popUp(5, function () {
+                state.clearGame();
+                state.restart();
+                game.paused = false;
+            });
         },
         bulletHit: function (bullet, target) {
             target.kill();
@@ -331,69 +274,33 @@ function Game(params) {
             this.score += 5;
             this.labelScore.text = "score: " + this.score;
         },
-        respawn: function (callback) {
-            this.pressEnter = game.add.text(30, 130,
-                                            "press ENTER before countdown finishes",
-                                            {font: "30px Arial",
-                                             fill: "#000000"});
-            this.respawnLeft = respawnLength/1000;
-            this.respawnLabel = game.add.text(260, 200,
-                                           this.respawnLeft.toString(),
-                                           {font: "60px Arial",
-                                            fill: "#000000"});
-            this.respawnLoop = game.time.events.loop(1000, function () {
-                if (this.respawnLeft > 0) {
-                    this.respawnLeft--;
-                }
-                this.respawnLabel.text = this.respawnLeft.toString();
-            }, this);
-            this.respawnEvent = game.time.events.add(respawnLength, function () {
-                this.pressEnter.destroy();
-                this.respawnLabel.destroy();
-                game.time.events.remove(this.respawnLoop);
-                this.dead = false;
-                this.clearGame();
-                this.restart();
-            }, this);
-        },
         stopGame: function (callback) {
-            this.obstacleTimer.pause();
             if (this.dead) {
-                game.time.events.remove(this.respawnEvent);
-                this.pressEnter.destroy();
-                this.respawnLabel.destroy();
-                game.time.events.remove(this.respawnLoop);
+                this.popupEnder();
             }
             this.clearGame();
             game.paused = true;
             callback();
         },
-        resumeGame: function (length, bonus) {
+        resumeGame: function (length, callback) {
+            console.log(length);
             length = length || 60;
-            bonus = bonus || 0;
-            this.obstacleInfo.obstacleType = 1;
             game.paused = false;
-            if (bonus < 0) {
-                this.restart();
-                this.obstacleInfo.obstacleType = 0;
-                game.time.events.add(30000, function () {
-                    this.obstacleInfo.obstacleType = 1;
-                }, this);
-            } else {
-                this.restart();
-                if (bonus > 0) {
-                    this.startPowerUp(bonus * 1000);
-                }
-            }
-            game.time.events.add(length * 1000, this.stopGame, this, postGameFn);
+            this.restart();
+            setTimeout(function () {
+                state.stopGame.call(state, callback);
+            }, length * 1000);
+            // game.time.events.add(length * 1000, this.stopGame, this, callback);
         }
 
     };
 
-    this.run = function (params) {
-        state.resumeGame.call(state, 20, params.bonus);
-
-        // setTimeout(60000, callback);
+    this.run = function (params, callback) {
+        if (params.length > 0) {
+            state.resumeGame.call(state, params.length, callback);
+        } else {
+            callback();
+        }
     };
 
     this.setup = function () {
