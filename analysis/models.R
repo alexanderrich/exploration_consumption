@@ -26,27 +26,29 @@ optimal_values <- function(ntrials, maxreward=6, pbad=.5, badcost=0) {
               VoI_diff=VoI_diff))
 }
 
-optimal_values_indefinite <- function (discount, maxreward=40, pbad=.5, badcost=-20, tol=.00001) {
-  n <- maxreward + 1
-  ptrans <- 1/maxreward * (1-pbad)
+optimal_values_indefinite <- function (discount, minreward=4, maxreward=12, pbad=.5, badcost=0, tol=.00001) {
+  ngood <- maxreward - minreward + 1
+  n <- ngood + 1
+  ptrans <- 1/ngood * (1-pbad)
   trans_explore <- matrix(0, n, n)
   trans_exploit <- diag(n)
   rew_explore <- matrix(0, n, n)
-  rew_exploit <- diag(n) * c(badcost, 1:maxreward)
+  rew_exploit <- diag(n) * c(badcost, minreward:maxreward)
+  reward_exploit <- c(badcost, minreward:maxreward)
+
   for (i in 1:n) {
     for (j in 1:n) {
       if (j > i) {
         trans_explore[i, j] <- ptrans
-        rew_explore[i, j] <- j - 1
+        rew_explore[i, j] <- reward_exploit[j]
       } else if (i == j){
         trans_explore[i,j] <- 1 - ptrans * (n - i)
-        rew_explore[i, j] <- (badcost * pbad + sum(1:(i-1))* ptrans)/(pbad + length(1:(i-1))*ptrans)
+        rew_explore[i, j] <- (badcost * pbad + sum(reward_exploit[2:i])* ptrans)/(pbad + length(1:(i-1))*ptrans)
       }
     }
   }
   rew_explore[1,1] <- badcost
 
-  ## write value iteration loop
   values <- rep(0, n)
   delta <- tol + 1
   while (delta > tol ) {
@@ -61,8 +63,7 @@ optimal_values_indefinite <- function (discount, maxreward=40, pbad=.5, badcost=
     values <- pmax(values_exploit, values_explore)
     delta <- max(abs(values - old_values))
   }
-  reward_explore <- rep(pbad*badcost + ptrans*sum(1:maxreward), n)
-  reward_exploit <- c(badcost, 1:maxreward)
+  reward_explore <- rep(pbad*badcost + ptrans*sum(minreward:maxreward), n)
   reward_diff <- reward_explore - reward_exploit
   VoI_diff <- values_explore - values_exploit - reward_diff
   list(values_explore=values_explore,
