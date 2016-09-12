@@ -523,11 +523,10 @@ function Game(params) {
 
 }
 
-function ExploreExploitTask(params) {
+function ExploreExploitTask(params, callback) {
     "use strict";
     var responseFn,
-        firstRun = true,
-        postChoiceFn = params.callback;
+        firstRun = true;
 
     responseFn = function (choiceId) {
         var card = $("#" + choiceId),
@@ -536,14 +535,14 @@ function ExploreExploitTask(params) {
             card.css("background", "white")
                 .addClass("clicked");
             if (Math.random() > .25) {
-                card.html((Math.ceil(Math.random() * 40)).toFixed());
+                card.html((3 + Math.ceil(Math.random() * 9)).toFixed());
             } else {
-                card.html("-1").css("color", "red");
+                card.html("0").css("color", "red");
             }
         }
         reward = parseFloat(card.html());
         $(".card").off("click");
-        setTimeout(function () {postChoiceFn(reward); }, 1000);
+        setTimeout(function () {callback(reward); }, 1000);
     };
 
     this.run = function() {
@@ -560,41 +559,139 @@ function ExploreExploitTask(params) {
     };
 }
 
+function PopupCreator (length, clicksneeded) {
+    "use strict";
+    var i,
+        self = this,
+        up = false,
+        number,
+        next,
+        popup,
+        clicks,
+        clickFn,
+        timer,
+        timeleft,
+        countdown,
+        nextFn;
+
+    popup = function () {
+        up = true;
+        timeleft = length;
+        clicks = 0;
+        $("#popup").show();
+        $("#popup").css("background", "red");
+        $("#popupinstruct").html("click box " + clicksneeded + " times");
+        $("#popupcountdown").html(timeleft.toString());
+        $("#popup").click(clickFn);
+        timer = setInterval(countdown, 1000);
+    };
+
+    clickFn = function() {
+        clicks++;
+        $("#popupinstruct").html("click box " + (clicksneeded - clicks) + " times");
+        if (clicks === clicksneeded) {
+            $("#popupinstruct").html("&nbsp;");
+            $("#popup").css("background", "green");
+            $("#popup").off("click");
+        }
+    };
+
+    countdown = function() {
+        timeleft--;
+        $("#popupcountdown").html(timeleft.toString());
+        if (timeleft === 0) {
+            self.clear();
+            next();
+        }
+    };
+
+    next = function () {
+        if (i === number) {
+            nextFn();
+        } else {
+            popup();
+            i++;
+        }
+    };
+
+    this.clear = function () {
+        clearInterval(timer);
+        $("#popup").hide();
+        $("#popup").css("background", "black");
+        up = false;
+    };
+
+    this.isUp = function () {
+        return up;
+    };
+
+
+    this.run = function (callback) {
+        i = 0;
+        number = 1;
+        nextFn = callback;
+        next();
+    };
+
+    this.runMultiple = function (num, callback) {
+        i = 0;
+        number = num;
+        nextFn = callback;
+        next();
+    };
+
+}
+
 function experimentDriver() {
     "use strict";
     var game,
         explore,
+        popupCreator,
         nextChoice,
-        nextGame;
+        setReward,
+        nextReward,
+        nextPunishment,
+        rewardAmount,
+        maxReward = 12,
+        baselength = 3;
 
     nextChoice = function () {
-        // $("#game").hide();
         $("#carddiv").show();
         explore.run();
     };
 
-    // hideGame = function () {
-    //     $("#carddiv").hide();
-    //     setTimeout(next, 2000);
-    // };
-
-    nextGame = function (bonus) {
+    setReward = function (reward) {
         $("#carddiv").hide();
-        // $("#game").show();
-        game.run({bonus: bonus});
+        rewardAmount = reward;
+        nextReward(rewardAmount);
     };
 
-    // $("#game").hide();
-    game = new Game({postGameFn: nextChoice});
+    nextReward = function (length) {
+        game.run(baselength * length, function () {
+            nextPunishment(maxReward - length);
+        });
+    };
+
+    nextPunishment = function (penalty) {
+        popupCreator.runMultiple(penalty, function () {
+            nextChoice();
+        });
+    };
+
+    $("#popup").hide();
+    // $("#carddiv").hide();
+    // game = new Game({postGameFn: nextChoice});
+
+    popupCreator = new PopupCreator(baselength, 1);
+
+    game = new Game2(popupCreator);
     game.setup();
 
-    explore = new ExploreExploitTask({cards: 15, callback: nextGame});
+    explore = new ExploreExploitTask({cards: 15}, setReward);
+
 
     nextChoice();
 
-    // game.setup();
-
-    // setTimeout(next, 1000);
 }
 
 $(window).load(function () {
