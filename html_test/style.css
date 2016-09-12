@@ -92,17 +92,20 @@ strong {
   padding-top: 15px;
 }
 
-#game {
-    
-    position: absolute;
-    /* opacity: 0.5 */
+#expdiv {
+    width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#rewards {
+    position: relative;
 }
 
 /* card task */
 
 
 #carddiv {
-    position: absolute;
     opacity: 1;
     margin-left: auto;
     margin-right: auto;
@@ -148,39 +151,7 @@ strong {
     font-weight: 500;
 }
 
-/* slider task */
-
-.sliderholder {
-    width: 600px;
-    /* margin-left: auto; */
-    /* margin-right: auto; */
-    height: 50px;
-    padding-left: 10px;
-    padding-top: 10px;
-}
-
-.sliderholder input {
-    width: 60%;
-    float: left;
-}
-
-.sliderholder p {
-    margin-left: 20px;
-    float: left;
-}
-
-.sliderholder button {
-    margin-left: 20px;
-    float: left;
-}
-
 /* game */
-
-#canvas {
-    background: #eee;
-    display: block;
-    margin: 0 auto;
-}
 
 /* popup */
 #popup {
@@ -188,7 +159,7 @@ strong {
     text-align: center;
     padding-top: 80px;
     font-size: 28px;
-    left: 100px;
+    left: 200px;
     top: 100px;
     width: 300px;
     height: 200px;

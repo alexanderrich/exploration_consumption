@@ -197,7 +197,7 @@ function Game(popupCreator) {
     };
 
     this.setup = function () {
-        game = new Phaser.Game(800, 600, Phaser.AUTO, "game", {preload: preload, create: create, update: update});
+        game = new Phaser.Game(800, 600, Phaser.AUTO, "rewards", {preload: preload, create: create, update: update});
     };
 
     this.run = function (time, callback) {
@@ -215,47 +215,6 @@ function Game(popupCreator) {
             game.paused = true;
             callback();
         }, time * 1000);
-    };
-}
-
-function ExploreExploitTask(params, callback) {
-    "use strict";
-    var responseFn,
-        firstRun = true;
-
-    responseFn = function (choiceId) {
-        var card = $("#" + choiceId),
-            reward;
-        if (!card.hasClass("clicked")) {
-            card.css("background", "white")
-                .addClass("clicked");
-            if (Math.random() > .25) {
-                card.html((3 + Math.ceil(Math.random() * 9)).toFixed());
-            } else {
-                card.html("0").css("color", "red");
-            }
-        }
-        reward = parseFloat(card.html());
-        $(".card").off("click");
-        setTimeout(function () {
-            $("#carddiv").hide();
-            callback(reward);
-        },
-                   1000);
-    };
-
-    this.run = function() {
-        $("#carddiv").show();
-        var i;
-        if (firstRun || Math.random() > .8) {
-            firstRun = false;
-            $("#carddiv").html("");
-            for (i = 0; i < params.cards; i++) {
-                $("#carddiv").append("<div class=\"card\" id=\"card" + i + "\"></div>");
-            }
-            $(".card").css("background", "gray");
-        }
-        $(".card").click(function () {responseFn(this.id); });
     };
 }
 
@@ -340,9 +299,51 @@ function PopupCreator (length, clicksneeded) {
         next();
     };
 
-    $("#game").append("<div id=\"popup\"> <div id=\"popupinstruct\"></div> <div id=\"popupcountdown\"></div> </div> ");
+    $("#rewards").append("<div id=\"popup\"> <div id=\"popupinstruct\"></div> <div id=\"popupcountdown\"></div> </div> ");
     $("#popup").hide();
 }
+
+function ExploreExploitTask(params, callback) {
+    "use strict";
+    var responseFn,
+        firstRun = true;
+
+    responseFn = function (choiceId) {
+        var card = $("#" + choiceId),
+            reward;
+        if (!card.hasClass("clicked")) {
+            card.css("background", "white")
+                .addClass("clicked");
+            if (Math.random() > .25) {
+                card.html((3 + Math.ceil(Math.random() * 9)).toFixed());
+            } else {
+                card.html("0").css("color", "red");
+            }
+        }
+        reward = parseFloat(card.html());
+        $(".card").off("click");
+        setTimeout(function () {
+            $("#carddiv").hide();
+            callback(reward);
+        },
+                   1000);
+    };
+
+    this.run = function() {
+        $("#carddiv").show();
+        var i;
+        if (firstRun || Math.random() > .8) {
+            firstRun = false;
+            $("#carddiv").html("");
+            for (i = 0; i < params.cards; i++) {
+                $("#carddiv").append("<div class=\"card\" id=\"card" + i + "\"></div>");
+            }
+            $(".card").css("background", "gray");
+        }
+        $(".card").click(function () {responseFn(this.id); });
+    };
+}
+
 
 function ConsumptionRewards(baselength, maxReward, callback) {
     "use strict";
@@ -364,22 +365,41 @@ function ConsumptionRewards(baselength, maxReward, callback) {
 
     nextPunishment = function (penalty) {
         popupCreator.runMultiple(penalty, function () {
+            $("#rewards").hide();
             callback();
         });
     };
 
     this.setReward = function(reward) {
+        $("#rewards").show();
         nextReward(reward);
     };
 
 
 }
 
+function StandardRewards (callback) {
+    "use strict";
+    $("#rewards").css({"font-size": "48pt",
+                       "text-align": "center"});
+
+    this.setReward = function (reward) {
+        $("#rewards").html(reward.toString());
+        $("#rewards").show();
+        setTimeout(function () {
+            $("#rewards").html("");
+            $("#rewards").hide();
+            callback();
+        }, 3000);
+    };
+}
+
 function experimentDriver() {
     "use strict";
     var explore,
         nextChoice,
-        consumptionRewards,
+        // consumptionRewards,
+        standardRewards,
         maxReward = 12,
         baselength = 3;
 
@@ -387,9 +407,13 @@ function experimentDriver() {
         explore.run();
     };
 
-    consumptionRewards = new ConsumptionRewards(baselength, maxReward, nextChoice);
+    $("#rewards").hide();
 
-    explore = new ExploreExploitTask({cards: 15}, consumptionRewards.setReward);
+    // consumptionRewards = new ConsumptionRewards(baselength, maxReward, nextChoice);
+    standardRewards = new StandardRewards(nextChoice);
+
+    // explore = new ExploreExploitTask({cards: 15}, consumptionRewards.setReward);
+    explore = new ExploreExploitTask({cards: 15}, standardRewards.setReward);
 
 
     nextChoice();
