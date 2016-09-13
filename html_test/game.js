@@ -4,7 +4,7 @@
  */
 
 /*jslint browser: true*/
-/*global $, Phaser, window, setTimeout, setInterval, clearInterval*/
+/*global $, _, Phaser, window, setTimeout, setInterval, clearInterval*/
 
 function Game(popupCreator) {
     "use strict";
@@ -306,41 +306,118 @@ function PopupCreator (length, clicksneeded) {
 function ExploreExploitTask(params, callback) {
     "use strict";
     var responseFn,
-        firstRun = true;
+        nTrials = 72,
+        contexts,
+        committed,
+        i,
+        trial = -1,
+        functionList = [],
+        runChoice,
+        showOutcome,
+        next,
+        trials;
 
-    responseFn = function (choiceId) {
-        var card = $("#" + choiceId),
-            reward;
-        if (!card.hasClass("clicked")) {
-            card.css("background", "white")
-                .addClass("clicked");
-            if (Math.random() > .25) {
-                card.html((3 + Math.ceil(Math.random() * 9)).toFixed());
+    committed = [];
+    for (i = 0; i < nTrials; i++) {
+        if (i < 6 || Math.random() < .5) {
+            committed.push(0);
+        } else {
+            committed.push(1);
+        }
+    }
+
+    contexts = [{color: "red"},
+                {color: "orange"},
+                {color: "yellow"},
+                {color: "green"},
+                {color: "blue"},
+                {color: "purple"}];
+    contexts = contexts.map(function (obj) {
+        obj.value = 3 + Math.ceil(Math.random() * 4);
+        obj.nextValue = 0;
+        return obj;
+    });
+
+    responseFn = function (choiceId, context) {
+        var contextObj = contexts[context];
+
+        $("#" + choiceId).css({"border": "10px solid black",
+                               "margin": "-5px"});
+        if (choiceId === "exploit") {
+            contextObj.nextChoice = "exploit";
+            contextObj.nextValue = contextObj.value;
+            // card.html(reward.toString());
+        } else {
+            contextObj.nextChoice = "explore";
+            if (Math.random() > .333) {
+                contextObj.nextValue = 3 + Math.ceil(Math.random() * 9);
             } else {
-                card.html("0").css("color", "red");
+                contextObj.nextValue = 0;
             }
         }
-        reward = parseFloat(card.html());
         $(".card").off("click");
+        setTimeout(functionList.pop(), 2000);
+    };
+
+    runChoice = function (context) {
+        var contextObj = contexts[context];
+        if (context === trial % 6) {
+            $("#info").html(contextObj.color + " context: <strong>immediate</strong> choice");
+        } else {
+            $("#info").html(contextObj.color + " context: <strong>advanced</strong> choice");
+        }
+        $("#exploit").html(contextObj.value.toFixed());
+        $("#explore").html("?");
+        $(".card").css({"border": "5px solid black",
+                        "margin": "0px"});
+        $("#carddiv").css("background", contextObj.color);
+        $("#carddiv").show();
+        $(".card").click(function () {responseFn(this.id, context); });
+    };
+
+    showOutcome = function (context) {
+        var contextObj = contexts[context];
+        $("#info").html(contextObj.color + " context: <strong>outcome</strong>");
+        $("#exploit").html(contextObj.value.toFixed());
+        $("#explore").html("?");
+        $(".card").css({"border": "5px solid black",
+                        "margin": "0px"});
+        $("#carddiv").css("background", contextObj.color);
+        $("#" + contextObj.nextChoice).css({"border": "10px solid black",
+                                            "margin": "-5px"});
+        $("#carddiv").show();
         setTimeout(function () {
-            $("#carddiv").hide();
-            callback(reward);
-        },
-                   1000);
+            $(".card").css({"border": "5px solid black",
+                            "margin": "0px"});
+            if (contextObj.nextChoice === "explore") {
+                $("#explore").html(contextObj.nextValue.toFixed());
+                if (contextObj.nextValue > contextObj.value) {
+                    contextObj.value = contextObj.nextValue;
+                    $("#exploit").html(contextObj.value.toFixed());
+                }
+            }
+            setTimeout(function () {
+                $("#carddiv").hide();
+                callback(contextObj.nextValue);
+            }, 2000);
+        }, 2000);
     };
 
     this.run = function() {
-        $("#carddiv").show();
-        var i;
-        if (firstRun || Math.random() > .8) {
-            firstRun = false;
-            $("#carddiv").html("");
-            for (i = 0; i < params.cards; i++) {
-                $("#carddiv").append("<div class=\"card\" id=\"card" + i + "\"></div>");
-            }
-            $(".card").css("background", "gray");
+        trial++;
+        functionList.push(function () {
+            showOutcome(trial % 6);
+        });
+        if (!committed[trial]) {
+            functionList.push(function () {
+                runChoice(trial % 6);
+            });
+        } if (committed[trial + 4]) {
+            functionList.push(function () {
+                runChoice((trial + 4) % 6);
+            });
         }
-        $(".card").click(function () {responseFn(this.id); });
+        functionList.pop()();
     };
 }
 
@@ -412,8 +489,8 @@ function experimentDriver() {
     // consumptionRewards = new ConsumptionRewards(baselength, maxReward, nextChoice);
     standardRewards = new StandardRewards(nextChoice);
 
-    // explore = new ExploreExploitTask({cards: 15}, consumptionRewards.setReward);
-    explore = new ExploreExploitTask({cards: 15}, standardRewards.setReward);
+    // explore = new ExploreExploitTask({nContexts: 6}, consumptionRewards.setReward);
+    explore = new ExploreExploitTask({nContexts: 6}, standardRewards.setReward);
 
 
     nextChoice();
