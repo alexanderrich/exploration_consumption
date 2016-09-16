@@ -93,6 +93,7 @@ strong {
 }
 
 #expdiv {
+    font-family: sans-serif;
     width: 800px;
     margin-left: auto;
     margin-right: auto;
@@ -104,69 +105,116 @@ strong {
 
 /* card task */
 
-#carddiv {
-    position: relative;
-    opacity: 1;
+#explorediv {
     margin-left: auto;
     margin-right: auto;
     width: 600px;
-    height: 310px;
-    text-align: center;
-    font-size: 30px;
-    font-family: sans-serif;
-    /* background: #AACCFF; */
+    height: 450px;
 }
 
-#info {
-    padding-top: 30px;
+#carddiv {
+    position: relative;
+    border: 1px solid black;
+    width: 600px;
+    height: 350px;
+    text-align: center;
+    font-size: 30px;
+    overflow: auto;
+}
+
+#context {
+    margin-top: 30px;
+    width: 230px;
+}
+
+#trialtype {
+    margin-top: 180px;
+    width: 280px;
 }
 
 .card {
     position: absolute;
     text-align: center;
-    font-size: 28px;
+    font-size: 38px;
     width: 120px;
     height: 120px;
     border-radius: 5px;
-    padding-top: 15px;
+    padding-top: 25px;
     border: 5px solid black;
     background: white;
 }
 
 #explore {
     left: 330px;
-    top: 80px;
+    top: 110px;
 }
 
 #exploit {
     left: 130px;
-    top: 80px;
-}
-
-
-#infodiv {
-    position: relative;
-    margin-left: auto;
-    margin-right: auto;
-    width: 600px;
-}
-
-.infotype {
-    float: left;
-    width: 200px;
-    height: 100px;
-    padding-top: 20px;
-    padding-left: 20px;
-}
-
-.infoheader {
-    margin-bottom: -8px;
+    top: 110px;
 }
 
 .info {
-    font-size: 42px;
-    font-weight: 500;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 10px;
+    height: 40px;
+    border-radius: 5px;
+    border: 5px solid black;
+    background: white;
 }
+
+.trialbox {
+    position: relative;
+    float: left;
+    width: 60px;
+    margin: 5px;
+    margin-top: 15px;
+    border: 1px solid black;
+}
+
+#trials {
+    position: relative;
+    font-size: 24px;
+    margin-top: 30px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 450px;
+}
+
+.trialicon {
+    font-size: 28px;
+    margin: 8px;
+    text-align: center;
+    width: 35px;
+    height: 35px;
+    border-radius: 5px;
+    padding-top: 10px;
+    border: 5px solid black;
+    background: white;
+}
+
+.committed {
+    position: absolute;
+    top: -15px;
+    left: 25px;
+    font-size: 28px;
+}
+
+#marker {
+    position: absolute;
+    top: 120px;
+    left: 20px;
+}
+
+#arrow-up {
+    width: 0px;
+    height: 0px;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-bottom: 15px solid black;
+}
+
 
 /* game */
 

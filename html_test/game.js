@@ -5,6 +5,7 @@
 
 /*jslint browser: true*/
 /*global $, _, Phaser, window, setTimeout, setInterval, clearInterval*/
+var counterbalance = 1;
 
 function Game(popupCreator) {
     "use strict";
@@ -283,6 +284,7 @@ function PopupCreator (length, clicksneeded) {
         clearInterval(timer);
         $("#popup").hide();
         $("#popup").css("background", "black");
+        $("#popup").off("click");
         up = false;
     };
 
@@ -312,23 +314,21 @@ function PopupCreator (length, clicksneeded) {
 function ExploreExploitTask(params, callback) {
     "use strict";
     var responseFn,
-        nTrials = 72,
+        nTrials = 78,
         contexts,
         committed,
         i,
         trial = -1,
         functionList = [],
         runChoice,
-        showOutcome,
-        next,
-        trials;
+        showOutcome;
 
     committed = [];
     for (i = 0; i < nTrials; i++) {
-        if (i < 6 || Math.random() < .5) {
+        if (i < 6) {
             committed.push(0);
         } else {
-            committed.push(1);
+            committed.push((Math.floor((i - 6) / 12) + counterbalance) % 2);
         }
     }
 
@@ -338,8 +338,9 @@ function ExploreExploitTask(params, callback) {
                 {color: "green"},
                 {color: "blue"},
                 {color: "purple"}];
+    contexts = _.shuffle(contexts);
     contexts = contexts.map(function (obj) {
-        obj.value = 3 + Math.ceil(Math.random() * 4);
+        obj.value = 4;
         obj.nextValue = 0;
         return obj;
     });
@@ -355,7 +356,7 @@ function ExploreExploitTask(params, callback) {
             // card.html(reward.toString());
         } else {
             contextObj.nextChoice = "explore";
-            if (Math.random() > .333) {
+            if (Math.random() > .5) {
                 contextObj.nextValue = 3 + Math.ceil(Math.random() * 9);
             } else {
                 contextObj.nextValue = 0;
@@ -367,23 +368,30 @@ function ExploreExploitTask(params, callback) {
 
     runChoice = function (context) {
         var contextObj = contexts[context];
+        $("#context").html(contextObj.color + " context");
         if (context === trial % 6) {
-            $("#info").html(contextObj.color + " context: <strong>immediate</strong> choice");
+            $("#trialtype").html("<strong>immediate</strong> choice");
+            $("#marker").css("left", 20);
         } else {
-            $("#info").html(contextObj.color + " context: <strong>advanced</strong> choice");
+            $("#trialtype").html("<strong>advanced</strong> choice");
+            $("#marker").css("left", 308);
         }
+        $("#marker-type").html("choice");
         $("#exploit").html(contextObj.value.toFixed());
         $("#explore").html("?");
         $(".card").css({"border": "5px solid black",
                         "margin": "0px"});
         $("#carddiv").css("background", contextObj.color);
-        $("#carddiv").show();
+        $("#explorediv").show();
         $(".card").click(function () {responseFn(this.id, context); });
     };
 
     showOutcome = function (context) {
         var contextObj = contexts[context];
-        $("#info").html(contextObj.color + " context: <strong>outcome</strong>");
+        $("#marker").css("left", 20);
+        $("#marker-type").html("outcome");
+        $("#context").html(contextObj.color + " context");
+        $("#trialtype").html("<strong>click</strong> for <strong>outcome</strong>");
         $("#exploit").html(contextObj.value.toFixed());
         $("#explore").html("?");
         $(".card").css({"border": "5px solid black",
@@ -391,25 +399,32 @@ function ExploreExploitTask(params, callback) {
         $("#carddiv").css("background", contextObj.color);
         $("#" + contextObj.nextChoice).css({"border": "10px solid black",
                                             "margin": "-5px"});
-        $("#carddiv").show();
-        setTimeout(function () {
+        $("#explorediv").show();
+        $("#trialtype").click(function () {
+            $("#trialtype").off("click");
+            $("#trialtype").html(contextObj.nextValue.toFixed());
             $(".card").css({"border": "5px solid black",
                             "margin": "0px"});
             if (contextObj.nextChoice === "explore") {
                 $("#explore").html(contextObj.nextValue.toFixed());
                 if (contextObj.nextValue > contextObj.value) {
                     contextObj.value = contextObj.nextValue;
+                    $(".trialicon").first().html(contextObj.value);
                     $("#exploit").html(contextObj.value.toFixed());
                 }
             }
             setTimeout(function () {
-                $("#carddiv").hide();
+                $("#explorediv").hide();
                 callback(contextObj.nextValue);
             }, 2000);
-        }, 2000);
+        });
     };
 
     this.run = function() {
+        var j,
+            trialBoxes = $(".trialbox"),
+            trialBox,
+            trialContext;
         trial++;
         functionList.push(function () {
             showOutcome(trial % 6);
@@ -424,6 +439,17 @@ function ExploreExploitTask(params, callback) {
             });
         }
         functionList.pop()();
+        for (j = 0; j < 10; j++) {
+            trialBox = trialBoxes.eq(j);
+            trialContext = contexts[(trial + j) % 6];
+            trialBox.css("background", trialContext.color);
+            if(committed[trial + j]) {
+                trialBox.children(".committed").html("*");
+            } else {
+                trialBox.children(".committed").html("");
+            }
+            trialBox.children(".trialicon").html(trialContext.value);
+        }
     };
 }
 
@@ -495,7 +521,7 @@ function experimentDriver() {
     // consumptionRewards = new ConsumptionRewards(baselength, maxReward, nextChoice);
     standardRewards = new StandardRewards(nextChoice);
 
-    // explore = new ExploreExploitTask({nContexts: 6}, consumptionRewards.setReward);
+    // explore = new ExploreExploitTask({}, consumptionRewards.setReward);
     explore = new ExploreExploitTask({nContexts: 6}, standardRewards.setReward);
 
 
