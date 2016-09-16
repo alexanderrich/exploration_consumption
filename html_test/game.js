@@ -17,6 +17,7 @@ function Game(popupCreator) {
         ballHitBrick,
         ballHitPaddle,
         brickTexture,
+        paddleTexture,
         ballTexture,
         ball,
         paddle,
@@ -33,6 +34,12 @@ function Game(popupCreator) {
         graphicBase.drawRect(0, 0, 40, 20);
         graphicBase.endFill();
         brickTexture = graphicBase.generateTexture();
+        graphicBase.destroy();
+        graphicBase = game.add.graphics(0, 0);
+        graphicBase.beginFill(0x444444);
+        graphicBase.drawRect(0, 0, 60, 10);
+        graphicBase.endFill();
+        paddleTexture = graphicBase.generateTexture();
         graphicBase.destroy();
         graphicBase = game.add.graphics(0, 0);
         graphicBase.beginFill(0x000000);
@@ -67,7 +74,7 @@ function Game(popupCreator) {
             }
         }
 
-        paddle = game.add.sprite(game.world.centerX, 500, brickTexture);
+        paddle = game.add.sprite(game.world.centerX, 500, paddleTexture);
         paddle.anchor.setTo(0.5, 0.5);
 
         game.physics.enable(paddle, Phaser.Physics.ARCADE);
@@ -89,7 +96,6 @@ function Game(popupCreator) {
 
         scoreText = game.add.text(32, 550, "score: 0", { font: "20px Arial", fill: "#ffffff", align: "left" });
 
-        game.input.onDown.add(releaseBall, this);
         game.time.events.add(1000, releaseBall, this);
 
         game.paused = true;
@@ -100,18 +106,18 @@ function Game(popupCreator) {
 
         paddle.x = game.input.x;
 
-        if (paddle.x < 24)
+        if (paddle.x < 30)
         {
-            paddle.x = 24;
+            paddle.x = 30;
         }
-        else if (paddle.x > game.width - 24)
+        else if (paddle.x > game.width - 30)
         {
-            paddle.x = game.width - 24;
+            paddle.x = game.width - 30;
         }
 
         if (ballOnPaddle)
         {
-            ball.body.x = paddle.x;
+            ball.body.x = paddle.x - 10;
         }
         else
         {
@@ -127,7 +133,7 @@ function Game(popupCreator) {
         {
             ballOnPaddle = false;
             ball.body.velocity.y = -300;
-            ball.body.velocity.x = -75;
+            ball.body.velocity.x = -75 + 150 * Math.random();
         }
 
     };
@@ -138,7 +144,7 @@ function Game(popupCreator) {
         popupCreator.run(function () {
             game.paused = false;
             ballOnPaddle = true;
-            ball.reset(paddle.body.x + 16, paddle.y - 16);
+            ball.reset(paddle.body.x + 20, paddle.y - 16);
             game.time.events.add(1000, releaseBall, this);
             dead = false;
         });
@@ -191,7 +197,7 @@ function Game(popupCreator) {
         {
             //  Ball is perfectly in the middle
             //  Add a little random X to stop it bouncing straight up!
-            _ball.body.velocity.x = 2 + Math.random() * 8;
+            _ball.body.velocity.x = -4 + Math.random() * 8;
         }
 
     };
