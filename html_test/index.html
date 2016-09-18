@@ -1,43 +1,33 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>test</title>
-		<script src="jquery-min.js" type="text/javascript"> </script>
-		<script src="underscore-min.js" type="text/javascript"> </script>
-  <script src="phaser.min.js" type="text/javascript"></script>
-  <script src="game.js" type="text/javascript"></script>
-  <link rel=stylesheet href="style.css" type="text/css">
-</head>
-<body>
-    <div id="expdiv">
-        <div id="rewards">
-        </div>
-        <div id="explorediv">
-            <div id="carddiv">
-                <div class="info" id="context">
-                </div>
-                <div class="card" id="exploit">
-                </div>
-                <div class="card" id="explore">
-                </div>
-                <div class="info" id="trialtype">
-                </div>
+    <head>
+        <meta charset="utf-8">
+        <title>test</title>
+		    <script src="jquery-min.js" type="text/javascript"> </script>
+		    <script src="underscore-min.js" type="text/javascript"> </script>
+        <script src="phaser.min.js" type="text/javascript"></script>
+        <script src="d3.min.js" type="text/javascript"></script>
+        <script src="game.js" type="text/javascript"></script>
+        <link rel=stylesheet href="style.css" type="text/css">
+    </head>
+    <body>
+        <div id="expdiv">
+            <div id="rewards">
             </div>
-            <div id="trials">
-                <div id="trialsheader">Upcoming contexts</div>
-                <div class="trialbox"><div class="trialicon"></div><div class="committed"></div></div>
-                <div class="trialbox"><div class="trialicon"></div><div class="committed"></div></div>
-                <div class="trialbox"><div class="trialicon"></div><div class="committed"></div></div>
-                <div class="trialbox"><div class="trialicon"></div><div class="committed"></div></div>
-                <div class="trialbox"><div class="trialicon"></div><div class="committed"></div></div>
-                <div class="trialbox"><div class="trialicon"></div><div class="committed"></div></div>
-            <div id="marker">
-                <div id="arrow-up"></div>
-                <div id="marker-type"></div>
-            </div>
+            <div id="explorediv">
+                <div id="carddiv">
+                    <div class="info" id="context">
+                    </div>
+                    <div class="card" id="exploit">
+                    </div>
+                    <div class="card" id="explore">
+                    </div>
+                    <div class="info" id="trialtype">
+                    </div>
+                </div>
+                <svg id="maze">
+                </svg>
             </div>
         </div>
-    </div>
-</body>
+    </body>
 </html>

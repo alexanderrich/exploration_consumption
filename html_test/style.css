@@ -112,6 +112,11 @@ strong {
     height: 450px;
 }
 
+#maze {
+    width: 600px;
+    height: 300px;
+}
+
 #carddiv {
     position: relative;
     border: 1px solid black;
