@@ -51,20 +51,14 @@ function Game(popupCreator) {
     };
 
     create = function () {
-
         game.physics.startSystem(Phaser.Physics.ARCADE);
-
         //  We check bounds collisions against all walls other than the bottom one
         game.physics.arcade.checkCollision.down = false;
-
         game.stage.backgroundColor = "#00c5cf";
-
         bricks = game.add.group();
         bricks.enableBody = true;
         bricks.physicsBodyType = Phaser.Physics.ARCADE;
-
         var brick;
-
         for (var y = 0; y < 4; y++)
         {
             for (var x = 0; x < 15; x++)
@@ -74,39 +68,26 @@ function Game(popupCreator) {
                 brick.body.immovable = true;
             }
         }
-
         paddle = game.add.sprite(game.world.centerX, 500, paddleTexture);
         paddle.anchor.setTo(0.5, 0.5);
-
         game.physics.enable(paddle, Phaser.Physics.ARCADE);
-
         paddle.body.collideWorldBounds = true;
         paddle.body.bounce.set(1);
         paddle.body.immovable = true;
-
         ball = game.add.sprite(game.world.centerX, paddle.y - 16, ballTexture);
         ball.anchor.set(0.5);
         ball.checkWorldBounds = true;
-
         game.physics.enable(ball, Phaser.Physics.ARCADE);
-
         ball.body.collideWorldBounds = true;
         ball.body.bounce.set(1);
-
         ball.events.onOutOfBounds.add(ballLost, this);
-
         scoreText = game.add.text(32, 550, "score: 0", { font: "20px Arial", fill: "#ffffff", align: "left" });
-
         game.time.events.add(1000, releaseBall, this);
-
         game.paused = true;
-
     };
 
     update = function () {
-
         paddle.x = game.input.x;
-
         if (paddle.x < 30)
         {
             paddle.x = 30;
@@ -115,7 +96,6 @@ function Game(popupCreator) {
         {
             paddle.x = game.width - 30;
         }
-
         if (ballOnPaddle)
         {
             ball.body.x = paddle.x - 10;
@@ -125,18 +105,15 @@ function Game(popupCreator) {
             game.physics.arcade.collide(ball, paddle, ballHitPaddle, null, this);
             game.physics.arcade.collide(ball, bricks, ballHitBrick, null, this);
         }
-
     };
 
     releaseBall = function () {
-
         if (ballOnPaddle)
         {
             ballOnPaddle = false;
             ball.body.velocity.y = -300;
             ball.body.velocity.x = -75 + 150 * Math.random();
         }
-
     };
 
     ballLost = function () {
@@ -152,36 +129,28 @@ function Game(popupCreator) {
     };
 
     ballHitBrick = function (_ball, _brick) {
-
         _brick.kill();
-
         score += 10;
-
         scoreText.text = "score: " + score;
-
         //  Are they any bricks left?
         if (bricks.countLiving() === 0)
         {
             //  New level starts
             score += 1000;
             scoreText.text = "score: " + score;
-
             //  Let's move the ball back to the paddle
             ballOnPaddle = true;
             ball.body.velocity.set(0);
+            game.time.events.add(1000, releaseBall, this);
             ball.x = paddle.x + 16;
             ball.y = paddle.y - 16;
-
             //  And bring the bricks back from the dead :)
             bricks.callAll("revive");
         }
-
     };
 
     ballHitPaddle = function (_ball, _paddle) {
-
         var diff = 0;
-
         if (_ball.x < _paddle.x)
         {
             //  Ball is on the left-hand side of the paddle
@@ -200,7 +169,6 @@ function Game(popupCreator) {
             //  Add a little random X to stop it bouncing straight up!
             _ball.body.velocity.x = -4 + Math.random() * 8;
         }
-
     };
 
     this.setup = function () {
@@ -330,7 +298,6 @@ function ExploreExploitTask(params, callback) {
         getLocation,
         resetContext,
         showOutcome;
-
 
     getLocation = function (context, advanced) {
         var x,
@@ -498,7 +465,6 @@ function ExploreExploitTask(params, callback) {
             committed.push((Math.floor((i - 6) / 12) + counterbalance) % 2);
         }
     }
-
     contexts = [{color: "red"},
                 {color: "orange"},
                 {color: "yellow"},
@@ -619,11 +585,6 @@ function ConsumptionRewards(baselength, maxReward, callback) {
         nextReward,
         nextPunishment;
 
-    popupCreator = new PopupCreator(baselength, 1);
-
-    game = new Game(popupCreator);
-    game.setup();
-
     nextReward = function (length) {
         game.run(baselength * length, function () {
             nextPunishment(maxReward - length);
@@ -639,16 +600,19 @@ function ConsumptionRewards(baselength, maxReward, callback) {
 
     this.setReward = function(reward) {
         $("#rewards").show();
-        nextReward(reward);
+        setTimeout(
+            function () {
+                nextReward(reward);
+            }, 1000);
     };
 
-
+    popupCreator = new PopupCreator(baselength, 1);
+    game = new Game(popupCreator);
+    game.setup();
 }
 
 function StandardRewards (callback) {
     "use strict";
-    $("#rewards").css({"font-size": "48pt",
-                       "text-align": "center"});
 
     this.setReward = function (reward) {
         $("#rewards").html(reward.toString());
@@ -659,6 +623,9 @@ function StandardRewards (callback) {
             callback();
         }, 3000);
     };
+
+    $("#rewards").css({"font-size": "48pt",
+                       "text-align": "center"});
 }
 
 function experimentDriver() {
@@ -675,16 +642,11 @@ function experimentDriver() {
     };
 
     $("#rewards").hide();
-
     // consumptionRewards = new ConsumptionRewards(baselength, maxReward, nextChoice);
     standardRewards = new StandardRewards(nextChoice);
-
     // explore = new ExploreExploitTask({}, consumptionRewards.setReward);
     explore = new ExploreExploitTask({nContexts: 6}, standardRewards.setReward);
-
-
     nextChoice();
-
 }
 
 $(window).load(function () {
