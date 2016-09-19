@@ -7,8 +7,7 @@
  */
 
 /*jslint browser: true*/
-/*global document, $, _, d3, Phaser, window, setTimeout, setInterval, clearInterval*/
-var counterbalance = 1;
+/*global counterbalance, uniqueId, adServerLoc, mode, document, PsiTurk, $, _, d3, Phaser, window, setTimeout, setInterval, clearInterval*/
 
 function Game(popupCreator) {
     "use strict";
@@ -277,7 +276,7 @@ function PopupCreator (length, clicksneeded) {
     $("#popup").hide();
 }
 
-function ExploreExploitTaskNoContext(params, callback) {
+function ExploreExploitTaskNoContext(counter, nTrials, gameType, psiTurk, callback) {
     "use strict";
     var responseFn,
         trial = -1,
@@ -368,10 +367,9 @@ function ExploreExploitTaskNoContext(params, callback) {
     $("#carddiv").css("background", "gray");
 }
 
-function ExploreExploitTask(params, callback) {
+function ExploreExploitTask(counter, nTrials, gameType, psiTurk, callback) {
     "use strict";
     var responseFn,
-        nTrials = 78,
         contexts,
         committed,
         committedOn = 0,
@@ -551,7 +549,7 @@ function ExploreExploitTask(params, callback) {
         if (i < 6) {
             committed.push(0);
         } else {
-            committed.push((Math.floor((i - 6) / 12) + counterbalance) % 2);
+            committed.push((Math.floor((i - 6) / 12) + counter) % 2);
         }
     }
     contexts = [{color: "red"},
@@ -666,10 +664,11 @@ function ExploreExploitTask(params, callback) {
     });
 }
 
-
-function ConsumptionRewards(baselength, maxReward, callback) {
+function ConsumptionRewards(psiTurk, callback) {
     "use strict";
     var game,
+        baselength = 3,
+        maxReward = 12,
         popupCreator,
         nextReward,
         nextPunishment,
@@ -718,7 +717,7 @@ function ConsumptionRewards(baselength, maxReward, callback) {
     $("#time").html("0");
 }
 
-function StandardRewards (callback) {
+function StandardRewards (psiTurk, callback) {
     "use strict";
     var totalRewards = 0;
 
@@ -740,31 +739,92 @@ function StandardRewards (callback) {
     $("#timediv").css("opacity", 0);
 }
 
+function phaseDriver(counter, nTrials, ExploreFn, RewardFn, gameType, psiTurk, callback) {
+    "use strict";
+    var exploreExploit,
+        rewards,
+        nextChoice,
+        trial = 0;
+
+    nextChoice = function () {
+        if (trial < nTrials) {
+            trial++;
+            exploreExploit.run();
+        } else {
+            callback();
+        }
+    };
+
+    psiTurk.showPage("stage.html");
+    $("#rewards").hide();
+
+    rewards = new RewardFn(psiTurk, nextChoice);
+    exploreExploit = new ExploreFn(counter, nTrials, gameType, psiTurk, rewards.setReward);
+    nextChoice();
+}
+
+function instructionDriver(instructionPages, quizPage, answerKey, psiTurk, callback) {
+    "use strict";
+    var quiz,
+        loop = 0;
+
+    quiz = function () {
+        var recordResponses;
+        recordResponses = function() {
+            var allRight = true;
+            $("select").each(function () {
+                psiTurk.recordTrialData({phase: "INSTRUCTQUIZ",
+                                         quiz: quizPage,
+                                         question: this.id,
+                                         answer: this.value,
+                                         loop: loop});
+                if (answerKey[this.id] !== this.value) {
+                    allRight = false;
+                }
+            });
+            return allRight;
+        };
+        psiTurk.showPage(quizPage);
+        $("#continue").click(function () {
+            if (recordResponses()) {
+                // Record that the user has finished the instructions and
+                // moved on to the experiment. This changes their status code
+                // in the database.
+                psiTurk.recordUnstructuredData("instructionloops_" + quizPage, loop);
+                psiTurk.finishInstructions();
+                // Move on to the experiment
+                callback();
+            } else {
+                loop += 1;
+                psiTurk.showPage("restart.html");
+                $(".continue").click(function () {
+                    psiTurk.doInstructions(instructionPages, quiz);
+                });
+            }
+        });
+    };
+
+    psiTurk.doInstructions(instructionPages, quiz);
+}
+
 function experimentDriver() {
     "use strict";
     var psiTurk = new PsiTurk(uniqueId, adServerLoc, mode),
-        explore,
-        nextChoice,
-        consumptionRewards,
-        // standardRewards,
-        maxReward = 12,
-        baselength = 3;
+        next,
+        // skipInstr = false,
+        nTrials = [36, 78, 78],
+        counter = parseInt(counterbalance),
+        functionList = [];
 
-    nextChoice = function () {
-        explore.run();
+    next = function () {
+        functionList.shift()();
     };
 
     psiTurk.preloadPages(["stage.html"]);
-    psiTurk.showPage("stage.html");
-
-    $("#rewards").hide();
-    consumptionRewards = new ConsumptionRewards(baselength, maxReward, nextChoice);
-    // standardRewards = new StandardRewards(nextChoice);
-    explore = new ExploreExploitTask({}, consumptionRewards.setReward);
-    // explore = new ExploreExploitTask({nContexts: 6}, standardRewards.setReward);
-    // explore = new ExploreExploitTaskNoContext({nContexts: 6}, standardRewards.setReward);
-    nextChoice();
-
+    functionList = [function () {phaseDriver(counter, nTrials[0], ExploreExploitTaskNoContext, StandardRewards, "nocontext", psiTurk, next); },
+                    function () {phaseDriver(counter, nTrials[1], ExploreExploitTask, StandardRewards, "standard", psiTurk, next); },
+                    function () {phaseDriver(counter, nTrials[2], ExploreExploitTask, ConsumptionRewards, "consumption", psiTurk, next); }];
+    next();
 }
 
 $(window).load(function () {
