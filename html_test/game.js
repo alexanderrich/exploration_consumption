@@ -1,6 +1,9 @@
 /*
  * Requires:
  * phaser.js
+ * jquery.js
+ * underscore.js
+ * d3.js
  */
 
 /*jslint browser: true*/
@@ -24,9 +27,8 @@ function Game(popupCreator) {
         paddle,
         bricks,
         ballOnPaddle = true,
-        score = 0,
-        dead = false,
-        scoreText;
+        points = 0,
+        dead = false;
 
     preload = function () {
         var graphicBase;
@@ -81,7 +83,6 @@ function Game(popupCreator) {
         ball.body.collideWorldBounds = true;
         ball.body.bounce.set(1);
         ball.events.onOutOfBounds.add(ballLost, this);
-        scoreText = game.add.text(32, 550, "score: 0", { font: "20px Arial", fill: "#ffffff", align: "left" });
         game.time.events.add(1000, releaseBall, this);
         game.paused = true;
     };
@@ -130,14 +131,11 @@ function Game(popupCreator) {
 
     ballHitBrick = function (_ball, _brick) {
         _brick.kill();
-        score += 10;
-        scoreText.text = "score: " + score;
+        points++;
+        $("#points").html(points);
         //  Are they any bricks left?
         if (bricks.countLiving() === 0)
         {
-            //  New level starts
-            score += 1000;
-            scoreText.text = "score: " + score;
             //  Let's move the ball back to the paddle
             ballOnPaddle = true;
             ball.body.velocity.set(0);
@@ -674,7 +672,11 @@ function ConsumptionRewards(baselength, maxReward, callback) {
     var game,
         popupCreator,
         nextReward,
-        nextPunishment;
+        nextPunishment,
+        totalTime = maxReward * baselength,
+        timeLeft,
+        decrementTime,
+        timeInterval;
 
     nextReward = function (length) {
         game.run(baselength * length, function () {
@@ -691,21 +693,38 @@ function ConsumptionRewards(baselength, maxReward, callback) {
 
     this.setReward = function(reward) {
         $("#rewards").show();
+        timeLeft = totalTime;
+        timeInterval = setInterval(decrementTime, 1000);
         setTimeout(
             function () {
                 nextReward(reward);
             }, 1000);
     };
 
+    decrementTime = function () {
+        if (timeLeft > 0) {
+            $("#time").html(timeLeft);
+            timeLeft--;
+        } else {
+            $("#time").html(timeLeft);
+            clearInterval(timeInterval);
+        }
+    };
+
     popupCreator = new PopupCreator(baselength, 1);
     game = new Game(popupCreator);
     game.setup();
+    $("#points").html("0");
+    $("#time").html("0");
 }
 
 function StandardRewards (callback) {
     "use strict";
+    var totalRewards = 0;
 
     this.setReward = function (reward) {
+        totalRewards += reward;
+        $("#points").html(totalRewards);
         $("#rewards").html(reward.toString());
         $("#rewards").show();
         setTimeout(function () {
@@ -717,14 +736,16 @@ function StandardRewards (callback) {
 
     $("#rewards").css({"font-size": "48pt",
                        "text-align": "center"});
+    $("#points").html(totalRewards);
+    $("#timediv").css("opacity", 0);
 }
 
 function experimentDriver() {
     "use strict";
     var explore,
         nextChoice,
-        // consumptionRewards,
-        standardRewards,
+        consumptionRewards,
+        // standardRewards,
         maxReward = 12,
         baselength = 3;
 
@@ -733,10 +754,11 @@ function experimentDriver() {
     };
 
     $("#rewards").hide();
-    // consumptionRewards = new ConsumptionRewards(baselength, maxReward, nextChoice);
-    standardRewards = new StandardRewards(nextChoice);
-    // explore = new ExploreExploitTask({}, consumptionRewards.setReward);
-    explore = new ExploreExploitTask({nContexts: 6}, standardRewards.setReward);
+    consumptionRewards = new ConsumptionRewards(baselength, maxReward, nextChoice);
+    // standardRewards = new StandardRewards(nextChoice);
+    explore = new ExploreExploitTask({}, consumptionRewards.setReward);
+    // explore = new ExploreExploitTask({nContexts: 6}, standardRewards.setReward);
+    // explore = new ExploreExploitTaskNoContext({nContexts: 6}, standardRewards.setReward);
     nextChoice();
 }
 

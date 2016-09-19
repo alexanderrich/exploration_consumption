@@ -103,6 +103,20 @@ strong {
     position: relative;
 }
 
+#topinfo {
+    margin-left: auto;
+    margin-right: auto;
+    width: 600px;
+    height: 30px;
+    font-size: 25px;
+    font-family: sans-serif;
+}
+
+#timediv {
+    float: right;
+    width: 100px;
+}
+
 /* card task */
 
 #explorediv {
