@@ -279,6 +279,97 @@ function PopupCreator (length, clicksneeded) {
     $("#popup").hide();
 }
 
+function ExploreExploitTaskNoContext(params, callback) {
+    "use strict";
+    var responseFn,
+        trial = -1,
+        runChoice,
+        reset,
+        showOutcome,
+        value = 4,
+        nextValue,
+        nextChoice;
+
+    responseFn = function (choiceId) {
+        $("#" + choiceId).css({"border": "10px solid black",
+                               "margin": "-5px"});
+        if (choiceId === "exploit") {
+            nextValue = value;
+            nextChoice = "exploit";
+        } else {
+            nextChoice = "explore";
+            if (Math.random() > .5) {
+                nextValue = 3 + Math.ceil(Math.random() * 9);
+            } else {
+                nextValue = 0;
+            }
+        }
+        $(".card").off("click");
+        setTimeout(showOutcome, 1000);
+    };
+
+    runChoice = function () {
+        $("#trialtype").html("choose a card");
+        $("#exploit").html(value);
+        $("#explore").html("?");
+        $(".card").css({"border": "5px solid black",
+                        "margin": "0px"});
+        $("#explorediv").show();
+        $(".card").click(function () {responseFn(this.id); });
+    };
+
+    showOutcome = function () {
+        $("#trialtype").html("<strong>click</strong> for <strong>outcome</strong>");
+        $("#exploit").html(value.toFixed());
+        $("#explore").html("?");
+        $(".card").css({"border": "5px solid black",
+                        "margin": "0px"});
+        $("#" + nextChoice).css({"border": "10px solid black",
+                                            "margin": "-5px"});
+        $("#explorediv").show();
+        $("#trialtype").click(function () {
+            $("#trialtype").off("click");
+            $("#trialtype").html(nextValue.toFixed());
+            $(".card").css({"border": "5px solid black",
+                            "margin": "0px"});
+            if (nextChoice === "explore") {
+                $("#explore").html(nextValue.toFixed());
+                if (nextValue > value) {
+                    value = nextValue;
+                    $("#exploit").html(value.toFixed());
+                }
+            }
+            setTimeout(function () {
+                $("#explorediv").hide();
+                callback(nextValue);
+            }, 2000);
+        });
+    };
+
+    reset = function () {
+        value = 4;
+        $("#trialtype").html("<strong>cards reset</strong>");
+        $("#exploit").html("4");
+        $("#explore").html("?");
+        $(".card").css({"border": "5px solid black",
+                        "margin": "0px"});
+        $("#explorediv").show();
+        setTimeout(runChoice, 2000);
+    };
+
+    this.run = function() {
+        trial++;
+        if (trial !== 0 && Math.random() < 1 / 8) {
+            reset();
+        } else {
+            runChoice();
+        }
+    };
+
+    $("#context").html("practice round");
+    $("#carddiv").css("background", "gray");
+}
+
 function ExploreExploitTask(params, callback) {
     "use strict";
     var responseFn,
