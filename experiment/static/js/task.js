@@ -660,7 +660,7 @@ function ExploreExploitTask(params, callback) {
         .attr("id", "marker")
         .attr("transform", "translate(" + (-12 + 1.3 * getLocation(0, 0)[0]) +
               "," + (-35 + 1.3 * getLocation(0, 0)[1] ) + ")");
-    d3.xml("player.svg", function(xml) {
+    d3.xml("/static/images/player.svg", function(xml) {
         var importedNode = document.importNode(xml.documentElement, true);
         document.getElementById("marker").appendChild(importedNode.cloneNode(true));
     });
@@ -742,7 +742,8 @@ function StandardRewards (callback) {
 
 function experimentDriver() {
     "use strict";
-    var explore,
+    var psiTurk = new PsiTurk(uniqueId, adServerLoc, mode),
+        explore,
         nextChoice,
         consumptionRewards,
         // standardRewards,
@@ -753,6 +754,9 @@ function experimentDriver() {
         explore.run();
     };
 
+    psiTurk.preloadPages(["stage.html"]);
+    psiTurk.showPage("stage.html");
+
     $("#rewards").hide();
     consumptionRewards = new ConsumptionRewards(baselength, maxReward, nextChoice);
     // standardRewards = new StandardRewards(nextChoice);
@@ -760,6 +764,7 @@ function experimentDriver() {
     // explore = new ExploreExploitTask({nContexts: 6}, standardRewards.setReward);
     // explore = new ExploreExploitTaskNoContext({nContexts: 6}, standardRewards.setReward);
     nextChoice();
+
 }
 
 $(window).load(function () {
