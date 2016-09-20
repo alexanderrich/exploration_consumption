@@ -103,6 +103,17 @@ strong {
     position: relative;
 }
 
+.standardRewards {
+    margin-left: auto;
+    margin-right: auto;
+    width: 600px;
+    height: 500px;
+    text-align: center;
+    font-size: 45px;
+    font-family: sans-serif;
+    padding-top: 150px;
+}
+
 #rewardintro {
     margin-left: auto;
     margin-right: auto;
@@ -126,6 +137,11 @@ strong {
 #timediv {
     float: right;
     width: 100px;
+}
+
+#popuppctdiv {
+    float: right;
+    width: 280px;
 }
 
 /* card task */

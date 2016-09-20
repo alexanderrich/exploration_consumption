@@ -201,15 +201,16 @@ function Game(popupCreator) {
     };
 }
 
-function PopupCreator (length, clicksneeded) {
+function PopupCreator (length) {
     "use strict";
     var i,
         self = this,
         up = false,
+        totalPopups = 0,
+        totalCompletes = 0,
         number,
         next,
         popup,
-        clicks,
         clickFn,
         timer,
         timeleft,
@@ -234,24 +235,19 @@ function PopupCreator (length, clicksneeded) {
             stats.penaltyPopups++;
         }
         timeleft = length;
-        clicks = 0;
         $("#popup").show();
         $("#popup").css("background", "red");
-        $("#popupinstruct").html("click box " + clicksneeded + " times");
+        $("#popupinstruct").html("<strong>Click here</strong");
         $("#popupcountdown").html(timeleft.toString());
         $("#popup").click(clickFn);
         timer = setInterval(countdown, 1000);
     };
 
     clickFn = function() {
-        clicks++;
-        $("#popupinstruct").html("click box " + (clicksneeded - clicks) + " times");
-        if (clicks === clicksneeded) {
-            completed = true;
-            $("#popupinstruct").html("&nbsp;");
-            $("#popup").css("background", "green");
-            $("#popup").off("click");
-        }
+        completed = true;
+        $("#popupinstruct").html("&nbsp;");
+        $("#popup").css("background", "green");
+        $("#popup").off("click");
     };
 
     countdown = function() {
@@ -276,14 +272,23 @@ function PopupCreator (length, clicksneeded) {
         if (preemptive) {
             stats.deathCancels++;
         } else {
+            totalPopups++;
             if (completed && fromDeath) {
                 stats.deathCompletes++;
+                totalCompletes++;
             } else if (completed) {
                 stats.penaltyCompletes++;
+                totalCompletes++;
             } else if (fromDeath) {
                 stats.deathMisses++;
             } else {
                 stats.penaltyMisses++;
+            }
+            $("#popuppct").html((totalCompletes / totalPopups * 100).toFixed());
+            if (totalCompletes / totalPopups < .85) {
+                $("#popuppctdiv").css("color", "red");
+            } else {
+                $("#popuppctdiv").css("color", "black");
             }
         }
         clearInterval(timer);
@@ -328,6 +333,7 @@ function PopupCreator (length, clicksneeded) {
 
     $("#rewards").append("<div id=\"popup\"> <div id=\"popupinstruct\"></div> <div id=\"popupcountdown\"></div> </div> ");
     $("#popup").hide();
+    $("#popuppct").html("100");
 }
 
 function ExploreExploitTaskNoContext(nTrials, taskType, psiTurk, callback) {
@@ -774,8 +780,7 @@ function ConsumptionRewards(psiTurk, callback) {
 
     recordData = function () {
         var gameData,
-            popupData,
-            key;
+            popupData;
         gameData = game.getStats();
         popupData = popupCreator.getStats();
         psiTurk.recordTrialData({phase: "EXPERIMENT",
@@ -820,7 +825,7 @@ function ConsumptionRewards(psiTurk, callback) {
         }
     };
 
-    popupCreator = new PopupCreator(baselength, 1);
+    popupCreator = new PopupCreator(baselength);
     game = new Game(popupCreator);
     game.setup();
     $("#points").html("0");
@@ -840,13 +845,13 @@ function StandardRewards (psiTurk, callback) {
             $("#rewards").html("");
             $("#rewards").hide();
             callback();
-        }, 3000);
+        }, 1000);
     };
 
-    $("#rewards").css({"font-size": "48pt",
-                       "text-align": "center"});
+    $("#rewards").addClass("standardRewards");
     $("#points").html(totalRewards);
     $("#timediv").css("opacity", 0);
+    $("#popuppctdiv").css("opacity", 0);
 }
 
 function practiceConsumption(psiTurk, callback) {
