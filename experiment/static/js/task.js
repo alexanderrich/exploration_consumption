@@ -27,6 +27,8 @@ function Game(popupCreator) {
         bricks,
         ballOnPaddle = true,
         points = 0,
+        lastRunPoints = 0,
+        lastRunDeaths = 0,
         dead = false;
 
     preload = function () {
@@ -118,6 +120,7 @@ function Game(popupCreator) {
 
     ballLost = function () {
         game.paused = true;
+        lastRunDeaths++;
         dead = true;
         popupCreator.run(function () {
             game.paused = false;
@@ -131,10 +134,10 @@ function Game(popupCreator) {
     ballHitBrick = function (_ball, _brick) {
         _brick.kill();
         points++;
+        lastRunPoints++;
         $("#points").html(points);
         //  Are they any bricks left?
-        if (bricks.countLiving() === 0)
-        {
+        if (bricks.countLiving() === 0) {
             //  Let's move the ball back to the paddle
             ballOnPaddle = true;
             ball.body.velocity.set(0);
@@ -173,6 +176,8 @@ function Game(popupCreator) {
     };
 
     this.run = function (time, callback) {
+        lastRunPoints = 0;
+        lastRunDeaths = 0;
         game.paused = false;
         if (dead) {
             ballOnPaddle = true;
@@ -182,11 +187,17 @@ function Game(popupCreator) {
         }
         setTimeout(function () {
             if (popupCreator.isUp()) {
-                popupCreator.clear();
+                popupCreator.clear(true);
             }
             game.paused = true;
             callback();
         }, time * 1000);
+    };
+
+    this.getStats = function () {
+        return {points: points,
+                lastRunPoints: lastRunPoints,
+                deaths: lastRunDeaths};
     };
 }
 
@@ -203,10 +214,25 @@ function PopupCreator (length, clicksneeded) {
         timer,
         timeleft,
         countdown,
-        nextFn;
+        fromDeath,
+        completed,
+        nextFn,
+        stats = {deathPopups: 0,
+                 deathCompletes: 0,
+                 deathMisses: 0,
+                 deathCancels: 0,
+                 penaltyPopups: 0,
+                 penaltyCompletes: 0,
+                 penaltyMisses: 0};
 
     popup = function () {
         up = true;
+        completed = false;
+        if (fromDeath) {
+            stats.deathPopups++;
+        } else {
+            stats.penaltyPopups++;
+        }
         timeleft = length;
         clicks = 0;
         $("#popup").show();
@@ -221,6 +247,7 @@ function PopupCreator (length, clicksneeded) {
         clicks++;
         $("#popupinstruct").html("click box " + (clicksneeded - clicks) + " times");
         if (clicks === clicksneeded) {
+            completed = true;
             $("#popupinstruct").html("&nbsp;");
             $("#popup").css("background", "green");
             $("#popup").off("click");
@@ -231,7 +258,7 @@ function PopupCreator (length, clicksneeded) {
         timeleft--;
         $("#popupcountdown").html(timeleft.toString());
         if (timeleft === 0) {
-            self.clear();
+            self.clear(false);
             next();
         }
     };
@@ -245,7 +272,20 @@ function PopupCreator (length, clicksneeded) {
         }
     };
 
-    this.clear = function () {
+    this.clear = function (preemptive) {
+        if (preemptive) {
+            stats.deathCancels++;
+        } else {
+            if (completed && fromDeath) {
+                stats.deathCompletes++;
+            } else if (completed) {
+                stats.penaltyCompletes++;
+            } else if (fromDeath) {
+                stats.deathMisses++;
+            } else {
+                stats.penaltyMisses++;
+            }
+        }
         clearInterval(timer);
         $("#popup").hide();
         $("#popup").css("background", "black");
@@ -257,8 +297,21 @@ function PopupCreator (length, clicksneeded) {
         return up;
     };
 
+    this.reset = function () {
+        var key;
+        for (key in stats) {
+            if (stats.hasOwnProperty(key)) {
+                stats[key] = 0;
+            }
+        }
+    };
+
+    this.getStats = function () {
+        return stats;
+    };
 
     this.run = function (callback) {
+        fromDeath = true;
         i = 0;
         number = 1;
         nextFn = callback;
@@ -266,6 +319,7 @@ function PopupCreator (length, clicksneeded) {
     };
 
     this.runMultiple = function (num, callback) {
+        fromDeath = false;
         i = 0;
         number = num;
         nextFn = callback;
@@ -276,7 +330,7 @@ function PopupCreator (length, clicksneeded) {
     $("#popup").hide();
 }
 
-function ExploreExploitTaskNoContext(counter, nTrials, gameType, psiTurk, callback) {
+function ExploreExploitTaskNoContext(nTrials, taskType, psiTurk, callback) {
     "use strict";
     var responseFn,
         trial = -1,
@@ -302,6 +356,18 @@ function ExploreExploitTaskNoContext(counter, nTrials, gameType, psiTurk, callba
             }
         }
         $(".card").off("click");
+        psiTurk.recordTrialData({phase: "EXPERIMENT",
+                                 trialType: "exploreexploit",
+                                 taskType: taskType,
+                                 trial: trial,
+                                 uniqueid: uniqueId,
+                                 counter: counterbalance,
+                                 context: -1,
+                                 response: choiceId,
+                                 advanced: -1,
+                                 currentValue: value,
+                                 outcome: nextValue
+                                });
         setTimeout(showOutcome, 1000);
     };
 
@@ -367,7 +433,7 @@ function ExploreExploitTaskNoContext(counter, nTrials, gameType, psiTurk, callba
     $("#carddiv").css("background", "gray");
 }
 
-function ExploreExploitTask(counter, nTrials, gameType, psiTurk, callback) {
+function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     "use strict";
     var responseFn,
         contexts,
@@ -429,7 +495,8 @@ function ExploreExploitTask(counter, nTrials, gameType, psiTurk, callback) {
     };
 
     responseFn = function (choiceId, context) {
-        var contextObj = contexts[context];
+        var contextObj = contexts[context],
+            advanced = context === (trial + 4) % 6;
         $("#" + choiceId).css({"border": "10px solid black",
                                "margin": "-5px"});
         if (choiceId === "exploit") {
@@ -444,10 +511,22 @@ function ExploreExploitTask(counter, nTrials, gameType, psiTurk, callback) {
                 contextObj.nextValue = 0;
             }
         }
-        if (context === (trial + 4) % 6) {
+        if (advanced) {
             contextObj.advancedSet = 1;
         }
         $(".card").off("click");
+        psiTurk.recordTrialData({phase: "EXPERIMENT",
+                                 trialType: "exploreexploit",
+                                 taskType: taskType,
+                                 trial: trial + 4 * advanced,
+                                 uniqueid: uniqueId,
+                                 counter: counterbalance,
+                                 context: context,
+                                 response: choiceId,
+                                 advanced: advanced,
+                                 currentValue: contextObj.value,
+                                 outcome: contextObj.nextValue
+                                });
         setTimeout(functionList.pop(), 1000);
     };
 
@@ -499,7 +578,7 @@ function ExploreExploitTask(counter, nTrials, gameType, psiTurk, callback) {
             update(context, 0);
             setTimeout(function () {
                 $("#explorediv").hide();
-                callback(contextObj.nextValue);
+                callback(contextObj.nextValue, trial);
             }, 2000);
         });
     };
@@ -549,7 +628,7 @@ function ExploreExploitTask(counter, nTrials, gameType, psiTurk, callback) {
         if (i < 6) {
             committed.push(0);
         } else {
-            committed.push((Math.floor((i - 6) / 12) + counter) % 2);
+            committed.push((Math.floor((i - 6) / 12) + parseInt(counterbalance)) % 2);
         }
     }
     contexts = [{color: "red"},
@@ -669,12 +748,15 @@ function ConsumptionRewards(psiTurk, callback) {
     var game,
         baselength = 3,
         maxReward = 12,
+        trialNum,
+        rewardAmount,
         popupCreator,
         nextReward,
         nextPunishment,
         totalTime = maxReward * baselength,
         timeLeft,
         decrementTime,
+        recordData,
         timeInterval;
 
     nextReward = function (length) {
@@ -686,12 +768,40 @@ function ConsumptionRewards(psiTurk, callback) {
     nextPunishment = function (penalty) {
         popupCreator.runMultiple(penalty, function () {
             $("#rewards").hide();
-            callback();
+            recordData();
         });
     };
 
-    this.setReward = function(reward) {
+    recordData = function () {
+        var gameData,
+            popupData,
+            key;
+        gameData = game.getStats();
+        popupData = popupCreator.getStats();
+        psiTurk.recordTrialData({phase: "EXPERIMENT",
+                                 trialType: "consumption",
+                                 trial: trialNum,
+                                 uniqueid: uniqueId,
+                                 counter: counterbalance,
+                                 reward: rewardAmount,
+                                 points: gameData.points,
+                                 lastRunPoints: gameData.lastRunPoints,
+                                 deaths: gameData.deaths,
+                                 deathCompletes: popupData.deathCompletes,
+                                 deathMisses: popupData.deathMisses,
+                                 deathCancels: popupData.deathCancels,
+                                 penaltyPopups: popupData.penaltyPopups,
+                                 penaltyCompletes: popupData.penaltyCompletes,
+                                 penaltyMisses: popupData.penaltyMisses
+        });
+        callback();
+    };
+
+    this.setReward = function(reward, trial) {
+        rewardAmount = reward;
+        trialNum = trial;
         $("#rewards").show();
+        popupCreator.reset();
         timeLeft = totalTime;
         timeInterval = setInterval(decrementTime, 1000);
         setTimeout(
@@ -739,7 +849,7 @@ function StandardRewards (psiTurk, callback) {
     $("#timediv").css("opacity", 0);
 }
 
-function phaseDriver(counter, nTrials, ExploreFn, RewardFn, gameType, psiTurk, callback) {
+function phaseDriver(nTrials, ExploreFn, RewardFn, taskType, psiTurk, callback) {
     "use strict";
     var exploreExploit,
         rewards,
@@ -751,7 +861,9 @@ function phaseDriver(counter, nTrials, ExploreFn, RewardFn, gameType, psiTurk, c
             trial++;
             exploreExploit.run();
         } else {
-            callback();
+            psiTurk.saveData({
+                success: callback,
+                error: callback});
         }
     };
 
@@ -759,7 +871,7 @@ function phaseDriver(counter, nTrials, ExploreFn, RewardFn, gameType, psiTurk, c
     $("#rewards").hide();
 
     rewards = new RewardFn(psiTurk, nextChoice);
-    exploreExploit = new ExploreFn(counter, nTrials, gameType, psiTurk, rewards.setReward);
+    exploreExploit = new ExploreFn(nTrials, taskType, psiTurk, rewards.setReward);
     nextChoice();
 }
 
