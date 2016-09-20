@@ -849,6 +849,36 @@ function StandardRewards (psiTurk, callback) {
     $("#timediv").css("opacity", 0);
 }
 
+function practiceConsumption(psiTurk, callback) {
+    "use strict";
+    var examples = [4, 0, 8, 0, 12],
+        trials = [-5, -4, -3, -2, -1],
+        rewards,
+        next;
+
+    next = function () {
+        if (examples.length === 0) {
+            $("#rewardintro").show();
+            $("#rewardintro").html("Continuing to main task");
+            setTimeout(callback, 3000);
+        } else {
+            var reward = examples.shift();
+            $("#rewardintro").show();
+            $("#rewardintro").html("Example outcome: " + reward);
+            setTimeout(
+                function () {
+                    $("#rewardintro").hide();
+                    rewards.setReward(reward, trials.shift());
+                }, 3000);
+        }
+    };
+
+    psiTurk.showPage("practice.html");
+    $("#rewards").hide();
+    rewards = new ConsumptionRewards(psiTurk, next);
+    next();
+}
+
 function phaseDriver(nTrials, ExploreFn, RewardFn, taskType, psiTurk, callback) {
     "use strict";
     var exploreExploit,
@@ -919,23 +949,85 @@ function instructionDriver(instructionPages, quizPage, answerKey, psiTurk, callb
     psiTurk.doInstructions(instructionPages, quiz);
 }
 
+function questionnaire(psiTurk) {
+    "use strict";
+    var errorMessage = "<h1>Oops!</h1><p>Something went wrong submitting your HIT. This might happen if you lose your internet connection. Press the button to resubmit.</p><button id='resubmit'>Resubmit</button>",
+        replaceBody, promptResubmit, resubmit, recordResponses;
+
+    replaceBody = function(x) { $("body").html(x); };
+
+    recordResponses = function () {
+        psiTurk.recordTrialData({"phase": "postquestionnaire", "status": "submit"});
+        $("textarea").each(function () {
+            psiTurk.recordUnstructuredData(this.id, this.value);
+        });
+        $("select").each(function () {
+            psiTurk.recordUnstructuredData(this.id, this.value);
+        });
+    };
+
+    promptResubmit = function () {
+        replaceBody(errorMessage);
+        $("#resubmit").click(resubmit);
+    };
+
+    resubmit = function () {
+        var reprompt;
+        replaceBody("<h1>Trying to resubmit...</h1>");
+        reprompt = setTimeout(promptResubmit, 10000);
+        psiTurk.saveData({
+            success: function() {
+                clearInterval(reprompt);
+                psiTurk.computeBonus("compute_bonus", function () {
+                    psiTurk.completeHIT();
+                });
+                // psiTurk.completeHIT();
+            },
+            error: promptResubmit
+        });
+    };
+
+    // Load the questionnaire snippet
+    psiTurk.showPage("postquestionnaire.html");
+    psiTurk.recordTrialData({"phase": "postquestionnaire", "status": "begin"});
+    $("#continue").click(function () {
+        recordResponses();
+        psiTurk.saveData({
+            success: function () {
+                psiTurk.computeBonus("compute_bonus", function () {
+                    psiTurk.completeHIT(); // when finished saving compute bonus, the quit
+                });
+            },
+            error: promptResubmit});
+    });
+}
+
 function experimentDriver() {
     "use strict";
     var psiTurk = new PsiTurk(uniqueId, adServerLoc, mode),
         next,
-        // skipInstr = false,
-        nTrials = [36, 78, 78],
-        counter = parseInt(counterbalance),
+        // nTrials = [36, 78, 78],
+        nTrials = [3, 3, 3],
         functionList = [];
 
     next = function () {
         functionList.shift()();
     };
 
-    psiTurk.preloadPages(["stage.html"]);
-    functionList = [function () {phaseDriver(counter, nTrials[0], ExploreExploitTaskNoContext, StandardRewards, "nocontext", psiTurk, next); },
-                    function () {phaseDriver(counter, nTrials[1], ExploreExploitTask, StandardRewards, "standard", psiTurk, next); },
-                    function () {phaseDriver(counter, nTrials[2], ExploreExploitTask, ConsumptionRewards, "consumption", psiTurk, next); }];
+    psiTurk.preloadPages(["stage.html",
+                          "practice.html",
+                         "postquestionnaire.html"]);
+    functionList = [
+        function () {
+            practiceConsumption(psiTurk, next); },
+        function () {
+            phaseDriver(nTrials[0], ExploreExploitTaskNoContext, StandardRewards, "nocontext", psiTurk, next); },
+        function () {
+            phaseDriver(nTrials[1], ExploreExploitTask, StandardRewards, "standard", psiTurk, next); },
+        function () {
+            phaseDriver(nTrials[2], ExploreExploitTask, ConsumptionRewards, "consumption", psiTurk, next); },
+        function () {
+            questionnaire(psiTurk); }];
     next();
 }
 
