@@ -1,0 +1,56 @@
+<div id="container-instructions">
+
+    <div class="header">
+        <h1>Comprehension Check</h1>
+    </div>
+
+	  <hr>
+
+    <div class="instructions well">
+        <p id="toptext">
+            Before beginning this phase of the experiment, you must answer a few simple
+            questions to ensure you have read the instructions. If you do not
+            answer all questions correctly, you will be returned to the start of
+            this set of instructions and have a chance to retake this quiz.
+        </p>
+        <form id="prequiz" action="debrief" method="post">
+            <div class="question">
+                <p class="questiontext">
+                    How will your icon move through the 6 contexts?
+                    <select id="contextmove" name="contextmove" class="form-control">
+                        <option value="noresp" SELECTED></option>
+	                      <option value="same">The context is the same on every trial</option>
+	                      <option value="random">The context is randomly selected on each trial</option>
+	                      <option value="clockwise">The icon moves clockwise through the 6 contexts</option>
+                    </select>
+                </p>
+            </div>
+            <div class="question">
+                <p class="questiontext">
+                    Do choices in one context affect cards in another context?
+                    <select id="contextlink" name="contextlink" class="form-control">
+                        <option value="noresp" SELECTED></option>
+	                      <option value="yes">Yes, the cards across contexts are linked</option>
+	                      <option value="no">No, the cards across contexts are completely separate</option>
+                    </select>
+                </p>
+            </div>
+            <div class="question">
+                <p class="questiontext">
+                    When you make an advanced choice, how many trials ahead of its context will it be?
+                    <select id="advancednum" name="advancednum" class="form-control">
+                        <option value="noresp" SELECTED></option>
+	                      <option value="1">1 trial ahead</option>
+	                      <option value="4">4 trials ahead</option>
+	                      <option value="10">10 trials ahead</option>
+                    </select>
+                </p>
+            </div>
+        </form>
+
+    </div>
+
+	  <hr>
+
+    <button type="button" id="continue" class="btn btn-success btn-lg continue"> Submit </button>
+</div>
