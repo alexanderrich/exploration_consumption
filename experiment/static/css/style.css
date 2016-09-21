@@ -27,11 +27,9 @@ strong {
 /* these are all the same for now, but easy to modify individually */
 #container-ad, #container-error, #container-exp, #container-consent, #container-instructions, #container-questionnaire {
     /* position: absolute; */
-    top: 0px; /* Header Height */
-    bottom: 0px; /* Footer Height */
-    left: 0px;
-    right: 0px;
-    padding: 100px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 800px;
     padding-top: 5%;
     /* border: 18px solid #f3f3f3; */
     background: white;
