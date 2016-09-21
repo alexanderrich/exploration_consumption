@@ -284,8 +284,8 @@ function PopupCreator (length) {
             } else {
                 stats.penaltyMisses++;
             }
-            $("#popuppct").html((totalCompletes / totalPopups * 100).toFixed());
-            if (totalCompletes / totalPopups < .85) {
+            $("#popuppct").html(((1 - totalCompletes / totalPopups) * 100).toFixed());
+            if ((1 - totalCompletes / totalPopups) > .15) {
                 $("#popuppctdiv").css("color", "red");
             } else {
                 $("#popuppctdiv").css("color", "black");
@@ -333,7 +333,7 @@ function PopupCreator (length) {
 
     $("#rewards").append("<div id=\"popup\"> <div id=\"popupinstruct\"></div> <div id=\"popupcountdown\"></div> </div> ");
     $("#popup").hide();
-    $("#popuppct").html("100");
+    $("#popuppct").html("0");
 }
 
 function ExploreExploitTaskNoContext(nTrials, taskType, psiTurk, callback) {
@@ -1026,8 +1026,11 @@ function experimentDriver() {
                           "instructions/instruct-1-2.html",
                           "instructions/instruct-2-1.html",
                           "instructions/instruct-2-2.html",
+                          "instructions/instruct-3-1.html",
+                          "instructions/instruct-3-2.html",
                           "instructions/quiz-1.html",
                           "instructions/quiz-2.html",
+                          "instructions/quiz-3.html",
                           "postquestionnaire.html"]);
     functionList = [
         function () {
@@ -1042,6 +1045,10 @@ function experimentDriver() {
                               psiTurk, next); },
         function () {
             phaseDriver(nTrials[1], ExploreExploitTask, StandardRewards, "standard", psiTurk, next); },
+        function () {
+            instructionDriver(["instructions/instruct-3-1.html", "instructions/instruct-3-2.html"],
+                              "instructions/quiz-3.html", {outcomelength: "36", penalty: "5percentage", gamename: "breakout"},
+                              psiTurk, next); },
         function () {
             practiceConsumption(psiTurk, next); },
         function () {
