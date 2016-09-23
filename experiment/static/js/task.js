@@ -19,12 +19,15 @@ function Game(popupCreator) {
         releaseBall,
         ballHitBrick,
         ballHitPaddle,
+        bonusHitPaddle,
         brickTexture,
+        bonusTexture,
         paddleTexture,
         ballTexture,
         ball,
         paddle,
         bricks,
+        bonuses,
         ballOnPaddle = true,
         points = 0,
         lastRunPoints = 0,
@@ -37,6 +40,12 @@ function Game(popupCreator) {
         graphicBase.drawRect(0, 0, 40, 20);
         graphicBase.endFill();
         brickTexture = graphicBase.generateTexture();
+        graphicBase.destroy();
+        graphicBase = game.add.graphics(0, 0);
+        graphicBase.beginFill(0x00bb00);
+        graphicBase.drawRect(0, 0, 40, 20);
+        graphicBase.endFill();
+        bonusTexture = graphicBase.generateTexture();
         graphicBase.destroy();
         graphicBase = game.add.graphics(0, 0);
         graphicBase.beginFill(0x444444);
@@ -61,15 +70,16 @@ function Game(popupCreator) {
         bricks.enableBody = true;
         bricks.physicsBodyType = Phaser.Physics.ARCADE;
         var brick;
-        for (var y = 0; y < 4; y++)
-        {
-            for (var x = 0; x < 15; x++)
-            {
-                brick = bricks.create(20 + (x * 50), 100 + (y * 52), brickTexture);
+        for (var y = 0; y < 5; y++) {
+            for (var x = 0; x < 15; x++) {
+                brick = bricks.create(30 + (x * 50), 90 + (y * 42), brickTexture);
                 brick.body.bounce.set(1);
                 brick.body.immovable = true;
             }
         }
+        bonuses = game.add.group();
+        bonuses.enableBody = true;
+        bonuses.physicsBodyType = Phaser.Physics.ARCADE;
         paddle = game.add.sprite(game.world.centerX, 500, paddleTexture);
         paddle.anchor.setTo(0.5, 0.5);
         game.physics.enable(paddle, Phaser.Physics.ARCADE);
@@ -105,6 +115,7 @@ function Game(popupCreator) {
         {
             game.physics.arcade.collide(ball, paddle, ballHitPaddle, null, this);
             game.physics.arcade.collide(ball, bricks, ballHitBrick, null, this);
+            game.physics.arcade.collide(bonuses, paddle, bonusHitPaddle, null, this);
         }
     };
 
@@ -129,6 +140,8 @@ function Game(popupCreator) {
     };
 
     ballHitBrick = function (_ball, _brick) {
+        var bonus;
+
         _brick.kill();
         points++;
         lastRunPoints++;
@@ -143,6 +156,12 @@ function Game(popupCreator) {
             ball.y = paddle.y - 16;
             //  And bring the bricks back from the dead :)
             bricks.callAll("revive");
+        } else if (Math.random() > .9) {
+            bonus = bonuses.create(_brick.x, _brick.y, bonusTexture);
+            bonus.body.velocity.y = 120;
+            bonus.checkWorldBounds = true;
+            bonus.outOfBoundsKill = true;
+            bonus.addChild(game.add.text(10, 0, "+3", {font: "15px Arial", fill: "#000000"}));
         }
     };
 
@@ -166,6 +185,13 @@ function Game(popupCreator) {
             //  Add a little random X to stop it bouncing straight up!
             _ball.body.velocity.x = -4 + Math.random() * 8;
         }
+    };
+
+    bonusHitPaddle = function (_paddle, _bonus) {
+        _bonus.kill();
+        points += 3;
+        lastRunPoints += 3;
+        $("#points").html(points);
     };
 
     this.setup = function () {
@@ -802,14 +828,15 @@ function ConsumptionRewards(psiTurk, callback) {
         $("#rewards").show();
         popupCreator.reset();
         timeLeft = totalTime;
+        $("#time").html(timeLeft);
         timeInterval = setInterval(decrementTime, 1000);
         nextReward(reward);
     };
 
     decrementTime = function () {
+        timeLeft--;
         if (timeLeft > 0) {
             $("#time").html(timeLeft);
-            timeLeft--;
         } else {
             $("#time").html(timeLeft);
             clearInterval(timeInterval);
