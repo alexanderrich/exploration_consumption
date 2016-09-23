@@ -1,0 +1,56 @@
+<div id="container-instructions">
+
+    <div class="header">
+        <h1>Post-game questions</h1>
+    </div>
+
+	  <hr>
+
+    <div class="instructions well">
+        <p id="toptext">
+            Before finishing the experiment, please answer these brief questions:
+        </p>
+        <form id="endingquestions" action="debrief" method="post">
+            <div class="question">
+                <p class="questiontext">
+                    On a scale from 1 to 7, where 1 is very un-enjoyable
+                    and 7 is very enjoyable, how enjoyable did you find the
+                    popup-clicking task?
+                    <select id="popupenjoyment" name="popupenjoyment">
+                        <option value="noresp" SELECTED></option>
+                        <option value="1">1 - very un-enjoyable</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4 - moderately enjoyable</option>
+                        <option value="5">5 </option>
+                        <option value="6">6</option>
+                        <option value="7">7 - very enjoyable</option>
+                    </select>
+                </p>
+            </div>
+            <div class="question">
+                <p class="questiontext">
+                    On a scale from 1 to 7, where 1 is very un-enjoyable
+                    and 7 is very enjoyable, how enjoyable did you find the
+                    breakout game?
+                    <select id="breakoutenjoyment" name="breakoutenjoyment">
+                        <option value="noresp" SELECTED></option>
+                        <option value="1">1 - very un-enjoyable</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4 - moderately enjoyable</option>
+                        <option value="5">5 </option>
+                        <option value="6">6</option>
+                        <option value="7">7 - very enjoyable</option>
+                    </select>
+                </p>
+            </div>
+        </form>
+
+    </div>
+
+	  <hr>
+    <p id="blankmessage"></p>
+
+    <button type="button" id="continue" class="btn btn-success btn-lg continue"> Submit </button>
+</div>

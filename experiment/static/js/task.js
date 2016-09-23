@@ -954,6 +954,28 @@ function instructionDriver(instructionPages, quizPage, answerKey, psiTurk, callb
     psiTurk.doInstructions(instructionPages, quiz);
 }
 
+function endingQuestions(psiTurk, callback) {
+    "use strict";
+    var recordResponses;
+
+    recordResponses = function () {
+        if ($("#popupenjoyment").val() === "noresp" || $("#breakoutenjoyment").val() === "noresp") {
+            $("#blankmessage").html("<strong>Please answer all questions before continuing.</strong>");
+        } else {
+            $("select").each(function () {
+                psiTurk.recordUnstructuredData(this.id, this.value);
+            });
+            callback();
+        }
+    };
+
+
+    psiTurk.showPage("endingquestions.html");
+    $("#continue").click(function () {
+        recordResponses();
+    });
+}
+
 function questionnaire(psiTurk) {
     "use strict";
     var errorMessage = "<h1>Oops!</h1><p>Something went wrong submitting your HIT. This might happen if you lose your internet connection. Press the button to resubmit.</p><button id='resubmit'>Resubmit</button>",
@@ -1031,6 +1053,7 @@ function experimentDriver() {
                           "instructions/quiz-1.html",
                           "instructions/quiz-2.html",
                           "instructions/quiz-3.html",
+                          "endingquestions.html",
                           "postquestionnaire.html"]);
     functionList = [
         function () {
@@ -1053,6 +1076,8 @@ function experimentDriver() {
             practiceConsumption(psiTurk, next); },
         function () {
             phaseDriver(nTrials[2], ExploreExploitTask, ConsumptionRewards, "consumption", psiTurk, next); },
+        function () {
+            endingQuestions(psiTurk, next); },
         function () {
             questionnaire(psiTurk); }];
     next();
