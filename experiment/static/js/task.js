@@ -337,7 +337,7 @@ function ExploreExploitTaskNoContext(nTrials, taskType, psiTurk, callback) {
         runChoice,
         reset,
         showOutcome,
-        value = 4,
+        value = 3 + Math.ceil(Math.random() * 4),
         nextValue,
         nextChoice;
 
@@ -410,7 +410,7 @@ function ExploreExploitTaskNoContext(nTrials, taskType, psiTurk, callback) {
     };
 
     reset = function () {
-        value = 4;
+        value = 3 + Math.ceil(Math.random() * 4);
         $("#trialtype").html("<strong>cards reset</strong>");
         $("#exploit").html("4");
         $("#explore").html("?");
@@ -585,7 +585,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
 
     resetContext = function (context) {
         var contextObj = contexts[context];
-        contextObj.value = 4;
+        contextObj.value = 3 + Math.ceil(Math.random() * 4);
         update(context, 0);
         $("#trialtype").html("<strong>context reset</strong>");
         $("#exploit").html("4");
@@ -639,7 +639,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                 {color: "purple"}];
     contexts = _.shuffle(contexts);
     contexts = contexts.map(function (obj) {
-        obj.value = 4;
+        obj.value = 3 + Math.ceil(Math.random() * 4);
         obj.nextValue = 0;
         obj.advancedSet = 0;
         return obj;
@@ -803,10 +803,7 @@ function ConsumptionRewards(psiTurk, callback) {
         popupCreator.reset();
         timeLeft = totalTime;
         timeInterval = setInterval(decrementTime, 1000);
-        setTimeout(
-            function () {
-                nextReward(reward);
-            }, 1000);
+        nextReward(reward);
     };
 
     decrementTime = function () {
@@ -887,6 +884,7 @@ function phaseDriver(nTrials, ExploreFn, RewardFn, taskType, psiTurk, callback) 
 
     nextChoice = function () {
         if (trial < nTrials) {
+            $("#trials").html(nTrials - trial);
             trial++;
             exploreExploit.run();
         } else {
@@ -1027,8 +1025,8 @@ function experimentDriver() {
     "use strict";
     var psiTurk = new PsiTurk(uniqueId, adServerLoc, mode),
         next,
-        // nTrials = [36, 78, 78],
-        nTrials = [3, 3, 3],
+        nTrials = [36, 78, 78],
+        // nTrials = [3, 3, 3],
         functionList = [];
 
     next = function () {

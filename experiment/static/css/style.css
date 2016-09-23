@@ -134,12 +134,22 @@ strong {
 
 #timediv {
     float: right;
-    width: 100px;
+    width: 120px;
+}
+
+#pointsdiv {
+    float: left;
+    width: 150px;
+}
+
+#trialsdiv {
+    float: left;
+    width: 150px;
 }
 
 #popuppctdiv {
-    float: right;
-    width: 280px;
+    float: left;
+    width: 180px;
 }
 
 /* card task */
