@@ -1,5 +1,6 @@
 library("ggplot2")
 library("dplyr")
+library("tidyr")
 
 optimal_values <- function(ntrials, maxreward=6, pbad=.5, badcost=0) {
   explore_values <- matrix(0, nrow=ntrials, ncol=maxreward+1)
@@ -76,3 +77,17 @@ optimal_values_indefinite <- function (discount, minreward=4, maxreward=12, pbad
        )
 
 }
+
+test <- optimal_values_indefinite(7/8, minreward=4, maxreward=12, pbad=.5, badcost=0)
+
+df <- data.frame(reward_exploit=test$reward_exploit)
+df$v_diff <- test$reward_diff + test$VoI_diff
+df$v_diff_9 <- test$reward_diff + .9 * test$VoI_diff
+df$v_diff_7 <- test$reward_diff + .7 * test$VoI_diff
+df$v_diff_5 <- test$reward_diff + .5 * test$VoI_diff
+df$v_diff_0 <- test$reward_diff
+
+df <- df %>% gather(bias, diff, -reward_exploit) %>%
+  filter(reward_exploit > 0)
+
+ggplot(df, aes(x=reward_exploit, y=diff, group=bias)) + geom_line(aes(color=bias))
