@@ -448,7 +448,7 @@ function ExploreExploitTaskNoContext(nTrials, taskType, psiTurk, callback) {
 
     this.run = function() {
         trial++;
-        if (trial !== 0 && Math.random() < 1 / 8) {
+        if (trial !== 0 && Math.random() < .1) {
             reset();
         } else {
             runChoice();
@@ -641,7 +641,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         } else {
             committedOn = 0;
         }
-        if (trial !== 0 && Math.random() < 1 / 8) {
+        if (trial !== 0 && Math.random() < .1) {
             functionList.push(function () {
                 resetContext((trial - 1) % 6);
             });
@@ -1077,7 +1077,7 @@ function experimentDriver() {
     functionList = [
         function () {
             instructionDriver(["instructions/instruct-1-1.html", "instructions/instruct-1-2.html"],
-                              "instructions/quiz-1.html", {mystery0: "50", range: "4_12", reset: "1_8"},
+                              "instructions/quiz-1.html", {mystery0: "50", range: "4_12", reset: "1_10"},
                               psiTurk, next); },
         function () {
             phaseDriver(nTrials[0], ExploreExploitTaskNoContext, StandardRewards, "nocontext", psiTurk, next); },

@@ -78,7 +78,7 @@ optimal_values_indefinite <- function (discount, minreward=4, maxreward=12, pbad
 
 }
 
-test <- optimal_values_indefinite(7/8, minreward=4, maxreward=12, pbad=.5, badcost=0)
+test <- optimal_values_indefinite(.9, minreward=4, maxreward=12, pbad=.5, badcost=0)
 
 df <- data.frame(reward_exploit=test$reward_exploit)
 df$v_diff <- test$reward_diff + test$VoI_diff
