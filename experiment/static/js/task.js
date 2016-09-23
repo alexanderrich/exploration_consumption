@@ -28,8 +28,7 @@ function Game(popupCreator) {
         ballOnPaddle = true,
         points = 0,
         lastRunPoints = 0,
-        lastRunDeaths = 0,
-        dead = false;
+        lastRunDeaths = 0;
 
     preload = function () {
         var graphicBase;
@@ -121,13 +120,11 @@ function Game(popupCreator) {
     ballLost = function () {
         game.paused = true;
         lastRunDeaths++;
-        dead = true;
         popupCreator.run(function () {
             game.paused = false;
             ballOnPaddle = true;
             ball.reset(paddle.body.x + 20, paddle.y - 16);
             game.time.events.add(1000, releaseBall, this);
-            dead = false;
         });
     };
 
@@ -179,12 +176,9 @@ function Game(popupCreator) {
         lastRunPoints = 0;
         lastRunDeaths = 0;
         game.paused = false;
-        if (dead) {
-            ballOnPaddle = true;
-            ball.reset(paddle.body.x + 16, paddle.y - 16);
-            game.time.events.add(1000, releaseBall, this);
-            dead = false;
-        }
+        ballOnPaddle = true;
+        ball.reset(paddle.body.x + 26, paddle.y - 16);
+        game.time.events.add(1000, releaseBall, this);
         setTimeout(function () {
             if (popupCreator.isUp()) {
                 popupCreator.clear(true);
