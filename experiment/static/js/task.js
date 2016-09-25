@@ -426,6 +426,10 @@ function ExploreExploitTaskNoContext(nTrials, taskType, psiTurk, callback) {
                 if (nextValue > value) {
                     value = nextValue;
                     $("#exploit").html(value.toFixed());
+                    $("#exploit").css("background", "lime");
+                    setTimeout(function () {
+                        $("#exploit").css("background", "white");
+                    }, 1000);
                 }
             }
             setTimeout(function () {
@@ -438,10 +442,14 @@ function ExploreExploitTaskNoContext(nTrials, taskType, psiTurk, callback) {
     reset = function () {
         value = 3 + Math.ceil(Math.random() * 4);
         $("#trialtype").html("<strong>cards reset</strong>");
-        $("#exploit").html("4");
+        $("#exploit").html(value);
         $("#explore").html("?");
         $(".card").css({"border": "5px solid black",
                         "margin": "0px"});
+        $("#exploit").css("background", "gray");
+        setTimeout(function () {
+            $("#exploit").css("background", "white");
+        }, 1000);
         $("#explorediv").show();
         setTimeout(runChoice, 2000);
     };
@@ -494,7 +502,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     update = function (context, advanced) {
         contextGroups = maze.selectAll(".context")
             .data(contexts);
-        contextGroups.select(".contextcard")
+        contextGroups.select(".contextvalue")
             .text(function (d) {
                 return d.value.toString();
             });
@@ -598,6 +606,16 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                 if (contextObj.nextValue > contextObj.value) {
                     contextObj.value = contextObj.nextValue;
                     $("#exploit").html(contextObj.value.toFixed());
+                    $("#exploit").css("background", "lime");
+                    setTimeout(function () {
+                        $("#exploit").css("background", "white");
+                    }, 1000);
+                    d3.select("#context" + context + " .contextcard")
+                        .style("fill", "lime")
+                        .transition()
+                        .delay(1000)
+                        .duration(0)
+                        .style("fill", "white");
                 }
             }
             contextObj.advancedSet = 0;
@@ -614,11 +632,21 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         contextObj.value = 3 + Math.ceil(Math.random() * 4);
         update(context, 0);
         $("#trialtype").html("<strong>context reset</strong>");
-        $("#exploit").html("4");
+        $("#exploit").html(contextObj.value);
         $("#explore").html("?");
         $(".card").css({"border": "5px solid black",
                         "margin": "0px"});
         $("#carddiv").css("background", contextObj.color);
+        $("#exploit").css("background", "gray");
+        setTimeout(function () {
+            $("#exploit").css("background", "white");
+        }, 1000);
+        d3.select("#context" + context + " .contextcard")
+            .style("fill", "gray")
+            .transition()
+            .delay(1000)
+            .duration(0)
+            .style("fill", "white");
         $("#explorediv").show();
         setTimeout(functionList.pop(), 2000);
     };
@@ -711,6 +739,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         .style("stroke", "black")
         .style("stroke-width", 1);
     contextGroups.append("rect")
+        .attr("class", "contextcard")
         .attr("width", 30)
         .attr("height", 30)
         .attr("x", function (d, idx) {
@@ -723,7 +752,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         .style("stroke", "black")
         .style("stroke-width", 1);
     contextGroups.append("text")
-        .attr("class", "contextcard")
+        .attr("class", "contextvalue")
         .attr("x", function (d, idx) {
             return getLocation(idx, 0)[0];
         })
