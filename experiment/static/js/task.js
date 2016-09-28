@@ -110,6 +110,7 @@ function Game(popupCreator) {
         if (ballOnPaddle)
         {
             ball.body.x = paddle.x - 10;
+            game.physics.arcade.collide(bonuses, paddle, bonusHitPaddle, null, this);
         }
         else
         {
@@ -305,7 +306,7 @@ function PopupCreator (length) {
                 stats.penaltyMisses++;
             }
             $("#popuppct").html(((1 - totalCompletes / totalPopups) * 100).toFixed());
-            if ((1 - totalCompletes / totalPopups) > .15) {
+            if ((1 - totalCompletes / totalPopups) > .1) {
                 $("#popuppctdiv").css("color", "red");
             } else {
                 $("#popuppctdiv").css("color", "black");
@@ -464,7 +465,7 @@ function ExploreExploitTaskNoContext(nTrials, taskType, psiTurk, callback) {
     };
 
     $("#context").html("practice round");
-    $("#carddiv").css("background", "gray");
+    $("#carddiv").css("background", "darkgray");
 }
 
 function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
@@ -682,7 +683,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         if (i < 6) {
             committed.push(0);
         } else {
-            committed.push((Math.floor((i - 6) / 12) + parseInt(counterbalance)) % 2);
+            committed.push((Math.floor((i - 6) / 18) + parseInt(counterbalance)) % 2);
         }
     }
     contexts = [{color: "red"},
