@@ -319,6 +319,10 @@ function PopupCreator (length) {
         up = false;
     };
 
+    this.missPct = function () {
+        return 1 - totalCompletes / totalPopups * 100;
+    };
+
     this.isUp = function () {
         return up;
     };
@@ -863,6 +867,11 @@ function ConsumptionRewards(psiTurk, callback) {
         nextReward(reward);
     };
 
+    this.recordFinal = function(taskType) {
+        psiTurk.recordUnstructuredData("points_" + taskType, game.getStats().points.toString());
+        psiTurk.recordUnstructuredData("misses_" + taskType, popupCreator.missPct().toString());
+    };
+
     decrementTime = function () {
         timeLeft--;
         if (timeLeft > 0) {
@@ -894,6 +903,10 @@ function StandardRewards (psiTurk, callback) {
             $("#rewards").hide();
             callback();
         }, 1000);
+    };
+
+    this.recordFinal = function(taskType) {
+        psiTurk.recordUnstructuredData("points_" + taskType, totalRewards.toString());
     };
 
     $("#rewards").addClass("standardRewards");
@@ -945,6 +958,7 @@ function phaseDriver(nTrials, ExploreFn, RewardFn, taskType, psiTurk, callback) 
             trial++;
             exploreExploit.run();
         } else {
+            rewards.recordFinal(taskType);
             psiTurk.saveData({
                 success: callback,
                 error: callback});
@@ -1005,7 +1019,12 @@ function instructionDriver(instructionPages, quizPage, answerKey, psiTurk, callb
 
 function endingQuestions(psiTurk, callback) {
     "use strict";
-    var recordResponses;
+    var recordResponses,
+        standardBonus = Math.floor(psiTurk.getQuestionData().points_standard / 10) / 100,
+        consumptionBonus = Math.floor(psiTurk.getQuestionData().points_consumption / 10) / 100,
+        misspct = Math.floor(psiTurk.getQuestionData().misses_consumption),
+        missloss = 0,
+        totalBonus;
 
     recordResponses = function () {
         if ($("#popupenjoyment").val() === "noresp" || $("#breakoutenjoyment").val() === "noresp") {
@@ -1020,6 +1039,18 @@ function endingQuestions(psiTurk, callback) {
 
 
     psiTurk.showPage("endingquestions.html");
+    $("#phase2bonus").html(standardBonus.toFixed(2));
+    $("#phase3bonus").html(consumptionBonus.toFixed(2));
+    if (misspct > 10) {
+        $("#misspct").html(misspct);
+        missloss = (misspct - 10) / 20;
+        $("#missloss").html(missloss.toFixed(2));
+    } else {
+        $("#misses").hide();
+    }
+    totalBonus = standardBonus + consumptionBonus - missloss;
+    psiTurk.recordUnstructuredData("bonus", totalBonus);
+    $("#totalbonus").html(totalBonus.toFixed(2));
     $("#continue").click(function () {
         recordResponses();
     });
