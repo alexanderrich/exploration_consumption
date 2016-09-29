@@ -17,6 +17,7 @@ function Game(popupCreator) {
         update,
         ballLost,
         releaseBall,
+        startLevel,
         ballHitBrick,
         ballHitPaddle,
         bonusHitPaddle,
@@ -29,6 +30,7 @@ function Game(popupCreator) {
         bricks,
         bonuses,
         ballOnPaddle = true,
+        level = 0,
         points = 0,
         lastRunPoints = 0,
         lastRunDeaths = 0;
@@ -37,13 +39,15 @@ function Game(popupCreator) {
         var graphicBase;
         graphicBase = game.add.graphics(0, 0);
         graphicBase.beginFill(0xff0000);
-        graphicBase.drawRect(0, 0, 40, 20);
+        graphicBase.lineStyle(1, 0x000000, 1);
+        graphicBase.drawRect(0, 0, 49, 19);
         graphicBase.endFill();
         brickTexture = graphicBase.generateTexture();
         graphicBase.destroy();
         graphicBase = game.add.graphics(0, 0);
         graphicBase.beginFill(0x00bb00);
-        graphicBase.drawRect(0, 0, 40, 20);
+        graphicBase.lineStyle(1, 0x000000, 1);
+        graphicBase.drawRect(0, 0, 49, 19);
         graphicBase.endFill();
         bonusTexture = graphicBase.generateTexture();
         graphicBase.destroy();
@@ -70,13 +74,14 @@ function Game(popupCreator) {
         bricks.enableBody = true;
         bricks.physicsBodyType = Phaser.Physics.ARCADE;
         var brick;
-        for (var y = 0; y < 5; y++) {
-            for (var x = 0; x < 15; x++) {
-                brick = bricks.create(30 + (x * 50), 90 + (y * 42), brickTexture);
+        for (var y = 0; y < 12; y++) {
+            for (var x = 0; x < 16; x++) {
+                brick = bricks.create(x * 50, 60 + (y * 20), brickTexture);
                 brick.body.bounce.set(1);
                 brick.body.immovable = true;
             }
         }
+        bricks.callAll("kill");
         bonuses = game.add.group();
         bonuses.enableBody = true;
         bonuses.physicsBodyType = Phaser.Physics.ARCADE;
@@ -94,6 +99,7 @@ function Game(popupCreator) {
         ball.body.bounce.set(1);
         ball.events.onOutOfBounds.add(ballLost, this);
         game.time.events.add(1000, releaseBall, this);
+        startLevel();
         game.paused = true;
     };
 
@@ -140,6 +146,113 @@ function Game(popupCreator) {
         });
     };
 
+
+    startLevel = function () {
+        var x, y;
+        //  Let's move the ball back to the paddle
+        ballOnPaddle = true;
+        ball.body.velocity.set(0);
+        game.time.events.add(1000, releaseBall, this);
+        ball.x = paddle.x + 16;
+        ball.y = paddle.y - 16;
+        switch (level % 8) {
+        case 0:
+            for (y = 0; y < 12; y++) {
+                for (x = 0; x < 16; x++) {
+                    if (y > 4 && y < 10) {
+                        bricks.getChildAt(y * 16 + x).revive();
+                    }
+                }
+            }
+            break;
+        case 1:
+            for (y = 0; y < 12; y++) {
+                for (x = 0; x < 16; x++) {
+                    if (y > x * .7) {
+                        bricks.getChildAt(y * 16 + x).revive();
+                    }
+                }
+            }
+            break;
+        case 2:
+            for (y = 0; y < 12; y++) {
+                for (x = 0; x < 16; x++) {
+                    if (y < 4 || y > 7) {
+                        bricks.getChildAt(y * 16 + x).revive();
+                    }
+                }
+            }
+            break;
+        case 3:
+            for (y = 0; y < 12; y++) {
+                for (x = 0; x < 16; x++) {
+                    if (y < 2 || y > 9) {
+                        bricks.getChildAt(y * 16 + x).revive();
+                    } else if (_.contains([2, 3, 4, 7, 8, 9], y) && (x < 4 || x > 11)) {
+                        bricks.getChildAt(y * 16 + x).revive();
+                    } else if (_.contains([5, 6], y) && !_.contains([4, 5, 10, 11], x)) {
+                        bricks.getChildAt(y * 16 + x).revive();
+                    }
+                }
+            }
+            break;
+        case 4:
+            for (y = 0; y < 12; y++) {
+                for (x = 0; x < 16; x++) {
+                    if (x !== 7 && x !== 8 && y > 1) {
+                        bricks.getChildAt(y * 16 + x).revive();
+                    }
+                }
+            }
+            break;
+        case 5:
+            for (y = 0; y < 12; y++) {
+                for (x = 0; x < 16; x++) {
+                    if (x !== 7 && x !== 8 && y > 1) {
+                        bricks.getChildAt(y * 16 + x).revive();
+                    }
+                }
+            }
+            break;
+        case 6:
+            for (y = 0; y < 12; y++) {
+                for (x = 0; x < 16; x++) {
+                    if (y < 2 || y > 9) {
+                        bricks.getChildAt(y * 16 + x).revive();
+                    } else if ((y === 2 || y === 9) && (x < 7 || x > 9)) {
+                        bricks.getChildAt(y * 16 + x).revive();
+                    } else if ((y === 3 || y === 8) && (x < 6 || x > 10)) {
+                        bricks.getChildAt(y * 16 + x).revive();
+                    } else if ((y === 4 || y === 7) && (x < 5 || x > 11)) {
+                        bricks.getChildAt(y * 16 + x).revive();
+                    } else if ((y === 5 || y === 6) && (x < 4 || x > 12)) {
+                        bricks.getChildAt(y * 16 + x).revive();
+                    }
+                }
+            }
+            break;
+        case 7:
+            for (y = 0; y < 12; y++) {
+                for (x = 0; x < 16; x++) {
+                    if ((y < x * .7 - 2) || (y > x * .7 + 2) ) {
+                        bricks.getChildAt(y * 16 + x).revive();
+                    }
+                }
+            }
+            break;
+        case 8:
+            for (y = 0; y < 12; y++) {
+                for (x = 0; x < 16; x++) {
+                    if (x > 0 && x < 15 && y > 1) {
+                        bricks.getChildAt(y * 16 + x).revive();
+                    }
+                }
+            }
+            break;
+        }
+        level++;
+    };
+
     ballHitBrick = function (_ball, _brick) {
         var bonus;
 
@@ -149,15 +262,8 @@ function Game(popupCreator) {
         $("#points").html(points);
         //  Are they any bricks left?
         if (bricks.countLiving() === 0) {
-            //  Let's move the ball back to the paddle
-            ballOnPaddle = true;
-            ball.body.velocity.set(0);
-            game.time.events.add(1000, releaseBall, this);
-            ball.x = paddle.x + 16;
-            ball.y = paddle.y - 16;
-            //  And bring the bricks back from the dead :)
-            bricks.callAll("revive");
         } else if (Math.random() > .9) {
+            startLevel();
             bonus = bonuses.create(_brick.x, _brick.y, bonusTexture);
             bonus.body.velocity.y = 120;
             bonus.checkWorldBounds = true;
