@@ -29,6 +29,7 @@ function Game(popupCreator) {
         paddle,
         bricks,
         bonuses,
+        stopBonuses = false,
         ballOnPaddle = true,
         level = 0,
         points = 0,
@@ -262,13 +263,13 @@ function Game(popupCreator) {
         $("#points").html(points);
         //  Are they any bricks left?
         if (bricks.countLiving() === 0) {
-        } else if (Math.random() > .9) {
             startLevel();
+        } else if (!stopBonuses && Math.random() > .9) {
             bonus = bonuses.create(_brick.x, _brick.y, bonusTexture);
-            bonus.body.velocity.y = 120;
+            bonus.body.velocity.y = 150;
             bonus.checkWorldBounds = true;
             bonus.outOfBoundsKill = true;
-            bonus.addChild(game.add.text(10, 0, "+3", {font: "15px Arial", fill: "#000000"}));
+            bonus.addChild(game.add.text(15, 0, "+3", {font: "15px Arial", fill: "#000000"}));
         }
     };
 
@@ -308,6 +309,7 @@ function Game(popupCreator) {
     this.run = function (time, callback) {
         lastRunPoints = 0;
         lastRunDeaths = 0;
+        stopBonuses = false;
         game.paused = false;
         ballOnPaddle = true;
         ball.reset(paddle.body.x + 26, paddle.y - 16);
@@ -319,6 +321,10 @@ function Game(popupCreator) {
             game.paused = true;
             callback();
         }, time * 1000);
+        // make sure there aren't bonuses falling when time runs out
+        setTimeout(function () {
+            stopBonuses = true;
+        }, time * 1000 - 5000);
     };
 
     this.getStats = function () {
