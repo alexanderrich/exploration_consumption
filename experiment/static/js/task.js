@@ -634,15 +634,14 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     responseFn = function (choiceId, context) {
         var contextObj = contexts[context],
             advanced = context === (trial + 4) % 6;
-        $("#" + choiceId).css({"border": "10px solid black",
-                               "margin": "-5px"});
+        $("#" + choiceId).css({"border": "10px solid black"});
         if (choiceId === "exploit") {
             contextObj.nextChoice = "exploit";
             contextObj.nextValue = contextObj.value;
             // card.html(reward.toString());
         } else {
             contextObj.nextChoice = "explore";
-            if (Math.random() > .5) {
+            if (Math.random() > .333) {
                 contextObj.nextValue = 3 + Math.ceil(Math.random() * 9);
             } else {
                 contextObj.nextValue = 0;
@@ -691,40 +690,50 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         update(context, 0);
         $("#context").html(contextObj.color + " context");
         $("#trialtype").html("<strong>click</strong> for <strong>outcome</strong>");
+        $("#trialtype").css({"border": "5px solid black", "border-radius": "5px"});
         $("#exploit").html(contextObj.value.toFixed());
         $("#explore").html("?");
         $(".card").css({"border": "5px solid black",
                         "margin": "0px"});
         $("#carddiv").css("background", contextObj.color);
-        $("#" + contextObj.nextChoice).css({"border": "10px solid black",
-                                            "margin": "-5px"});
+        $("#" + contextObj.nextChoice).css({"border": "10px solid black"});
+                                            // "margin": "-5px"});
         $("#explorediv").show();
         $("#trialtype").click(function () {
             $("#trialtype").off("click");
-            $("#trialtype").html(contextObj.nextValue.toFixed());
+            $("#trialtype").css("border", "");
+            $("#trialtype").html("Outcome: <strong>" + contextObj.nextValue.toFixed() + "</strong>");
+            $("#trialtype").html("Outcome: <strong>" + contextObj.nextValue.toFixed() + "</strong>");
             $(".card").css({"border": "5px solid black",
                             "margin": "0px"});
             if (contextObj.nextChoice === "explore") {
                 $("#explore").html(contextObj.nextValue.toFixed());
                 if (contextObj.nextValue > contextObj.value) {
                     contextObj.value = contextObj.nextValue;
-                    $("#exploit").html(contextObj.value.toFixed());
-                    $("#exploit").css("background", "lime");
-                    setTimeout(function () {
-                        $("#exploit").css("background", "white");
-                    }, 1000);
+                    $("#explore").css("background", "lime");
+                    $("#explore").animate({"margin-left": "-200px"}, 1000, "swing",
+                                          function () {
+                                              $("#explore").css("margin-left", "");
+                                              $("#explore").css("background", "gainsboro");
+                                              $("#explore").html("?");
+                                              $("#exploit").html(contextObj.value.toFixed());
+                                              $("#exploit").css("background", "lime");
+                                          });
+                    // setTimeout(function () {
+                    //     $("#explore").css("background", "gainsboro");
+                    //     $("#explore").html("?");
+                    // }, 1000);
                     d3.select("#context" + context + " .contextcard")
-                        .style("fill", "lime")
-                        .transition()
-                        .delay(1000)
-                        .duration(0)
-                        .style("fill", "white");
+                        .style("fill", "lime");
                 }
             }
             contextObj.advancedSet = 0;
             update(context, 0);
             setTimeout(function () {
                 $("#explorediv").hide();
+                d3.select("#context" + context + " .contextcard")
+                    .style("fill", "white");
+                $("#exploit").css("background", "gainsboro");
                 callback(contextObj.nextValue, trial);
             }, 2000);
         });
@@ -742,7 +751,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         $("#carddiv").css("background", contextObj.color);
         $("#exploit").css("background", "gray");
         setTimeout(function () {
-            $("#exploit").css("background", "white");
+            $("#exploit").css("background", "gainsboro");
         }, 1000);
         d3.select("#context" + context + " .contextcard")
             .style("fill", "gray")
@@ -772,7 +781,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         } else {
             committedOn = 0;
         }
-        if (trial !== 0 && Math.random() < .1) {
+        if (trial !== 0 && Math.random() < .125) {
             functionList.push(function () {
                 resetContext((trial - 1) % 6);
             });
@@ -780,6 +789,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         functionList.pop()();
     };
 
+    $("#inforeminderbutton").click(function () {$("#inforeminder").toggle(400); });
     committed = [];
     for (i = 0; i < nTrials; i++) {
         if (i < 6) {
@@ -994,13 +1004,14 @@ function StandardRewards (psiTurk, callback) {
     this.setReward = function (reward) {
         totalRewards += reward;
         $("#points").html(totalRewards);
-        $("#rewards").html(reward.toString());
+        $("#rewards").html((reward * 3).toString() + "s brickbreak<br/>" +
+                           ((12 - reward) * 3).toString() + "s popups");
         $("#rewards").show();
         setTimeout(function () {
             $("#rewards").html("");
             $("#rewards").hide();
             callback();
-        }, 1000);
+        }, 3000);
     };
 
     this.recordFinal = function(taskType) {
