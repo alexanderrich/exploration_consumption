@@ -41,7 +41,7 @@ function Game(popupCreator) {
         graphicBase = game.add.graphics(0, 0);
         graphicBase.beginFill(0xff0000);
         graphicBase.lineStyle(1, 0x000000, 1);
-        graphicBase.drawRect(0, 0, 49, 19);
+        graphicBase.drawRect(0, 0, 50, 20);
         graphicBase.endFill();
         brickTexture = graphicBase.generateTexture();
         graphicBase.destroy();
@@ -67,6 +67,7 @@ function Game(popupCreator) {
     };
 
     create = function () {
+        game.stage.disableVisibilityChange = true;
         game.physics.startSystem(Phaser.Physics.ARCADE);
         //  We check bounds collisions against all walls other than the bottom one
         game.physics.arcade.checkCollision.down = false;
@@ -75,8 +76,8 @@ function Game(popupCreator) {
         bricks.enableBody = true;
         bricks.physicsBodyType = Phaser.Physics.ARCADE;
         var brick;
-        for (var y = 0; y < 12; y++) {
-            for (var x = 0; x < 16; x++) {
+        for (var y = 0; y < 10; y++) {
+            for (var x = 0; x < 14; x++) {
                 brick = bricks.create(x * 50, 60 + (y * 20), brickTexture);
                 brick.body.bounce.set(1);
                 brick.body.immovable = true;
@@ -86,7 +87,7 @@ function Game(popupCreator) {
         bonuses = game.add.group();
         bonuses.enableBody = true;
         bonuses.physicsBodyType = Phaser.Physics.ARCADE;
-        paddle = game.add.sprite(game.world.centerX, 500, paddleTexture);
+        paddle = game.add.sprite(game.world.centerX, 475, paddleTexture);
         paddle.anchor.setTo(0.5, 0.5);
         game.physics.enable(paddle, Phaser.Physics.ARCADE);
         paddle.body.collideWorldBounds = true;
@@ -101,26 +102,21 @@ function Game(popupCreator) {
         ball.events.onOutOfBounds.add(ballLost, this);
         game.time.events.add(1000, releaseBall, this);
         startLevel();
+        update();
         game.paused = true;
     };
 
     update = function () {
         paddle.x = game.input.x;
-        if (paddle.x < 30)
-        {
+        if (paddle.x < 30) {
             paddle.x = 30;
-        }
-        else if (paddle.x > game.width - 30)
-        {
+        } else if (paddle.x > game.width - 30) {
             paddle.x = game.width - 30;
         }
-        if (ballOnPaddle)
-        {
+        if (ballOnPaddle) {
             ball.body.x = paddle.x - 10;
             game.physics.arcade.collide(bonuses, paddle, bonusHitPaddle, null, this);
-        }
-        else
-        {
+        } else {
             game.physics.arcade.collide(ball, paddle, ballHitPaddle, null, this);
             game.physics.arcade.collide(ball, bricks, ballHitBrick, null, this);
             game.physics.arcade.collide(bonuses, paddle, bonusHitPaddle, null, this);
@@ -147,7 +143,6 @@ function Game(popupCreator) {
         });
     };
 
-
     startLevel = function () {
         var x, y;
         //  Let's move the ball back to the paddle
@@ -158,94 +153,86 @@ function Game(popupCreator) {
         ball.y = paddle.y - 16;
         switch (level % 8) {
         case 0:
-            for (y = 0; y < 12; y++) {
-                for (x = 0; x < 16; x++) {
-                    if (y > 4 && y < 10) {
-                        bricks.getChildAt(y * 16 + x).revive();
+            for (y = 0; y < 10; y++) {
+                for (x = 0; x < 14; x++) {
+                    // if (y % 2 === 0) {
+                    if (y > 3 && y < 8) {
+                        bricks.getChildAt(y * 14 + x).revive();
                     }
                 }
             }
             break;
         case 1:
-            for (y = 0; y < 12; y++) {
-                for (x = 0; x < 16; x++) {
-                    if (y > x * .7) {
-                        bricks.getChildAt(y * 16 + x).revive();
+            for (y = 0; y < 10; y++) {
+                for (x = 0; x < 14; x++) {
+                    if (y > x * .65) {
+                        bricks.getChildAt(y * 14 + x).revive();
                     }
                 }
             }
             break;
         case 2:
-            for (y = 0; y < 12; y++) {
-                for (x = 0; x < 16; x++) {
-                    if (y < 4 || y > 7) {
-                        bricks.getChildAt(y * 16 + x).revive();
+            for (y = 0; y < 10; y++) {
+                for (x = 0; x < 14; x++) {
+                    if (y < 3 || y > 6) {
+                        bricks.getChildAt(y * 14 + x).revive();
                     }
                 }
             }
             break;
         case 3:
-            for (y = 0; y < 12; y++) {
-                for (x = 0; x < 16; x++) {
-                    if (y < 2 || y > 9) {
-                        bricks.getChildAt(y * 16 + x).revive();
-                    } else if (_.contains([2, 3, 4, 7, 8, 9], y) && (x < 4 || x > 11)) {
-                        bricks.getChildAt(y * 16 + x).revive();
-                    } else if (_.contains([5, 6], y) && !_.contains([4, 5, 10, 11], x)) {
-                        bricks.getChildAt(y * 16 + x).revive();
+            for (y = 0; y < 10; y++) {
+                for (x = 0; x < 14; x++) {
+                    if (y < 2 || y > 7) {
+                        bricks.getChildAt(y * 14 + x).revive();
+                    } else if (_.contains([2, 3, 6, 7], y) && (x < 2 || x > 11)) {
+                        bricks.getChildAt(y * 14 + x).revive();
+                    } else if (_.contains([4, 5], y) && _.contains([0, 1, 4, 5, 6, 7, 8, 9, 12, 13], x)) {
+                        bricks.getChildAt(y * 14 + x).revive();
                     }
                 }
             }
             break;
         case 4:
-            for (y = 0; y < 12; y++) {
-                for (x = 0; x < 16; x++) {
-                    if (x !== 7 && x !== 8 && y > 1) {
-                        bricks.getChildAt(y * 16 + x).revive();
+            for (y = 0; y < 10; y++) {
+                for (x = 0; x < 14; x++) {
+                    if (!_.contains([2, 3, 6, 7, 10, 11], x) && y > 1) {
+                        bricks.getChildAt(y * 14 + x).revive();
                     }
                 }
             }
             break;
         case 5:
-            for (y = 0; y < 12; y++) {
-                for (x = 0; x < 16; x++) {
-                    if (x !== 7 && x !== 8 && y > 1) {
-                        bricks.getChildAt(y * 16 + x).revive();
+            for (y = 0; y < 10; y++) {
+                for (x = 0; x < 14; x++) {
+                    if (y % 2 === 0) {
+                        bricks.getChildAt(y * 14 + x).revive();
                     }
                 }
             }
             break;
         case 6:
-            for (y = 0; y < 12; y++) {
-                for (x = 0; x < 16; x++) {
-                    if (y < 2 || y > 9) {
-                        bricks.getChildAt(y * 16 + x).revive();
-                    } else if ((y === 2 || y === 9) && (x < 7 || x > 9)) {
-                        bricks.getChildAt(y * 16 + x).revive();
-                    } else if ((y === 3 || y === 8) && (x < 6 || x > 10)) {
-                        bricks.getChildAt(y * 16 + x).revive();
-                    } else if ((y === 4 || y === 7) && (x < 5 || x > 11)) {
-                        bricks.getChildAt(y * 16 + x).revive();
-                    } else if ((y === 5 || y === 6) && (x < 4 || x > 12)) {
-                        bricks.getChildAt(y * 16 + x).revive();
+            for (y = 0; y < 10; y++) {
+                for (x = 0; x < 14; x++) {
+                    if (y < 1 || y > 8) {
+                        bricks.getChildAt(y * 14 + x).revive();
+                    } else if ((y === 1 || y === 8) && (x < 5 || x > 8)) {
+                        bricks.getChildAt(y * 14 + x).revive();
+                    } else if ((y === 2 || y === 7) && (x < 4 || x > 9)) {
+                        bricks.getChildAt(y * 14 + x).revive();
+                    } else if ((y === 3 || y === 6) && (x < 3 || x > 10)) {
+                        bricks.getChildAt(y * 14 + x).revive();
+                    } else if ((y === 4 || y === 5) && (x < 2 || x > 11)) {
+                        bricks.getChildAt(y * 14 + x).revive();
                     }
                 }
             }
             break;
         case 7:
-            for (y = 0; y < 12; y++) {
-                for (x = 0; x < 16; x++) {
+            for (y = 0; y < 10; y++) {
+                for (x = 0; x < 14; x++) {
                     if ((y < x * .7 - 2) || (y > x * .7 + 2) ) {
-                        bricks.getChildAt(y * 16 + x).revive();
-                    }
-                }
-            }
-            break;
-        case 8:
-            for (y = 0; y < 12; y++) {
-                for (x = 0; x < 16; x++) {
-                    if (x > 0 && x < 15 && y > 1) {
-                        bricks.getChildAt(y * 16 + x).revive();
+                        bricks.getChildAt(y * 14 + x).revive();
                     }
                 }
             }
@@ -256,7 +243,6 @@ function Game(popupCreator) {
 
     ballHitBrick = function (_ball, _brick) {
         var bonus;
-
         _brick.kill();
         points++;
         lastRunPoints++;
@@ -303,7 +289,7 @@ function Game(popupCreator) {
     };
 
     this.setup = function () {
-        game = new Phaser.Game(800, 600, Phaser.AUTO, "rewards", {preload: preload, create: create, update: update});
+        game = new Phaser.Game(700, 500, Phaser.AUTO, "rewards", {preload: preload, create: create, update: update});
     };
 
     this.run = function (time, callback) {
