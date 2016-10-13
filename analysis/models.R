@@ -1,24 +1,26 @@
 library("ggplot2")
 library("dplyr")
 library("tidyr")
+library("reshape2")
 
-optimal_values <- function(ntrials, maxreward=6, pbad=.5, badcost=0) {
-  explore_values <- matrix(0, nrow=ntrials, ncol=maxreward+1)
-  exploit_values <- matrix(0, nrow=ntrials, ncol=maxreward+1)
-  exploit_rewards <- t(replicate(ntrials, c(badcost, 1:maxreward)))
-  explore_rewards <- matrix((maxreward + 1) / 2 * (1-pbad) + (pbad * badcost), nrow=ntrials, ncol=maxreward+1)
-  values <- matrix(0, nrow=ntrials, ncol=maxreward+1)
+optimal_values <- function (discount, ntrials, minreward=4, maxreward=12, pbad=.333, badcost=0) {
+  ngood <- maxreward - minreward + 1
+  n <- ngood + 1
+  explore_values <- matrix(0, nrow=ntrials, ncol=n)
+  exploit_values <- matrix(0, nrow=ntrials, ncol=n)
+  exploit_rewards <- t(replicate(ntrials, c(badcost, minreward:maxreward)))
+  explore_rewards <- matrix((minreward + (maxreward - minreward) / 2) * (1-pbad) + badcost * pbad, nrow=ntrials, ncol=n)
+  values <- matrix(0, nrow=ntrials, ncol=n)
   explore_values[ntrials,] <- explore_rewards[ntrials,]
   exploit_values[ntrials,] <- exploit_rewards[ntrials,]
   values[ntrials,] <- pmax(exploit_values[ntrials,], explore_values[ntrials,])
   for (i in (ntrials-1):1) {
-    exploit_values[i,] <- c(badcost, 1:maxreward) + values[i+1,]
-    explore_values[i,] <- sapply(0:maxreward, function (x) {
-      pbad * (badcost + values[i+1, x+1]) + (1-pbad) * mean(1:maxreward + values[i+1, pmax(x, 1:maxreward)+1])
+    exploit_values[i,] <- c(badcost, minreward:maxreward) + discount * values[i+1,]
+    explore_values[i,] <- sapply(1:n, function (x) {
+      pbad * (badcost + discount * values[i+1, x]) + (1 - pbad) * mean(minreward:maxreward + discount * values[i+1, pmax(x, 2:n)])
     })
     values[i,] <- pmax(exploit_values[i,], explore_values[i,])
   }
-
   reward_diff <- explore_rewards - exploit_rewards
   VoI_diff <- explore_values - exploit_values - reward_diff
   return(list(exploit_values=exploit_values,
@@ -36,7 +38,6 @@ optimal_values_indefinite <- function (discount, minreward=4, maxreward=12, pbad
   rew_explore <- matrix(0, n, n)
   rew_exploit <- diag(n) * c(badcost, minreward:maxreward)
   reward_exploit <- c(badcost, minreward:maxreward)
-
   for (i in 1:n) {
     for (j in 1:n) {
       if (j > i) {
@@ -49,7 +50,6 @@ optimal_values_indefinite <- function (discount, minreward=4, maxreward=12, pbad
     }
   }
   rew_explore[1,1] <- badcost
-
   values <- rep(0, n)
   delta <- tol + 1
   while (delta > tol ) {
@@ -57,10 +57,10 @@ optimal_values_indefinite <- function (discount, minreward=4, maxreward=12, pbad
     disc_values <- values * discount
     values_explore <- sweep(rew_explore, MARGIN=2, disc_values, `+`)
     values_explore <- trans_explore * values_explore
-    values_explore <- apply(values_explore, MARGIN=1, sum) 
+    values_explore <- apply(values_explore, MARGIN=1, sum)
     values_exploit <- sweep(rew_exploit, MARGIN=2, disc_values, `+`)
     values_exploit <- trans_exploit * values_exploit
-    values_exploit <- apply(values_exploit, MARGIN=1, sum) 
+    values_exploit <- apply(values_exploit, MARGIN=1, sum)
     values <- pmax(values_exploit, values_explore)
     delta <- max(abs(values - old_values))
   }
@@ -75,10 +75,9 @@ optimal_values_indefinite <- function (discount, minreward=4, maxreward=12, pbad
        reward_diff=reward_diff,
        VoI_diff=VoI_diff
        )
-
 }
 
-test <- optimal_values_indefinite(.9, minreward=4, maxreward=12, pbad=.5, badcost=0)
+test <- optimal_values_indefinite(.8, minreward=4, maxreward=12, pbad=.33, badcost=0)
 
 df <- data.frame(reward_exploit=test$reward_exploit)
 df$v_diff <- test$reward_diff + test$VoI_diff
@@ -91,3 +90,26 @@ df <- df %>% gather(bias, diff, -reward_exploit) %>%
   filter(reward_exploit > 0)
 
 ggplot(df, aes(x=reward_exploit, y=diff, group=bias)) + geom_line(aes(color=bias))
+
+
+test <- optimal_values(7/8, 10)
+df <- melt(test$exploit_values)
+df <- setNames(df, c("trial", "rewardIdx", "exploit_value"))
+df$explore_value <- melt(test$explore_values)[,3]
+df$reward_diff <- melt(test$reward_diff)[,3]
+df$VoI_diff <- melt(test$VoI_diff)[,3]
+
+df$v_diff <- df$reward_diff + df$VoI_diff
+df$v_diff_8 <- df$reward_diff + .8 * df$VoI_diff
+df$v_diff_6 <- df$reward_diff + .6 * df$VoI_diff
+df$v_diff_4 <- df$reward_diff + .4 * df$VoI_diff
+df$v_diff_2 <- df$reward_diff + .2 * df$VoI_diff
+df$v_diff_0 <- df$reward_diff
+
+df <- df %>%
+  select(-reward_diff, -VoI_diff, -exploit_value, -explore_value) %>%
+  gather(bias, diff, -trial, -rewardIdx) %>%
+  filter(rewardIdx > 1)
+
+## plot of how optimal effect changes as the end of the experiment is reached
+ggplot(df, aes(x=rewardIdx, y=diff, group=bias)) + geom_hline(yintercept=0) + geom_line(aes(color=bias)) + facet_wrap(~trial)
