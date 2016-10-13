@@ -1,0 +1,67 @@
+<div id="container-instructions">
+
+	  <h1>Instructions&mdash;decision-making task</h1>
+
+	  <hr>
+
+	  <div class="instructions well">
+
+        <p>
+            In the decision making task, you will move clockwise through six <strong>contexts</strong>,
+            each with a different color. The <strong>context map</strong> at the bottom of the screen shows
+            your position in the contexts. Whenever you reach a context, you
+            will make a choice and receive an outcome. This outcome corresponds
+            to the number of seconds that you will get to play the arcade game
+            durint the 36-second outcome phase. The details of the outcome phase
+            will be explained later.
+        </p>
+
+        <p>
+            In each context, you will find two cards: a "<strong>best-yet</strong>" card on the
+            left, and a "<strong>mystery</strong>" card on the right. Your task is choose one of
+            these cards. Click a card to select it, and then click the button
+            marked "click for outcome".
+        </p>
+
+        <p>
+            The "best-yet" card always produces the outcome printed on it, and
+            the context map shows the current best-yet card value in each
+            context. The best-yet card starts at a random value between 12 and
+            21, in multiples of 3. In other words, it starts at 12, 15, 18, or
+            21. The "mystery" card produces a randomly-generated outcome each
+            time it is chosen. <strong>One third of the time (33%), it will produce an
+            outcome of 0. Two thirds of the time (67%), it will
+            produce a random outcome between 12 and 36</strong>, again in multiples of 3. If the mystery card
+            produces an outcome higher than the current value of the best-yet card, this
+            value will <strong>replace</strong> the value of best-yet card. This
+            means that while choosing the mystery card can sometimes produce
+            poor outcomes, it can also improve your outcomes in the long run by
+            improving the best-yet card.
+        </p>
+
+        <p>
+            A counter at the top of the screen will inform you of the number of
+            outcomes remaining in the experiment.
+        </p>
+
+	  </div>
+
+	  <hr>
+
+    <div class="instructionsnav">
+        <div class="row">
+            <div class="col-xs-2">
+                <button type="button" id="next" value="next" class="btn btn-primary btn-lg previous">
+                <span class="glyphicon glyphicon-arrow-left"></span> Previous
+                </button>
+            </div>
+            <div class="col-xs-8">
+            </div>
+            <div class="col-xs-2">
+                <button type="button" id="next" value="next" class="btn btn-primary btn-lg continue">
+                    Next <span class="glyphicon glyphicon-arrow-right"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
