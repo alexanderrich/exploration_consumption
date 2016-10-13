@@ -474,7 +474,8 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         contextGroups,
         marker,
         futureMarker,
-        update,
+        updateMaze,
+        updateCards,
         getLocation,
         resetContext,
         showOutcome;
@@ -492,7 +493,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         return [x, y];
     };
 
-    update = function (context, advanced) {
+    updateMaze = function (context, advanced) {
         contextGroups = maze.selectAll(".context")
             .data(contexts);
         contextGroups.select(".contextvalue")
@@ -521,6 +522,26 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         }
     };
 
+    updateCards = function (exploitVal, exploreVal) {
+        var widthpct;
+        $("#exploittext").html(exploitVal.toFixed());
+        $("#gametimenote").html(exploitVal.toFixed());
+        $("#popuptimenote").html((36 - exploitVal).toFixed());
+        widthpct = Math.ceil(exploitVal/.36);
+        $("#exploitprogress :nth-child(1)").css("width", widthpct.toFixed() + "%");
+        $("#exploitprogress :nth-child(2)").css("width", (100-widthpct).toFixed() + "%");
+        if (exploreVal === "?") {
+            $("#exploretext").html("?");
+            $("#exploreprogress").css("opacity", "0");
+        } else {
+            $("#exploretext").html(exploreVal.toFixed());
+            $("#exploreprogress").css("opacity", "1");
+            widthpct = Math.ceil(exploreVal/.36);
+            $("#exploreprogress :nth-child(1)").css("width", widthpct.toFixed() + "%");
+            $("#exploreprogress :nth-child(2)").css("width", (100-widthpct).toFixed() + "%");
+        }
+    };
+
     responseFn = function (choiceId, context) {
         var contextObj = contexts[context],
             advanced = context === (trial + 4) % 6;
@@ -532,7 +553,8 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         } else {
             contextObj.nextChoice = "explore";
             if (Math.random() > .333) {
-                contextObj.nextValue = 3 + Math.ceil(Math.random() * 9);
+                // contextObj.nextValue = 3 + Math.ceil(Math.random() * 9);
+                contextObj.nextValue = 3 * (3 + Math.ceil(Math.random() * 9));
             } else {
                 contextObj.nextValue = 0;
             }
@@ -561,13 +583,12 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         $("#context").html(contextObj.color + " context");
         if (context === trial % 6) {
             $("#trialtype").html("<strong>immediate</strong> choice");
-            update(context, 0);
+            updateMaze(context, 0);
         } else {
             $("#trialtype").html("<strong>advanced</strong> choice");
-            update(context, 1);
+            updateMaze(context, 1);
         }
-        $("#exploit").html(contextObj.value.toFixed());
-        $("#explore").html("?");
+        updateCards(contextObj.value, "?");
         $(".card").css({"border": "5px solid black",
                         "margin": "0px"});
         $("#carddiv").css("background", contextObj.color);
@@ -577,12 +598,11 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
 
     showOutcome = function (context) {
         var contextObj = contexts[context];
-        update(context, 0);
+        updateMaze(context, 0);
         $("#context").html(contextObj.color + " context");
         $("#trialtype").html("<strong>click</strong> for <strong>outcome</strong>");
         $("#trialtype").css({"border": "5px solid black", "border-radius": "5px"});
-        $("#exploit").html(contextObj.value.toFixed());
-        $("#explore").html("?");
+        updateCards(contextObj.value, "?");
         $(".card").css({"border": "5px solid black",
                         "margin": "0px"});
         $("#carddiv").css("background", contextObj.color);
@@ -597,7 +617,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             $(".card").css({"border": "5px solid black",
                             "margin": "0px"});
             if (contextObj.nextChoice === "explore") {
-                $("#explore").html(contextObj.nextValue.toFixed());
+                updateCards(contextObj.value, contextObj.nextValue);
                 if (contextObj.nextValue > contextObj.value) {
                     contextObj.value = contextObj.nextValue;
                     $("#explore").css("background", "lime");
@@ -605,8 +625,8 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                                           function () {
                                               $("#explore").css("margin-left", "");
                                               $("#explore").css("background", "gainsboro");
-                                              $("#explore").html("?");
-                                              $("#exploit").html(contextObj.value.toFixed());
+                                              updateCards(contextObj.value, "?");
+                                              $("#popuptimenote").html((36 - contextObj.value).toFixed());
                                               $("#exploit").css("background", "lime");
                                           });
                     // setTimeout(function () {
@@ -618,7 +638,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                 }
             }
             contextObj.advancedSet = 0;
-            update(context, 0);
+            updateMaze(context, 0);
             setTimeout(function () {
                 $("#explorediv").hide();
                 d3.select("#context" + context + " .contextcard")
@@ -631,11 +651,10 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
 
     resetContext = function (context) {
         var contextObj = contexts[context];
-        contextObj.value = 3 + Math.ceil(Math.random() * 4);
-        update(context, 0);
+        contextObj.value = 3 * (3 + Math.ceil(Math.random() * 4));
+        updateMaze(context, 0);
         $("#trialtype").html("<strong>context reset</strong>");
-        $("#exploit").html(contextObj.value);
-        $("#explore").html("?");
+        updateCards(contextObj.value, "?");
         $(".card").css({"border": "5px solid black",
                         "margin": "0px"});
         $("#carddiv").css("background", contextObj.color);
@@ -684,8 +703,10 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     for (i = 0; i < nTrials; i++) {
         if (i < 6) {
             committed.push(0);
+        } else if (i < 54){
+            committed.push((Math.floor((i - 6) / 12) + parseInt(counterbalance)) % 2);
         } else {
-            committed.push((Math.floor((i - 6) / 18) + parseInt(counterbalance)) % 2);
+            committed.push((Math.floor((i - 6) / 6) + parseInt(counterbalance)) % 2);
         }
     }
     contexts = [{color: "red"},
@@ -696,7 +717,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                 {color: "purple"}];
     contexts = _.shuffle(contexts);
     contexts = contexts.map(function (obj) {
-        obj.value = 3 + Math.ceil(Math.random() * 4);
+        obj.value = 3 * (3 + Math.ceil(Math.random() * 4));
         obj.nextValue = 0;
         obj.advancedSet = 0;
         return obj;
@@ -805,27 +826,35 @@ function ConsumptionRewards(psiTurk, callback) {
     "use strict";
     var game,
         baselength = 3,
-        maxReward = 12,
+        maxReward = 36,
         trialNum,
         rewardAmount,
         popupCreator,
         nextReward,
         nextPunishment,
-        totalTime = maxReward * baselength,
+        totalTime = maxReward,
         timeLeft,
         decrementTime,
         recordData,
         timeInterval;
 
     nextReward = function (length) {
-        game.run(baselength * length, function () {
+        $("#time").html(length);
+        timeLeft = length;
+        timeInterval = setInterval(decrementTime, 1000);
+        game.run(length, function () {
+            clearInterval(timeInterval);
             nextPunishment(maxReward - length);
         });
     };
 
-    nextPunishment = function (penalty) {
-        popupCreator.runMultiple(penalty, function () {
+    nextPunishment = function (length) {
+        $("#time").html(length);
+        timeLeft = length;
+        timeInterval = setInterval(decrementTime, 1000);
+        popupCreator.runMultiple(length / 3, function () {
             $("#rewards").hide();
+            clearInterval(timeInterval);
             recordData();
         });
     };
@@ -859,9 +888,6 @@ function ConsumptionRewards(psiTurk, callback) {
         trialNum = trial;
         $("#rewards").show();
         popupCreator.reset();
-        timeLeft = totalTime;
-        $("#time").html(timeLeft);
-        timeInterval = setInterval(decrementTime, 1000);
         nextReward(reward);
     };
 
@@ -872,11 +898,8 @@ function ConsumptionRewards(psiTurk, callback) {
 
     decrementTime = function () {
         timeLeft--;
-        if (timeLeft > 0) {
+        if (timeLeft >= 0) {
             $("#time").html(timeLeft);
-        } else {
-            $("#time").html(timeLeft);
-            clearInterval(timeInterval);
         }
     };
 
@@ -892,16 +915,7 @@ function StandardRewards (psiTurk, callback) {
     var totalRewards = 0;
 
     this.setReward = function (reward) {
-        totalRewards += reward;
-        $("#points").html(totalRewards);
-        $("#rewards").html((reward * 3).toString() + "s brickbreak<br/>" +
-                           ((12 - reward) * 3).toString() + "s popups");
-        $("#rewards").show();
-        setTimeout(function () {
-            $("#rewards").html("");
-            $("#rewards").hide();
-            callback();
-        }, 3000);
+        callback();
     };
 
     this.recordFinal = function(taskType) {
@@ -909,8 +923,8 @@ function StandardRewards (psiTurk, callback) {
     };
 
     $("#rewards").addClass("standardRewards");
-    $("#points").html(totalRewards);
     $("#timediv").css("opacity", 0);
+    $("#pointsdiv").css("opacity", 0);
     $("#popuppctdiv").css("opacity", 0);
 }
 
@@ -1112,7 +1126,7 @@ function experimentDriver() {
     "use strict";
     var psiTurk = new PsiTurk(uniqueId, adServerLoc, mode),
         next,
-        nTrials = [36, 78, 78],
+        nTrials = [30, 66],
         // nTrials = [3, 3, 3],
         functionList = [];
 
@@ -1151,11 +1165,11 @@ function experimentDriver() {
                               "instructions/quiz-2.html", {contextmove: "clockwise", contextlink: "no", advancednum: "4"},
                               psiTurk, next); },
         function () {
-            phaseDriver(nTrials[1], ExploreExploitTask, StandardRewards, "standard", psiTurk, next); },
+            phaseDriver(nTrials[0], ExploreExploitTask, StandardRewards, "standard", psiTurk, next); },
         function () {
             practiceConsumption(psiTurk, next); },
         function () {
-            phaseDriver(nTrials[2], ExploreExploitTask, ConsumptionRewards, "consumption", psiTurk, next); },
+            phaseDriver(nTrials[1], ExploreExploitTask, ConsumptionRewards, "consumption", psiTurk, next); },
         function () {
             endingQuestions(psiTurk, next); },
         function () {

@@ -204,7 +204,7 @@ strong {
     width: 120px;
     height: 120px;
     border-radius: 5px;
-    padding-top: 25px;
+    padding-top: 15px;
     border: 5px solid black;
     background: gainsboro;
 }
@@ -287,4 +287,17 @@ strong {
     padding-top: 15px;
     border: 5px solid black;
     background: yellow;
+}
+
+.progress {
+    margin-left: auto;
+    margin-right: auto;
+    width: 80px;
+}
+.progress-bar {
+    -webkit-transition: none;
+    -moz-transition: none;
+    -ms-transition: none;
+    -o-transition: none;
+    transition: none;
 }
