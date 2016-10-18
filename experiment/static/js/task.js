@@ -112,6 +112,8 @@ function Game(popupCreator) {
                 ball.body.velocity.x = ball.body.velocity.x * speed / (speed - 1);
                 ball.body.velocity.y = ball.body.velocity.y * speed / (speed - 1);
             }
+            $("#multiplierbar :first-child").css("width", (speed/8*100).toFixed() + "%");
+            $("#multiplierbar :first-child").html(speed.toFixed() +  "x");
             clearTimeout(multiplierTimeout);
             $("#multiplier").css("opacity", 1);
             $("#multiplier").html(speed.toString() + "x points");
@@ -123,11 +125,15 @@ function Game(popupCreator) {
                 ball.body.velocity.x = ball.body.velocity.x * speed / (speed + 1);
                 ball.body.velocity.y = ball.body.velocity.y * speed / (speed + 1);
             }
+            $("#multiplierbar :first-child").css("width", (speed/8*100).toFixed() + "%");
+            $("#multiplierbar :first-child").html(speed.toFixed() +  "x");
             clearTimeout(multiplierTimeout);
             $("#multiplier").css("opacity", 1);
             $("#multiplier").html(speed.toString() + "x points");
             multiplierTimeout = setTimeout(function () { $("#multiplier").css("opacity", 0); }, 1000);
         });
+        $("#multiplierbar :first-child").css("width", (speed/8*100).toFixed() + "%");
+        $("#multiplierbar :first-child").html(speed.toFixed() +  "x");
         startLevel();
         update();
         game.paused = true;
@@ -725,6 +731,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             });
         }
         functionList.pop()();
+        $("#inforeminder").hide();
     };
 
     $("#inforeminderbutton").click(function () {$("#inforeminder").toggle(400); });
