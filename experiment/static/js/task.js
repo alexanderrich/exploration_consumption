@@ -7,7 +7,7 @@
  */
 
 /*jslint browser: true*/
-/*global counterbalance, uniqueId, adServerLoc, mode, document, PsiTurk, $, _, d3, Phaser, window, setTimeout, setInterval, clearInterval*/
+/*global counterbalance, uniqueId, adServerLoc, mode, document, PsiTurk, $, _, d3, Phaser, window, setTimeout, clearTimeout, setInterval, clearInterval*/
 
 function Game(popupCreator) {
     "use strict";
@@ -33,7 +33,11 @@ function Game(popupCreator) {
         ballOnPaddle = true,
         level = 0,
         points = 0,
+        speed = 4,
+        cursors,
+        multiplierTimeout,
         lastRunPoints = 0,
+        lastRunBricks = 0,
         lastRunDeaths = 0;
 
     preload = function () {
@@ -101,6 +105,29 @@ function Game(popupCreator) {
         ball.body.bounce.set(1);
         ball.events.onOutOfBounds.add(ballLost, this);
         game.time.events.add(1000, releaseBall, this);
+        cursors = game.input.keyboard.createCursorKeys();
+        cursors.up.onDown.add(function () {
+            if (speed < 8) {
+                speed++;
+                ball.body.velocity.x = ball.body.velocity.x * speed / (speed - 1);
+                ball.body.velocity.y = ball.body.velocity.y * speed / (speed - 1);
+            }
+            clearTimeout(multiplierTimeout);
+            $("#multiplier").css("opacity", 1);
+            $("#multiplier").html(speed.toString() + "x points");
+            multiplierTimeout = setTimeout(function () { $("#multiplier").css("opacity", 0); }, 1000);
+        });
+        cursors.down.onDown.add(function () {
+            if (speed > 1) {
+                speed--;
+                ball.body.velocity.x = ball.body.velocity.x * speed / (speed + 1);
+                ball.body.velocity.y = ball.body.velocity.y * speed / (speed + 1);
+            }
+            clearTimeout(multiplierTimeout);
+            $("#multiplier").css("opacity", 1);
+            $("#multiplier").html(speed.toString() + "x points");
+            multiplierTimeout = setTimeout(function () { $("#multiplier").css("opacity", 0); }, 1000);
+        });
         startLevel();
         update();
         game.paused = true;
@@ -127,8 +154,8 @@ function Game(popupCreator) {
         if (ballOnPaddle)
         {
             ballOnPaddle = false;
-            ball.body.velocity.y = -300;
-            ball.body.velocity.x = -75 + 150 * Math.random();
+            ball.body.velocity.y = speed * -75;
+            ball.body.velocity.x = speed * (-20 + 40 * Math.random());
         }
     };
 
@@ -244,8 +271,9 @@ function Game(popupCreator) {
     ballHitBrick = function (_ball, _brick) {
         var bonus;
         _brick.kill();
-        points++;
-        lastRunPoints++;
+        points += speed;
+        lastRunPoints += speed;
+        lastRunBricks++;
         $("#points").html(points);
         //  Are they any bricks left?
         if (bricks.countLiving() === 0) {
@@ -255,7 +283,7 @@ function Game(popupCreator) {
             bonus.body.velocity.y = 150;
             bonus.checkWorldBounds = true;
             bonus.outOfBoundsKill = true;
-            bonus.addChild(game.add.text(15, 0, "+3", {font: "15px Arial", fill: "#000000"}));
+            bonus.addChild(game.add.text(10, 0, "+15", {font: "15px Arial", fill: "#000000"}));
         }
     };
 
@@ -283,17 +311,18 @@ function Game(popupCreator) {
 
     bonusHitPaddle = function (_paddle, _bonus) {
         _bonus.kill();
-        points += 3;
-        lastRunPoints += 3;
+        points += 15;
+        lastRunPoints += 15;
         $("#points").html(points);
     };
 
     this.setup = function () {
-        game = new Phaser.Game(700, 500, Phaser.AUTO, "rewards", {preload: preload, create: create, update: update});
+        game = new Phaser.Game(700, 500, Phaser.AUTO, "gamediv", {preload: preload, create: create, update: update});
     };
 
     this.run = function (time, callback) {
         lastRunPoints = 0;
+        lastRunBricks = 0;
         lastRunDeaths = 0;
         stopBonuses = false;
         game.paused = false;
@@ -316,6 +345,7 @@ function Game(popupCreator) {
     this.getStats = function () {
         return {points: points,
                 lastRunPoints: lastRunPoints,
+                lastRunBricks: lastRunBricks,
                 deaths: lastRunDeaths};
     };
 }
@@ -454,7 +484,6 @@ function PopupCreator (length) {
         next();
     };
 
-    $("#rewards").append("<div id=\"popup\"> <div id=\"popupinstruct\"></div> <div id=\"popupcountdown\"></div> </div> ");
     $("#popup").hide();
     $("#popuppct").html("0");
 }
@@ -872,6 +901,7 @@ function ConsumptionRewards(psiTurk, callback) {
                                  reward: rewardAmount,
                                  points: gameData.points,
                                  lastRunPoints: gameData.lastRunPoints,
+                                 lastRunBricks: gameData.lastRunBricks,
                                  deaths: gameData.deaths,
                                  deathCompletes: popupData.deathCompletes,
                                  deathMisses: popupData.deathMisses,
