@@ -205,16 +205,16 @@ function Game(popupCreator) {
         case 1:
             for (y = 0; y < 10; y++) {
                 for (x = 0; x < 14; x++) {
-                    if (y > x * .65) {
+                    if (y < 3 || y > 6) {
                         bricks.getChildAt(y * 14 + x).revive();
                     }
                 }
             }
             break;
         case 2:
-            for (y = 0; y < 10; y++) {
+            for (y = 0; y < 9; y++) {
                 for (x = 0; x < 14; x++) {
-                    if (y < 3 || y > 6) {
+                    if (y > x * .65) {
                         bricks.getChildAt(y * 14 + x).revive();
                     }
                 }
@@ -674,10 +674,6 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                                               $("#popuptimenote").html((36 - contextObj.value).toFixed());
                                               $("#exploit").css("background", "lime");
                                           });
-                    // setTimeout(function () {
-                    //     $("#explore").css("background", "gainsboro");
-                    //     $("#explore").html("?");
-                    // }, 1000);
                     d3.select("#context" + context + " .contextcard")
                         .style("fill", "lime");
                 }
