@@ -696,7 +696,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
 
     resetContext = function (context) {
         var contextObj = contexts[context];
-        contextObj.value = 3 * (3 + Math.ceil(Math.random() * 4));
+        contextObj.value = 3 * (3 + Math.ceil(Math.random() * 3));
         updateMaze(context, 0);
         $("#trialtype").html("<strong>context reset</strong>");
         updateCards(contextObj.value, "?");
@@ -763,7 +763,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                 {color: "purple"}];
     contexts = _.shuffle(contexts);
     contexts = contexts.map(function (obj) {
-        obj.value = 3 * (3 + Math.ceil(Math.random() * 4));
+        obj.value = 3 * (3 + Math.ceil(Math.random() * 3));
         obj.nextValue = 0;
         obj.advancedSet = 0;
         return obj;
