@@ -4,14 +4,14 @@ body {
     margin: 0px;
     background-color: white;
     color: black;
-    font-weight: 300; 
+    font-weight: 300;
     font-size: 13pt;
 }
 
 
 /* text styling */
 strong {
-  font-weight: 600;         
+  font-weight: 600;
 }
 
 .warm {
@@ -41,6 +41,13 @@ strong {
   padding-left: 20px;
   padding-right: 20px;
   padding-top: 1%;
+}
+
+.instrimages {
+    text-align: center;
+    padding-top: 20px;
+    padding-bottom: 20px;
+
 }
 
 #choiceholder{
