@@ -36,6 +36,7 @@ function Game(popupCreator) {
         speed = 4,
         cursors,
         multiplierTimeout,
+        multiplierText,
         lastRunPoints = 0,
         lastRunBricks = 0,
         lastRunDeaths = 0;
@@ -105,6 +106,8 @@ function Game(popupCreator) {
         ball.body.bounce.set(1);
         ball.events.onOutOfBounds.add(ballLost, this);
         game.time.events.add(1000, releaseBall, this);
+        multiplierText = game.add.text(275, 180, speed.toString() + "x points", {font: "30px Arial"});
+        multiplierText.alpha = 0;
         cursors = game.input.keyboard.createCursorKeys();
         cursors.up.onDown.add(function () {
             if (speed < 8) {
@@ -113,11 +116,11 @@ function Game(popupCreator) {
                 ball.body.velocity.y = ball.body.velocity.y * speed / (speed - 1);
             }
             $("#multiplierbar :first-child").css("width", (speed/8*100).toFixed() + "%");
-            $("#multiplierbar :first-child").html(speed.toFixed() +  "x");
+            $("#multiplierbar :first-child").html(speed.toString() +  "x");
             clearTimeout(multiplierTimeout);
-            $("#multiplier").css("opacity", 1);
-            $("#multiplier").html(speed.toString() + "x points");
-            multiplierTimeout = setTimeout(function () { $("#multiplier").css("opacity", 0); }, 1000);
+            multiplierText.alpha = 1;
+            multiplierText.text = speed.toString() + "x points";
+            multiplierTimeout = setTimeout(function () {multiplierText.alpha = 0; }, 1000);
         });
         cursors.down.onDown.add(function () {
             if (speed > 1) {
@@ -126,14 +129,14 @@ function Game(popupCreator) {
                 ball.body.velocity.y = ball.body.velocity.y * speed / (speed + 1);
             }
             $("#multiplierbar :first-child").css("width", (speed/8*100).toFixed() + "%");
-            $("#multiplierbar :first-child").html(speed.toFixed() +  "x");
+            $("#multiplierbar :first-child").html(speed.toString() +  "x");
             clearTimeout(multiplierTimeout);
-            $("#multiplier").css("opacity", 1);
-            $("#multiplier").html(speed.toString() + "x points");
-            multiplierTimeout = setTimeout(function () { $("#multiplier").css("opacity", 0); }, 1000);
+            multiplierText.alpha = 1;
+            multiplierText.text = speed.toString() + "x points";
+            multiplierTimeout = setTimeout(function () {multiplierText.alpha = 0; }, 1000);
         });
         $("#multiplierbar :first-child").css("width", (speed/8*100).toFixed() + "%");
-        $("#multiplierbar :first-child").html(speed.toFixed() +  "x");
+        $("#multiplierbar :first-child").html(speed.toString() +  "x");
         startLevel();
         update();
         game.paused = true;
@@ -636,6 +639,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         updateMaze(context, 0);
         $("#context").html(contextObj.color + " context");
         $("#trialtype").html("<strong>click</strong> for <strong>outcome</strong>");
+        $("#trialtype").css("background", "gainsboro")
         $("#trialtype").css({"border": "5px solid black", "border-radius": "5px"});
         updateCards(contextObj.value, "?");
         $(".card").css({"border": "5px solid black",
@@ -646,6 +650,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         $("#explorediv").show();
         $("#trialtype").click(function () {
             $("#trialtype").off("click");
+            $("#trialtype").css("background", "white")
             $("#trialtype").css("border", "");
             $("#trialtype").html("Outcome: <strong>" + contextObj.nextValue.toFixed() + "</strong>");
             $("#trialtype").html("Outcome: <strong>" + contextObj.nextValue.toFixed() + "</strong>");

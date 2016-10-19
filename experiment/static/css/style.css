@@ -276,17 +276,6 @@ strong {
     text-align: center;
 }
 
-#multiplier {
-    position: absolute;
-    text-align; center;
-    padding-top: 80px;
-    left: 270px;
-    top: 140px;
-    width: 300px;
-    height: 200px;
-    font-size: 28px;
-}
-
 /* popup */
 #popup {
     position: absolute;
