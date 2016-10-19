@@ -110,30 +110,34 @@ function Game(popupCreator) {
         multiplierText.alpha = 0;
         cursors = game.input.keyboard.createCursorKeys();
         cursors.up.onDown.add(function () {
-            if (speed < 8) {
-                speed++;
-                ball.body.velocity.x = ball.body.velocity.x * speed / (speed - 1);
-                ball.body.velocity.y = ball.body.velocity.y * speed / (speed - 1);
+            if (!game.paused) {
+                if (speed < 8) {
+                    speed++;
+                    ball.body.velocity.x = ball.body.velocity.x * speed / (speed - 1);
+                    ball.body.velocity.y = ball.body.velocity.y * speed / (speed - 1);
+                }
+                $("#multiplierbar :first-child").css("width", (speed/8*100).toFixed() + "%");
+                $("#multiplierbar :first-child").html(speed.toString() +  "x");
+                clearTimeout(multiplierTimeout);
+                multiplierText.alpha = 1;
+                multiplierText.text = speed.toString() + "x points";
+                multiplierTimeout = setTimeout(function () {multiplierText.alpha = 0; }, 1000);
             }
-            $("#multiplierbar :first-child").css("width", (speed/8*100).toFixed() + "%");
-            $("#multiplierbar :first-child").html(speed.toString() +  "x");
-            clearTimeout(multiplierTimeout);
-            multiplierText.alpha = 1;
-            multiplierText.text = speed.toString() + "x points";
-            multiplierTimeout = setTimeout(function () {multiplierText.alpha = 0; }, 1000);
         });
         cursors.down.onDown.add(function () {
-            if (speed > 1) {
-                speed--;
-                ball.body.velocity.x = ball.body.velocity.x * speed / (speed + 1);
-                ball.body.velocity.y = ball.body.velocity.y * speed / (speed + 1);
+            if (!game.paused) {
+                if (speed > 1) {
+                    speed--;
+                    ball.body.velocity.x = ball.body.velocity.x * speed / (speed + 1);
+                    ball.body.velocity.y = ball.body.velocity.y * speed / (speed + 1);
+                }
+                $("#multiplierbar :first-child").css("width", (speed/8*100).toFixed() + "%");
+                $("#multiplierbar :first-child").html(speed.toString() +  "x");
+                clearTimeout(multiplierTimeout);
+                multiplierText.alpha = 1;
+                multiplierText.text = speed.toString() + "x points";
+                multiplierTimeout = setTimeout(function () {multiplierText.alpha = 0; }, 1000);
             }
-            $("#multiplierbar :first-child").css("width", (speed/8*100).toFixed() + "%");
-            $("#multiplierbar :first-child").html(speed.toString() +  "x");
-            clearTimeout(multiplierTimeout);
-            multiplierText.alpha = 1;
-            multiplierText.text = speed.toString() + "x points";
-            multiplierTimeout = setTimeout(function () {multiplierText.alpha = 0; }, 1000);
         });
         $("#multiplierbar :first-child").css("width", (speed/8*100).toFixed() + "%");
         $("#multiplierbar :first-child").html(speed.toString() +  "x");
@@ -355,6 +359,7 @@ function Game(popupCreator) {
         return {points: points,
                 lastRunPoints: lastRunPoints,
                 lastRunBricks: lastRunBricks,
+                endingSpeed: speed,
                 deaths: lastRunDeaths};
     };
 }
@@ -442,7 +447,7 @@ function PopupCreator (length) {
             } else {
                 stats.penaltyMisses++;
             }
-            $("#popuppct").html(((1 - totalCompletes / totalPopups) * 100).toFixed());
+            $("#popuppct").html(Math.floor(((1 - totalCompletes / totalPopups) * 100)).toString());
             if ((1 - totalCompletes / totalPopups) > .1) {
                 $("#popuppctdiv").css("color", "red");
             } else {
@@ -457,7 +462,7 @@ function PopupCreator (length) {
     };
 
     this.missPct = function () {
-        return 1 - totalCompletes / totalPopups * 100;
+        return (1 - totalCompletes / totalPopups) * 100;
     };
 
     this.isUp = function () {
@@ -914,6 +919,7 @@ function ConsumptionRewards(psiTurk, callback) {
                                  points: gameData.points,
                                  lastRunPoints: gameData.lastRunPoints,
                                  lastRunBricks: gameData.lastRunBricks,
+                                 endingSpeed: gameData.endingSpeed,
                                  deaths: gameData.deaths,
                                  deathCompletes: popupData.deathCompletes,
                                  deathMisses: popupData.deathMisses,
@@ -1075,14 +1081,13 @@ function instructionDriver(instructionPages, quizPage, answerKey, psiTurk, callb
 function endingQuestions(psiTurk, callback) {
     "use strict";
     var recordResponses,
-        standardBonus = Math.floor(psiTurk.getQuestionData().points_standard / 10) / 100,
-        consumptionBonus = Math.floor(psiTurk.getQuestionData().points_consumption / 10) / 100,
+        points = psiTurk.getQuestionData().points_consumption,
         misspct = Math.floor(psiTurk.getQuestionData().misses_consumption),
         missloss = 0,
-        totalBonus;
+        bonus;
 
     recordResponses = function () {
-        if ($("#popupenjoyment").val() === "noresp" || $("#breakoutenjoyment").val() === "noresp") {
+        if ($("#popupenjoyment").val() === "noresp" || $("#brickbreakenjoyment").val() === "noresp") {
             $("#blankmessage").html("<strong>Please answer all questions before continuing.</strong>");
         } else {
             $("select").each(function () {
@@ -1094,18 +1099,17 @@ function endingQuestions(psiTurk, callback) {
 
 
     psiTurk.showPage("endingquestions.html");
-    $("#phase2bonus").html(standardBonus.toFixed(2));
-    $("#phase3bonus").html(consumptionBonus.toFixed(2));
+    $("#pointsscored").html(points);
+    $("#misspct").html(misspct);
     if (misspct > 10) {
-        $("#misspct").html(misspct);
-        missloss = (misspct - 10) / 20;
-        $("#missloss").html(missloss.toFixed(2));
+        missloss = Math.min((misspct - 10) * .1, 3);
+        bonus = 3 - missloss;
     } else {
-        $("#misses").hide();
+        bonus = 3;
     }
-    totalBonus = standardBonus + consumptionBonus - missloss;
-    psiTurk.recordUnstructuredData("bonus", totalBonus);
-    $("#totalbonus").html(totalBonus.toFixed(2));
+    $("#missloss").html(missloss.toFixed(2));
+    psiTurk.recordUnstructuredData("bonus", bonus);
+    $("#totalbonus").html(bonus.toFixed(2));
     $("#continue").click(function () {
         recordResponses();
     });

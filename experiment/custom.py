@@ -100,19 +100,11 @@ def compute_bonus():
     try:
         # lookup user in database
         user = Participant.query.\
-               filter(Participant.uniqueid == uniqueId).\
-               one()
+           filter(Participant.uniqueid == uniqueId).\
+           one()
         user_data = loads(user.datastring) # load datastring from JSON
-        finalscores = []
-
-        for record in user_data['data']: # for line in data file
-                trial = record['trialdata']
-                if trial['phase']=='experiment':
-                        if trial['blocktrial']==30:
-                                finalscores.append(trial['score'])
-        random.shuffle(finalscores)
-        bonus = finalscores[0]
-        user.bonus = bonus * .02
+        bonus = user_data['questiondata']['bonus']
+        user.bonus = bonus
         db_session.add(user)
         db_session.commit()
         resp = {"bonusComputed": "success"}
