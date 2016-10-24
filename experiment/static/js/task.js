@@ -306,19 +306,19 @@ function Game(popupCreator) {
         {
             //  Ball is on the left-hand side of the paddle
             diff = _paddle.x - _ball.x;
-            _ball.body.velocity.x = (-10 * diff);
+            _ball.body.velocity.x = speed * (-2.5 * diff);
         }
         else if (_ball.x > _paddle.x)
         {
             //  Ball is on the right-hand side of the paddle
             diff = _ball.x - _paddle.x;
-            _ball.body.velocity.x = (10 * diff);
+            _ball.body.velocity.x = speed * (2.5 * diff);
         }
         else
         {
             //  Ball is perfectly in the middle
             //  Add a little random X to stop it bouncing straight up!
-            _ball.body.velocity.x = -4 + Math.random() * 8;
+            _ball.body.velocity.x = speed * (-1 + Math.random() * 2);
         }
     };
 
