@@ -742,13 +742,28 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
 
     $("#inforeminderbutton").click(function () {$("#inforeminder").toggle(400); });
     committed = [];
-    for (i = 0; i < nTrials; i++) {
-        if (i < 6) {
-            committed.push(0);
-        } else if (i < 54){
-            committed.push((Math.floor((i - 6) / 12) + parseInt(counterbalance)) % 2);
-        } else {
-            committed.push((Math.floor((i - 6) / 6) + parseInt(counterbalance)) % 2);
+    if (taskType === "practice") {
+        for (i = 0; i < nTrials; i++) {
+            if (i < 12) {
+                committed.push(0);
+            } else if (i < 24){
+                committed.push(1);
+            } else {
+                committed.push(0);
+            }
+        }
+        $("#timediv").css("opacity", 0);
+        $("#pointsdiv").css("opacity", 0);
+        $("#popuppctdiv").css("opacity", 0);
+    } else {
+        for (i = 0; i < nTrials; i++) {
+            if (i < 6) {
+                committed.push(0);
+            } else if (i < 54){
+                committed.push((Math.floor((i - 6) / 12) + parseInt(counterbalance)) % 2);
+            } else {
+                committed.push((Math.floor((i - 6) / 6) + parseInt(counterbalance)) % 2);
+            }
         }
     }
     contexts = [{color: "red"},
@@ -954,22 +969,16 @@ function ConsumptionRewards(psiTurk, callback) {
     $("#time").html("0");
 }
 
-function StandardRewards (psiTurk, callback) {
+function PracticeRewards (psiTurk, callback) {
     "use strict";
-    var totalRewards = 0;
 
     this.setReward = function (reward) {
         callback();
     };
 
     this.recordFinal = function(taskType) {
-        psiTurk.recordUnstructuredData("points_" + taskType, totalRewards.toString());
+        return;
     };
-
-    $("#rewards").addClass("standardRewards");
-    $("#timediv").css("opacity", 0);
-    $("#pointsdiv").css("opacity", 0);
-    $("#popuppctdiv").css("opacity", 0);
 }
 
 function practiceConsumption(psiTurk, callback) {
