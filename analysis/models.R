@@ -92,7 +92,7 @@ df <- df %>% gather(bias, diff, -reward_exploit) %>%
 ggplot(df, aes(x=reward_exploit, y=diff, group=bias)) + geom_line(aes(color=bias))
 
 
-test <- optimal_values(7/8, 10)
+test <- optimal_values(5/6, 10)
 df <- melt(test$exploit_values)
 df <- setNames(df, c("trial", "rewardIdx", "exploit_value"))
 df$explore_value <- melt(test$explore_values)[,3]
@@ -112,4 +112,4 @@ df <- df %>%
   filter(rewardIdx > 1)
 
 ## plot of how optimal effect changes as the end of the experiment is reached
-ggplot(df, aes(x=rewardIdx, y=diff, group=bias)) + geom_hline(yintercept=0) + geom_line(aes(color=bias)) + facet_wrap(~trial)
+ggplot(df, aes(x=rewardIdx, y=diff, group=bias)) + geom_hline(yintercept=0) + geom_line(aes(color=bias)) + ylim(-7, 5)+ facet_wrap(~trial)

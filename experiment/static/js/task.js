@@ -508,6 +508,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     var responseFn,
         contexts,
         committed,
+        resetArray,
         committedOn = 0,
         i,
         trial = -1,
@@ -731,7 +732,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         } else {
             committedOn = 0;
         }
-        if (trial !== 0 && Math.random() < .125) {
+        if (resetArray[trial - 1]) {
             functionList.push(function () {
                 resetContext((trial - 1) % 6);
             });
@@ -765,6 +766,11 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                 committed.push((Math.floor((i - 6) / 6) + parseInt(counterbalance)) % 2);
             }
         }
+    }
+    resetArray = [];
+    for (i = 0; i < nTrials / 6; i++) {
+        resetArray = [0, 0, 0, 0, 0, 0].concat(resetArray);
+        resetArray[Math.floor(Math.random() * 6)] = 1;
     }
     contexts = [{color: "red"},
                 {color: "orange"},
@@ -1213,8 +1219,12 @@ function experimentDriver() {
                                "instructions/instruct_4.html",
                                "instructions/instruct_5.html",
                                "instructions/instruct_6.html"],
-                              "instructions/quiz.html", {mystery0: "third", range: "12_36", reset: "1_8",
-                                                         advancednum: "4", penalty: "10percentage"},
+                              "instructions/quiz.html",
+                              {mystery0: "third",
+                               range: "12_36",
+                               reset: "1_6",
+                               advancednum: "4",
+                               penalty: "10percentage"},
                               psiTurk, next); },
         function () {
             TransitionScreen("transition_practicedecision.html", psiTurk, next);
