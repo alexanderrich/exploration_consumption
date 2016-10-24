@@ -1011,6 +1011,11 @@ function practiceConsumption(psiTurk, callback) {
     next();
 }
 
+function TransitionScreen(page, psiTurk, callback) {
+    psiTurk.showPage(page);
+    $("#continue").click(callback);
+}
+
 function phaseDriver(nTrials, ExploreFn, RewardFn, taskType, psiTurk, callback) {
     "use strict";
     var exploreExploit,
@@ -1195,6 +1200,9 @@ function experimentDriver() {
                           "instructions/instruct_5.html",
                           "instructions/instruct_6.html",
                           "instructions/quiz.html",
+                          "transition_practicedecision.html",
+                          "transition_practiceconsumption.html",
+                          "transition_fulltask.html",
                           "endingquestions.html",
                           "postquestionnaire.html"]);
     functionList = [
@@ -1209,9 +1217,18 @@ function experimentDriver() {
                                                          advancednum: "4", penalty: "10percentage"},
                               psiTurk, next); },
         function () {
-            phaseDriver(nTrials[0], ExploreExploitTask, StandardRewards, "standard", psiTurk, next); },
+            TransitionScreen("transition_practicedecision.html", psiTurk, next);
+        },
+        function () {
+            phaseDriver(nTrials[0], ExploreExploitTask, PracticeRewards, "practice", psiTurk, next); },
+        function () {
+            TransitionScreen("transition_practiceconsumption.html", psiTurk, next);
+        },
         function () {
             practiceConsumption(psiTurk, next); },
+        function () {
+            TransitionScreen("transition_fulltask.html", psiTurk, next);
+        },
         function () {
             phaseDriver(nTrials[1], ExploreExploitTask, ConsumptionRewards, "consumption", psiTurk, next); },
         function () {
