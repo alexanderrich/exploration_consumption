@@ -1185,18 +1185,10 @@ function experimentDriver() {
                           "instructions/instruct_4.html",
                           "instructions/instruct_5.html",
                           "instructions/instruct_6.html",
-                          "instructions/quiz-1.html",
-                          "instructions/quiz-2.html",
-                          "instructions/quiz-3.html",
+                          "instructions/quiz.html",
                           "endingquestions.html",
                           "postquestionnaire.html"]);
     functionList = [
-        // function () {
-        //     instructionDriver(["instructions/instruct-1-1.html", "instructions/instruct-1-2.html"],
-        //                       "instructions/quiz-1.html", {mystery0: "50", range: "4_12", reset: "1_10"},
-        //                       psiTurk, next); },
-        // function () {
-        //     phaseDriver(nTrials[0], ExploreExploitTaskNoContext, StandardRewards, "nocontext", psiTurk, next); },
         function () {
             instructionDriver(["instructions/instruct_1.html",
                                "instructions/instruct_2.html",
@@ -1204,7 +1196,8 @@ function experimentDriver() {
                                "instructions/instruct_4.html",
                                "instructions/instruct_5.html",
                                "instructions/instruct_6.html"],
-                              "instructions/quiz-2.html", {contextmove: "clockwise", contextlink: "no", advancednum: "4"},
+                              "instructions/quiz.html", {mystery0: "third", range: "12_36", reset: "1_8",
+                                                         advancednum: "4", penalty: "10percentage"},
                               psiTurk, next); },
         function () {
             phaseDriver(nTrials[0], ExploreExploitTask, StandardRewards, "standard", psiTurk, next); },
