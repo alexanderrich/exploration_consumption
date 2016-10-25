@@ -767,11 +767,19 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             }
         }
     }
-    resetArray = [];
-    for (i = 0; i < nTrials / 6; i++) {
-        resetArray = [0, 0, 0, 0, 0, 0].concat(resetArray);
-        resetArray[Math.floor(Math.random() * 6)] = 1;
-    }
+    (function () {
+        var lastchosen = -1,
+            chosen = -1;
+        resetArray = [];
+        for (i = 0; i < nTrials / 6; i++) {
+            while(chosen === lastchosen) {
+                chosen = Math.floor(Math.random() * 6);
+            }
+            resetArray = [0, 0, 0, 0, 0, 0].concat(resetArray);
+            resetArray[chosen] = 1;
+            lastchosen = chosen;
+        }
+    })();
     contexts = [{color: "red"},
                 {color: "orange"},
                 {color: "yellow"},
