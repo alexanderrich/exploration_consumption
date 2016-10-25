@@ -989,25 +989,25 @@ function PracticeRewards (psiTurk, callback) {
 
 function practiceConsumption(psiTurk, callback) {
     "use strict";
-    var examples = [4, 0, 8, 0, 12],
-        trials = [-5, -4, -3, -2, -1],
+    var examples = [24, 12, 0, 36],
+        trials = [-4, -3, -2, -1],
         rewards,
         next;
 
     next = function () {
         if (examples.length === 0) {
-            $("#rewardintro").show();
-            $("#rewardintro").html("Continuing to main task");
-            setTimeout(callback, 3000);
+            callback();
         } else {
             var reward = examples.shift();
             $("#rewardintro").show();
-            $("#rewardintro").html("Example outcome: " + reward);
-            setTimeout(
+            $("#rewardintrotext").html("Example outcome: " + reward);
+            $("#continue").off("click");
+            $("#continue").click(
                 function () {
                     $("#rewardintro").hide();
                     rewards.setReward(reward, trials.shift());
-                }, 3000);
+                }
+            );
         }
     };
 
