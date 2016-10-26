@@ -191,7 +191,7 @@ function Game(popupCreator) {
         game.time.events.add(1000, releaseBall, this);
         ball.x = paddle.x + 16;
         ball.y = paddle.y - 16;
-        switch (level % 8) {
+        switch (level % 10) {
         case 0:
             for (y = 0; y < 10; y++) {
                 for (x = 0; x < 14; x++) {
@@ -272,6 +272,24 @@ function Game(popupCreator) {
             for (y = 0; y < 10; y++) {
                 for (x = 0; x < 14; x++) {
                     if ((y < x * .7 - 2) || (y > x * .7 + 2) ) {
+                        bricks.getChildAt(y * 14 + x).revive();
+                    }
+                }
+            }
+            break;
+        case 8:
+            for (y = 0; y < 10; y++) {
+                for (x = 0; x < 14; x++) {
+                    if ((y === 0 || y === 1 || y === 8 || y === 9) || (x === 6 || x === 7)) {
+                        bricks.getChildAt(y * 14 + x).revive();
+                    }
+                }
+            }
+            break;
+        case 9:
+            for (y = 0; y < 10; y++) {
+                for (x = 0; x < 14; x++) {
+                    if ("toqwiusdkjfetiufknskdfjetqoewtopsdiufaspqweioidsuflkjxvnmvksjdfhqwiyoerrsflkmmjbkhdfqietasdfqewrwertasdfasdwertdsadfewrtdsytouooojknvlkjfhtieorewoijflk".charCodeAt(y*14 + x) > 109) {
                         bricks.getChildAt(y * 14 + x).revive();
                     }
                 }
