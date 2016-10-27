@@ -1,19 +1,19 @@
 [HIT Configuration]
-title = Gem mining game
-description = Takes about 12 minutes, bonus around $0.50!
+title = Decision making game
+description = Easy $3.00 bonus, takes 60 to 70 minutes. Make choices to gain time playing an arcade game.
 amt_keywords = Decision making, Psychology
 lifetime = 24
 us_only = true
 approve_requirement = 95
 contact_email_on_error = gureckislab@gmail.com
-ad_group = Complex rewards
-psiturk_keywords = reinforcement learning, attention
+ad_group = exploration consumption
+psiturk_keywords = reinforcement learning, exploration, intertemporal
 organization_name = New York University
 browser_exclude_rule = MSIE, mobile, tablet
 
 [Database Parameters]
 database_url = sqlite:///participants.db
-table_name = complex_rewards
+table_name = exploration_consumption
 
 [Server Parameters]
 host = localhost
