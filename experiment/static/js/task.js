@@ -378,6 +378,8 @@ function Game(popupCreator) {
                 lastRunPoints: lastRunPoints,
                 lastRunBricks: lastRunBricks,
                 endingSpeed: speed,
+                level: level,
+                bricksLeft: bricks.countLiving(),
                 deaths: lastRunDeaths};
     };
 }
@@ -530,6 +532,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         committedOn = 0,
         i,
         trial = -1,
+        choiceNumber = -1,
         functionList = [],
         runChoice,
         maze = d3.select("#maze").append("g"),
@@ -540,6 +543,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         updateCards,
         getLocation,
         resetContext,
+        timeMarker,
         showOutcome;
 
     getLocation = function (context, advanced) {
@@ -628,12 +632,14 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         psiTurk.recordTrialData({phase: "EXPERIMENT",
                                  trialType: "exploreexploit",
                                  taskType: taskType,
-                                 trial: trial + 4 * advanced,
+                                 trialChoice: trial + 4 * advanced,
+                                 trialOutcome: choiceNumber,
                                  uniqueid: uniqueId,
                                  counter: counterbalance,
                                  context: context,
                                  response: choiceId,
                                  advanced: advanced,
+                                 rt: new Date().getTime() - timeMarker,
                                  currentValue: contextObj.value,
                                  outcome: contextObj.nextValue
                                 });
@@ -642,6 +648,8 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
 
     runChoice = function (context) {
         var contextObj = contexts[context];
+        timeMarker = new Date().getTime();
+        choiceNumber++;
         $("#context").html(contextObj.color + " context");
         if (context === trial % 6) {
             $("#trialtype").html("<strong>immediate</strong> choice");
@@ -963,6 +971,8 @@ function ConsumptionRewards(psiTurk, callback) {
                                  lastRunPoints: gameData.lastRunPoints,
                                  lastRunBricks: gameData.lastRunBricks,
                                  endingSpeed: gameData.endingSpeed,
+                                 level: gameData.level,
+                                 bricksLeft: gameData.bricksLeft,
                                  deaths: gameData.deaths,
                                  deathCompletes: popupData.deathCompletes,
                                  deathMisses: popupData.deathMisses,
