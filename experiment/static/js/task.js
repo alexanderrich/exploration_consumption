@@ -635,9 +635,9 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                                  trialChoice: trial + 4 * advanced,
                                  trialOutcome: choiceNumber,
                                  uniqueid: uniqueId,
-                                 counter: counterbalance,
+                                 counterbalance: counterbalance,
                                  context: context,
-                                 response: choiceId,
+                                 response: choiceId === "explore" ? 1 : 0,
                                  advanced: advanced,
                                  rt: new Date().getTime() - timeMarker,
                                  currentValue: contextObj.value,
@@ -965,8 +965,8 @@ function ConsumptionRewards(psiTurk, callback) {
                                  trialType: "consumption",
                                  trial: trialNum,
                                  uniqueid: uniqueId,
-                                 counter: counterbalance,
-                                 reward: rewardAmount,
+                                 counterbalance: counterbalance,
+                                 outcome: rewardAmount,
                                  points: gameData.points,
                                  lastRunPoints: gameData.lastRunPoints,
                                  lastRunBricks: gameData.lastRunBricks,
@@ -1161,6 +1161,8 @@ function endingQuestions(psiTurk, callback) {
     }
     $("#missloss").html(missloss.toFixed(2));
     psiTurk.recordUnstructuredData("bonus", bonus);
+    psiTurk.recordUnstructuredData("uniqueid", uniqueId);
+    psiTurk.recordUnstructuredData("counterbalance", counterbalance);
     $("#totalbonus").html(bonus.toFixed(2));
     $("#continue").click(function () {
         recordResponses();
