@@ -583,9 +583,13 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             advanced = context === (trial + 4) % 6;
         $("#" + choiceId).css({"border": "10px solid black"});
         if (choiceId === "exploit") {
+            d3.select("#context" + context + " .contextcard")
+                .style("stroke-width", 4);
             contextObj.nextChoice = "exploit";
             contextObj.nextValue = contextObj.value;
         } else {
+            d3.select("#context" + context + " .mysterycard")
+                .style("stroke-width", 4);
             contextObj.nextChoice = "explore";
             if (Math.random() > .333) {
                 contextObj.nextValue = 3 * (3 + Math.ceil(Math.random() * 9));
@@ -594,9 +598,6 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             }
         }
         if (advanced) {
-            contextObj.advancedSet = 1;
-            d3.select("#context" + context + " .advancedmarker")
-                .style("opacity", 1);
         }
         $(".card").off("click");
         psiTurk.recordTrialData({phase: "EXPERIMENT",
@@ -651,7 +652,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         choiceNumber++;
         $("#context").html(contextObj.color + " context");
         if (context === trial % 6) {
-            $("#trialtype").html("<strong>immediate</strong> choice");
+            $("#trialtype").html("&nbsp;");
         } else {
             $("#trialtype").html("<strong>advanced</strong> choice");
         }
@@ -681,6 +682,10 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             $("#trialtype").html("Outcome: <strong>" + contextObj.nextValue.toFixed() + "</strong>");
             $(".card").css({"border": "5px solid black",
                             "margin": "0px"});
+            d3.select("#context" + context + " .contextcard")
+                .style("stroke-width", 1);
+            d3.select("#context" + context + " .mysterycard")
+                .style("stroke-width", 1);
             if (contextObj.nextChoice === "explore") {
                 updateCards(contextObj.value, contextObj.nextValue);
                 if (contextObj.nextValue > contextObj.value) {
@@ -700,9 +705,6 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                         .text(contextObj.value);
                 }
             }
-            contextObj.advancedSet = 0;
-            d3.select("#context" + context + " .advancedmarker")
-                .style("opacity", 0);
             d3.select("#context" + context + " .contextvalue")
                 .text(contextObj.value);
             setTimeout(function () {
@@ -823,12 +825,11 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     contexts = contexts.map(function (obj) {
         obj.value = 3 * (3 + Math.ceil(Math.random() * 3));
         obj.nextValue = 0;
-        obj.advancedSet = 0;
         return obj;
     });
     maze.attr("transform", "translate(300, 150)");
     contextMarker = maze.append("circle")
-        .attr("r", "40")
+        .attr("r", "50")
         .style("fill", "gainsboro")
         .style("opacity", 0)
         .style("stroke", "black")
@@ -853,13 +854,13 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             return "context" + idx;
         });
     contextGroups.append("rect")
-        .attr("width", 50)
-        .attr("height", 50)
+        .attr("width", 84)
+        .attr("height", 44)
         .attr("x", function (d, idx) {
-            return -25 + getLocation(idx, 0)[0];
+            return -42 + getLocation(idx, 0)[0];
         })
         .attr("y", function (d, idx) {
-            return -25 + getLocation(idx, 0)[1];
+            return -22 + getLocation(idx, 0)[1];
         })
         .style("fill", function (d) {
             return d.color;
@@ -871,7 +872,20 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         .attr("width", 30)
         .attr("height", 30)
         .attr("x", function (d, idx) {
-            return -15 + getLocation(idx, 0)[0];
+            return -35 + getLocation(idx, 0)[0];
+        })
+        .attr("y", function (d, idx) {
+            return -15 + getLocation(idx, 0)[1];
+        })
+        .style("fill", "white")
+        .style("stroke", "black")
+        .style("stroke-width", 1);
+    contextGroups.append("rect")
+        .attr("class", "mysterycard")
+        .attr("width", 30)
+        .attr("height", 30)
+        .attr("x", function (d, idx) {
+            return 5 + getLocation(idx, 0)[0];
         })
         .attr("y", function (d, idx) {
             return -15 + getLocation(idx, 0)[1];
@@ -882,7 +896,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     contextGroups.append("text")
         .attr("class", "contextvalue")
         .attr("x", function (d, idx) {
-            return getLocation(idx, 0)[0];
+            return -20 + getLocation(idx, 0)[0];
         })
         .attr("y", function (d, idx) {
             return 6 + getLocation(idx, 0)[1];
@@ -890,16 +904,15 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         .attr("text-anchor", "middle")
         .text(function (d) {return d.value.toString(); });
     contextGroups.append("text")
-        .attr("class", "advancedmarker")
+        .attr("class", "mysteryvalue")
         .attr("x", function (d, idx) {
-            return getLocation(idx, 0)[0];
+            return 20 + getLocation(idx, 0)[0];
         })
         .attr("y", function (d, idx) {
-            return 40 + getLocation(idx, 0)[1];
+            return 6 + getLocation(idx, 0)[1];
         })
         .attr("text-anchor", "middle")
-        .style("opacity", 0)
-        .text("a");
+        .text("?");
     contextGroups.append("rect")
         .attr("width", 20)
         .attr("height", 20)
