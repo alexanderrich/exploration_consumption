@@ -167,10 +167,18 @@ strong {
 /* card task */
 
 #explorediv {
+    position: relative;
     margin-left: auto;
     margin-right: auto;
     width: 600px;
     height: 450px;
+}
+
+#behindcarddiv {
+    position: absolute;
+    top: 200px;
+    left: 110px;
+    font-size: 30px;
 }
 
 #maze {

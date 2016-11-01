@@ -529,7 +529,6 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         contexts,
         committed,
         resetArray,
-        committedOn = 0,
         i,
         trial = -1,
         choiceNumber = -1,
@@ -537,13 +536,13 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         runChoice,
         maze = d3.select("#maze").append("g"),
         contextGroups,
-        marker,
-        futureMarker,
-        updateMaze,
+        playerMarker,
+        contextMarker,
         updateCards,
         getLocation,
+        enterRoom,
         resetContext,
-        timeMarker,
+        timeStamp,
         showOutcome;
 
     getLocation = function (context, advanced) {
@@ -557,35 +556,6 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             y = 100 * -Math.sin(Math.PI * (context / 3 - 4 / 3));
         }
         return [x, y];
-    };
-
-    updateMaze = function (context, advanced) {
-        contextGroups = maze.selectAll(".context")
-            .data(contexts);
-        contextGroups.select(".contextvalue")
-            .text(function (d) {
-                return d.value.toString();
-            });
-        contextGroups.select(".advancedmarker")
-            .style("opacity", function (d) {
-                return d.advancedSet;
-            });
-        contextGroups.select(".advanced")
-            .style("opacity", committedOn);
-        // marker.attr("cx", getLocation(context, advanced)[0])
-        //     .attr("cy", getLocation(context, advanced)[1]);
-        marker.transition()
-            .duration(1500)
-            .attr("transform", "translate(" + (-12 + 1.3 * getLocation(context, advanced)[0]) +
-                    "," + (-35 + 1.3 * getLocation(context, advanced)[1] ) + ")");
-        if (advanced) {
-            futureMarker.attr("cx", getLocation(context, 0)[0])
-                .attr("cy", getLocation(context, 0)[1])
-                .style("opacity", 1);
-        } else {
-            futureMarker
-                .style("opacity", 0);
-        }
     };
 
     updateCards = function (exploitVal, exploreVal) {
@@ -615,11 +585,9 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         if (choiceId === "exploit") {
             contextObj.nextChoice = "exploit";
             contextObj.nextValue = contextObj.value;
-            // card.html(reward.toString());
         } else {
             contextObj.nextChoice = "explore";
             if (Math.random() > .333) {
-                // contextObj.nextValue = 3 + Math.ceil(Math.random() * 9);
                 contextObj.nextValue = 3 * (3 + Math.ceil(Math.random() * 9));
             } else {
                 contextObj.nextValue = 0;
@@ -627,6 +595,8 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         }
         if (advanced) {
             contextObj.advancedSet = 1;
+            d3.select("#context" + context + " .advancedmarker")
+                .style("opacity", 1);
         }
         $(".card").off("click");
         psiTurk.recordTrialData({phase: "EXPERIMENT",
@@ -639,52 +609,75 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                                  context: context,
                                  response: choiceId === "explore" ? 1 : 0,
                                  advanced: advanced,
-                                 rt: new Date().getTime() - timeMarker,
+                                 rt: new Date().getTime() - timeStamp,
                                  currentValue: contextObj.value,
                                  outcome: contextObj.nextValue
                                 });
         setTimeout(functionList.pop(), 1000);
     };
 
+    enterRoom = function (context) {
+        $("#carddiv").css("opacity", 0);
+        contextMarker.style("opacity", 1);
+        contextMarker.attr("cx", getLocation(context, 0)[0])
+            .attr("cy", getLocation(context, 0)[1]);
+        if (context === trial % 6) {
+            playerMarker.attr("cx", getLocation(context, 0)[0])
+                .attr("cy", getLocation(context, 0)[1]);
+            playerMarker.transition()
+                .duration(1500)
+                .attr("transform", "translate(" + (-12 + 1.3 * getLocation(context, 0)[0]) +
+                      "," + (-35 + 1.3 * getLocation(context, 0)[1] ) + ")");
+        } else {
+            playerMarker.attr("cx", getLocation(context, 1)[0])
+                .attr("cy", getLocation(context, 1)[1]);
+            playerMarker.transition()
+                .duration(1500)
+                .attr("transform", "translate(" + (-12 + 1.3 * getLocation(context, 1)[0]) +
+                      "," + (-35 + 1.3 * getLocation(context, 1)[1] ) + ")");
+        }
+        $("#explorediv").show();
+        $("#context" + context).click(function () {
+            $("#context" + context).off("click");
+            contextMarker.style("opacity", 0);
+            $("#carddiv").css("opacity", 1);
+            functionList.pop()();
+        });
+    };
+
     runChoice = function (context) {
         var contextObj = contexts[context];
-        timeMarker = new Date().getTime();
+        timeStamp = new Date().getTime();
         choiceNumber++;
         $("#context").html(contextObj.color + " context");
         if (context === trial % 6) {
             $("#trialtype").html("<strong>immediate</strong> choice");
-            updateMaze(context, 0);
         } else {
             $("#trialtype").html("<strong>advanced</strong> choice");
-            updateMaze(context, 1);
         }
         updateCards(contextObj.value, "?");
         $(".card").css({"border": "5px solid black",
                         "margin": "0px"});
         $("#carddiv").css("background", contextObj.color);
-        $("#explorediv").show();
         $(".card").click(function () {responseFn(this.id, context); });
     };
 
     showOutcome = function (context) {
         var contextObj = contexts[context];
-        updateMaze(context, 0);
         $("#context").html(contextObj.color + " context");
         $("#trialtype").html("<strong>click</strong> for <strong>outcome</strong>");
-        $("#trialtype").css("background", "gainsboro")
+        $("#trialtype").css("background", "gainsboro");
         $("#trialtype").css({"border": "5px solid black", "border-radius": "5px"});
         updateCards(contextObj.value, "?");
         $(".card").css({"border": "5px solid black",
                         "margin": "0px"});
         $("#carddiv").css("background", contextObj.color);
         $("#" + contextObj.nextChoice).css({"border": "10px solid black"});
-                                            // "margin": "-5px"});
         $("#explorediv").show();
         $("#trialtype").click(function () {
             $("#trialtype").off("click");
-            $("#trialtype").css("background", "white")
+            $("#trialtype").css("background", "white");
             $("#trialtype").css("border", "");
-            $("#trialtype").html("Outcome: <strong>" + contextObj.nextValue.toFixed() + "</strong>");
             $("#trialtype").html("Outcome: <strong>" + contextObj.nextValue.toFixed() + "</strong>");
             $(".card").css({"border": "5px solid black",
                             "margin": "0px"});
@@ -703,10 +696,15 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                                           });
                     d3.select("#context" + context + " .contextcard")
                         .style("fill", "lime");
+                    d3.select("#context" + context + " .contextvalue")
+                        .text(contextObj.value);
                 }
             }
             contextObj.advancedSet = 0;
-            updateMaze(context, 0);
+            d3.select("#context" + context + " .advancedmarker")
+                .style("opacity", 0);
+            d3.select("#context" + context + " .contextvalue")
+                .text(contextObj.value);
             setTimeout(function () {
                 $("#explorediv").hide();
                 d3.select("#context" + context + " .contextcard")
@@ -720,7 +718,6 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     resetContext = function (context) {
         var contextObj = contexts[context];
         contextObj.value = 3 * (3 + Math.ceil(Math.random() * 3));
-        updateMaze(context, 0);
         $("#trialtype").html("<strong>context reset</strong>");
         updateCards(contextObj.value, "?");
         $(".card").css({"border": "5px solid black",
@@ -730,6 +727,8 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         setTimeout(function () {
             $("#exploit").css("background", "gainsboro");
         }, 1000);
+        d3.select("#context" + context + " .contextvalue")
+            .text(contextObj.value);
         d3.select("#context" + context + " .contextcard")
             .style("fill", "gray")
             .transition()
@@ -750,13 +749,21 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                 runChoice(trial % 6);
             });
         }
+        functionList.push(function () {
+            enterRoom(trial % 6);
+        });
         if (committed[trial + 4]) {
-            committedOn = 1;
+            contextGroups.select(".advanced")
+                .style("opacity", 1);
             functionList.push(function () {
                 runChoice((trial + 4) % 6);
             });
+            functionList.push(function () {
+                enterRoom((trial + 4) % 6);
+            });
         } else {
-            committedOn = 0;
+            contextGroups.select(".advanced")
+                .style("opacity", 0);
         }
         if (resetArray[trial - 1]) {
             functionList.push(function () {
@@ -820,7 +827,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         return obj;
     });
     maze.attr("transform", "translate(300, 150)");
-    futureMarker = maze.append("circle")
+    contextMarker = maze.append("circle")
         .attr("r", "40")
         .style("fill", "gainsboro")
         .style("opacity", 0)
@@ -881,7 +888,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             return 6 + getLocation(idx, 0)[1];
         })
         .attr("text-anchor", "middle")
-        .text("4");
+        .text(function (d) {return d.value.toString(); });
     contextGroups.append("text")
         .attr("class", "advancedmarker")
         .attr("x", function (d, idx) {
@@ -909,7 +916,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         })
         .style("stroke", "black")
         .style("stroke-width", 1);
-    marker = maze.append("g")
+    playerMarker = maze.append("g")
         .attr("id", "marker")
         .attr("transform", "translate(" + (-12 + 1.3 * getLocation(0, 0)[0]) +
               "," + (-35 + 1.3 * getLocation(0, 0)[1] ) + ")");
