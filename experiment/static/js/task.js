@@ -724,7 +724,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                 if (contextObj.nextValue > contextObj.value) {
                     contextObj.value = contextObj.nextValue;
                     $("#explore").css("background", "lime");
-                    $("#explore").animate({"margin-left": "-200px"}, 1000, "swing",
+                    $("#explore").animate({"margin-left": "-220px"}, 1000, "swing",
                                           function () {
                                               $("#explore").css("margin-left", "");
                                               $("#explore").css("background", "gainsboro");
