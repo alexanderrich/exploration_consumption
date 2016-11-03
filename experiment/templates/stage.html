@@ -28,49 +28,52 @@
         </div>
     </div>
     <div id="explorediv">
-        <div id="behindcarddiv" >
-            Click circled context to enter
-        </div>
         <div id="carddiv">
             <div id="innercarddiv">
-                <div id="context">
+                <div id="alternativecontents" >
                 </div>
-                <div class="cardholder" id="outerexploitdiv">
-                    <div class="card" id="exploit">
-                        <div id="exploittext" ></div>
-                        <div id="exploitprogress" class="progress">
-                            <div class="progress-bar progress-bar-success" role="progressbar">
-                            </div>
-                            <div class="progress-bar progress-bar-danger" role="progressbar">
-                            </div>
-                        </div>
+                <div id="contextcontents">
+                    <div id="context">
                     </div>
-                    <div class="undercard" id="underexploit">
-                        <span id="gametimenote"></span>s game <br/>
-                        <span id="popuptimenote"></span>s popups
-                    </div>
-                </div>
-                <div class="cardholder" id="outerexplorediv">
-                    <div class="card" id="explore">
-                        <div id="exploretext" ></div>
-                        <div id="exploreprogress" class="progress">
-                            <div class="progress-bar progress-bar-success" role="progressbar" >
-                            </div>
-                            <div class="progress-bar progress-bar-danger" role="progressbar" >
+                    <div class="cardholder" id="outerexploitdiv">
+                        <div class="card" id="exploit">
+                            <div id="exploittext" ></div>
+                            <div id="exploitprogress" class="progress">
+                                <div class="progress-bar progress-bar-success" role="progressbar">
+                                </div>
+                                <div class="progress-bar progress-bar-danger" role="progressbar">
+                                </div>
                             </div>
                         </div>
+                        <div class="undercard" id="underexploit">
+                            <span id="gametimenote"></span>s game <br/>
+                            <span id="popuptimenote"></span>s popups
+                        </div>
                     </div>
-                    <div class="undercard" id="underexplore">
-                        1/3 chance 0 <br/>
-                        2/3 chance 12&ndash;36
+                    <div class="cardholder" id="outerexplorediv">
+                        <div class="card" id="explore">
+                            <div id="exploretext" ></div>
+                            <div id="exploreprogress" class="progress">
+                                <div class="progress-bar progress-bar-success" role="progressbar" >
+                                </div>
+                                <div class="progress-bar progress-bar-danger" role="progressbar" >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="undercard" id="underexplore">
+                            1/3 chance 0 <br/>
+                            2/3 chance 12&ndash;36
+                        </div>
                     </div>
-                </div>
-                <div id="trialtype">
-                </div>
-                <div id="inforeminderbutton">
-                    info
+                    <div id="trialtype">
+                    </div>
                 </div>
             </div>
+        </div>
+        <svg id="maze">
+        </svg>
+        <div id="inforeminderbutton">
+            info
         </div>
         <div id="inforeminder">
             <ul>
@@ -79,7 +82,5 @@
                 <li>After making a choice, there is a 1 in 6 chance that the best-yet card will reset to a value between 12 and 18.</li>
             </ul>
         </div>
-        <svg id="maze">
-        </svg>
     </div>
 </div>

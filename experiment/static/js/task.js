@@ -541,6 +541,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         updateCards,
         getLocation,
         enterRoom,
+        preCommitted,
         resetContext,
         timeStamp,
         showOutcome;
@@ -614,11 +615,21 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                                  currentValue: contextObj.value,
                                  outcome: contextObj.nextValue
                                 });
-        setTimeout(functionList.pop(), 1000);
+        setTimeout(
+            function () {
+                if (advanced) {
+                    d3.select("#context" + context + " .advancedpointer")
+                        .style("opacity", 0);
+                }
+                functionList.pop()();
+            }, 1000);
     };
 
     enterRoom = function (context) {
-        $("#carddiv").css("opacity", 0);
+        $("#contextcontents").hide();
+        $("#carddiv").css("background-color", "white");
+        $("#alternativecontents").show();
+        $("#alternativecontents").html("Click circled room");
         contextMarker.style("opacity", 1);
         contextMarker.attr("cx", getLocation(context, 0)[0])
             .attr("cy", getLocation(context, 0)[1]);
@@ -630,6 +641,8 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                 .attr("transform", "translate(" + (-12 + 1.3 * getLocation(context, 0)[0]) +
                       "," + (-35 + 1.3 * getLocation(context, 0)[1] ) + ")");
         } else {
+            d3.select("#context" + context + " .advancedpointer")
+                .style("opacity", 1);
             playerMarker.attr("cx", getLocation(context, 1)[0])
                 .attr("cy", getLocation(context, 1)[1]);
             playerMarker.transition()
@@ -638,23 +651,40 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                       "," + (-35 + 1.3 * getLocation(context, 1)[1] ) + ")");
         }
         $("#explorediv").show();
-        $("#context" + context).click(function () {
-            $("#context" + context).off("click");
+        $("#contextmarker, #context" + context).click(function () {
+            $("#contextmarker, #context" + context).off("click");
+            $("#contextcontents").show();
+            $("#alternativecontents").hide();
             contextMarker.style("opacity", 0);
             $("#carddiv").css("opacity", 1);
             functionList.pop()();
         });
     };
 
+    preCommitted = function (context) {
+        $("#contextcontents").hide();
+        $("#alternativecontents").show();
+        $("#carddiv").css("background", contexts[context].color);
+        if(context === trial % 6) {
+            $("#alternativecontents").html("Choice <strong>called ahead</strong>");
+        } else {
+            $("#alternativecontents").html("<strong>Call-ahead</strong> confirmed");
+        }
+        setTimeout(functionList.pop(), 1500);
+    };
+
     runChoice = function (context) {
+        $("#contextcontents").show();
+        $("#alternativecontents").hide();
         var contextObj = contexts[context];
         timeStamp = new Date().getTime();
         choiceNumber++;
-        $("#context").html(contextObj.color + " context");
+        $("#context").html(contextObj.color + " room");
         if (context === trial % 6) {
             $("#trialtype").html("&nbsp;");
         } else {
-            $("#trialtype").html("<strong>advanced</strong> choice");
+            $("#trialtype").html("<strong>call-ahead</strong> choice");
+            contextObj.advanced = true;
         }
         updateCards(contextObj.value, "?");
         $(".card").css({"border": "5px solid black",
@@ -664,8 +694,11 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     };
 
     showOutcome = function (context) {
+        $("#contextcontents").show();
+        $("#alternativecontents").hide();
         var contextObj = contexts[context];
-        $("#context").html(contextObj.color + " context");
+        contextObj.advanced = false;
+        $("#context").html(contextObj.color + " room");
         $("#trialtype").html("<strong>click</strong> for <strong>outcome</strong>");
         $("#trialtype").css("background", "gainsboro");
         $("#trialtype").css({"border": "5px solid black", "border-radius": "5px"});
@@ -720,7 +753,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     resetContext = function (context) {
         var contextObj = contexts[context];
         contextObj.value = 3 * (3 + Math.ceil(Math.random() * 3));
-        $("#trialtype").html("<strong>context reset</strong>");
+        $("#trialtype").html("<strong>room reset</strong>");
         updateCards(contextObj.value, "?");
         $(".card").css({"border": "5px solid black",
                         "margin": "0px"});
@@ -750,6 +783,10 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             functionList.push(function () {
                 runChoice(trial % 6);
             });
+        } else {
+            functionList.push(function () {
+                preCommitted(trial % 6);
+            });
         }
         functionList.push(function () {
             enterRoom(trial % 6);
@@ -757,6 +794,9 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         if (committed[trial + 4]) {
             contextGroups.select(".advanced")
                 .style("opacity", 1);
+            functionList.push(function () {
+                preCommitted((trial + 4) % 6);
+            });
             functionList.push(function () {
                 runChoice((trial + 4) % 6);
             });
@@ -780,9 +820,10 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     committed = [];
     if (taskType === "practice") {
         for (i = 0; i < nTrials; i++) {
-            if (i < 12) {
+            if (i < 6) {
                 committed.push(0);
-            } else if (i < 24){
+                // committed.push(1);
+            } else if (i < 12){
                 committed.push(1);
             } else {
                 committed.push(0);
@@ -825,10 +866,12 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     contexts = contexts.map(function (obj) {
         obj.value = 3 * (3 + Math.ceil(Math.random() * 3));
         obj.nextValue = 0;
+        obj.advanced = true;
         return obj;
     });
     maze.attr("transform", "translate(300, 150)");
     contextMarker = maze.append("circle")
+        .attr("id", "contextmarker")
         .attr("r", "50")
         .style("fill", "gainsboro")
         .style("opacity", 0)
@@ -853,6 +896,37 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         .attr("id", function (d, idx) {
             return "context" + idx;
         });
+    maze.append("svg:defs").append("svg:marker")
+        .attr("id", "triangle")
+        .attr("refX", 3)
+        .attr("refY", 3)
+        .attr("markerWidth", 15)
+        .attr("markerHeight", 15)
+        .attr("orient", "auto")
+        .append("path")
+        .attr("d", "M 0 0 6 3 0 6")
+        .style("fill", "black");
+    contextGroups.append("line")
+        .attr("class", "advancedpointer")
+        .attr("x1", function (d, idx) {
+            return getLocation(idx, 1)[0];
+        })
+        .attr("y1", function (d, idx) {
+            return getLocation(idx, 1)[1];
+        })
+        .attr("x2", function (d, idx) {
+            return .25 * getLocation(idx, 1)[0] +
+                .75 * getLocation(idx, 0)[0];
+        })
+        .attr("y2", function (d, idx) {
+            return .25 * getLocation(idx, 1)[1] +
+                .75 * getLocation(idx, 0)[1];
+        })
+        .attr("stroke-width", 3)
+        .attr("stroke", "black")
+        .attr("stroke-dasharray", "5, 5")
+        .attr("marker-end", "url(#triangle)")
+        .style("opacity", 0);
     contextGroups.append("rect")
         .attr("width", 84)
         .attr("height", 44)
@@ -1246,7 +1320,7 @@ function experimentDriver() {
     "use strict";
     var psiTurk = new PsiTurk(uniqueId, adServerLoc, mode),
         next,
-        nTrials = [30, 66],
+        nTrials = [18, 66],
         // nTrials = [3, 3, 3],
         functionList = [];
 
