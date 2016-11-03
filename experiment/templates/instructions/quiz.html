@@ -16,7 +16,7 @@
         <form id="prequiz" action="debrief" method="post">
             <div class="question">
                 <p class="questiontext">
-                    What proportion of mystery cards have an outcome of <strong>0</strong>?
+                    What proportion of cards in the deck have a value of <strong>0</strong>?
                     <select id="mystery0" name="mystery0" class="form-control">
                         <option value="noresp" SELECTED></option>
 	                      <option value="none">none of the cards</option>
@@ -28,35 +28,35 @@
             </div>
             <div class="question">
                 <p class="questiontext">
-                    For mystery cards with an outcome <strong>higher than</strong> 0, what range of outcomes is possible?
+                    For cards with a value <strong>higher than</strong> 0, what range of values is possible?
                     <select id="range" name="range" class="form-control">
                         <option value="noresp" SELECTED></option>
-	                      <option value="12_18">12 to 18 points</option>
-	                      <option value="12_36">12 to 36 points</option>
-	                      <option value="24_36">24 to 36 points</option>
+	                      <option value="12_18">12 to 18</option>
+	                      <option value="12_36">12 to 36</option>
+	                      <option value="24_36">24 to 36</option>
                     </select>
                 </p>
             </div>
             <div class="question">
                 <p class="questiontext">
-                    What are the chances of the sure-thing card being <strong>reset</strong> to a value between 12 and 18 after an outcome?
+                    What are the chances of the best-yet card being <strong>reset</strong> to a value between 12 and 18 after a visit to a room?
                     <select id="reset" name="reset" class="form-control">
                         <option value="noresp" SELECTED></option>
 	                      <option value="never">It is never reset</option>
-	                      <option value="1_6">It is reset randomly after 1 in 6 trials</option>
-	                      <option value="1_2">It is reset randomly after half of trials</option>
-	                      <option value="always">It is reset after every trial</option>
+	                      <option value="1_6">It is reset randomly after 1 in 6 visits</option>
+	                      <option value="1_2">It is reset randomly after half of visits</option>
+	                      <option value="always">It is reset after every visit</option>
                     </select>
                 </p>
             </div>
             <div class="question">
                 <p class="questiontext">
-                    When you make an <strong>advanced choice</strong>, how far ahead of its context will it be?
+                    When you make an <strong>call-ahead choice</strong>, how far ahead of its room will it be?
                     <select id="advancednum" name="advancednum" class="form-control">
                         <option value="noresp" SELECTED></option>
-	                      <option value="1">1 context ahead</option>
-	                      <option value="4">4 contexts ahead</option>
-	                      <option value="10">10 contexts ahead</option>
+	                      <option value="1">1 room ahead</option>
+	                      <option value="4">4 rooms ahead</option>
+	                      <option value="10">10 rooms ahead</option>
                     </select>
                 </p>
             </div>
