@@ -255,6 +255,13 @@ strong {
     margin-right: auto;
 }
 
+#callahead {
+    position: absolute;
+    left: 280px;
+    top: 225px;
+    opacity: 0;
+}
+
 #trialtype {
     margin-left: auto;
     margin-right: auto;

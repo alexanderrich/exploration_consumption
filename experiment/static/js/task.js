@@ -599,6 +599,8 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             }
         }
         if (advanced) {
+            d3.select("#context" + context + " .roomphones")
+                .style("opacity", 1);
         }
         $(".card").off("click");
         psiTurk.recordTrialData({phase: "EXPERIMENT",
@@ -666,9 +668,10 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         $("#alternativecontents").show();
         $("#carddiv").css("background", contexts[context].color);
         if(context === trial % 6) {
-            $("#alternativecontents").html("Choice <strong>called ahead</strong>");
+            $("#alternativecontents").html("Choice <strong>called ahead</strong> <br/> &#x260E;");
         } else {
-            $("#alternativecontents").html("<strong>Call-ahead</strong> confirmed");
+            $("#alternativecontents").html("<strong>Call-ahead</strong> confirmed <br/> &#x260E;");
+            $("#callahead").css("opacity", 0);
         }
         setTimeout(functionList.pop(), 1500);
     };
@@ -679,11 +682,12 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         var contextObj = contexts[context];
         timeStamp = new Date().getTime();
         choiceNumber++;
-        $("#context").html(contextObj.color + " room");
+        $("#context").html(contextObj.colorName + " room");
         if (context === trial % 6) {
             $("#trialtype").html("&nbsp;");
         } else {
             $("#trialtype").html("<strong>call-ahead</strong> choice");
+            $("#callahead").css("opacity", 1);
             contextObj.advanced = true;
         }
         updateCards(contextObj.value, "?");
@@ -697,8 +701,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         $("#contextcontents").show();
         $("#alternativecontents").hide();
         var contextObj = contexts[context];
-        contextObj.advanced = false;
-        $("#context").html(contextObj.color + " room");
+        $("#context").html(contextObj.colorName + " room");
         $("#trialtype").html("<strong>click</strong> for <strong>outcome</strong>");
         $("#trialtype").css("background", "gainsboro");
         $("#trialtype").css({"border": "5px solid black", "border-radius": "5px"});
@@ -709,6 +712,11 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         $("#" + contextObj.nextChoice).css({"border": "10px solid black"});
         $("#explorediv").show();
         $("#trialtype").click(function () {
+            if (contextObj.advanced) {
+                contextObj.advanced = false;
+                d3.select("#context" + context + " .roomphones")
+                    .style("opacity", 0);
+            }
             $("#trialtype").off("click");
             $("#trialtype").css("background", "white");
             $("#trialtype").css("border", "");
@@ -856,17 +864,17 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             lastchosen = chosen;
         }
     })();
-    contexts = [{color: "red"},
-                {color: "orange"},
-                {color: "yellow"},
-                {color: "green"},
-                {color: "blue"},
-                {color: "purple"}];
+    contexts = [{color: "red", colorName: "red"},
+                {color: "orange", colorName: "orange"},
+                {color: "yellow", colorName: "yellow"},
+                {color: "green", colorName: "green"},
+                {color: "#4444FF", colorName: "blue"},
+                {color: "#A000A0", colorName: "purple"}];
     contexts = _.shuffle(contexts);
     contexts = contexts.map(function (obj) {
         obj.value = 3 * (3 + Math.ceil(Math.random() * 3));
         obj.nextValue = 0;
-        obj.advanced = true;
+        obj.advanced = false;
         return obj;
     });
     maze.attr("transform", "translate(300, 150)");
@@ -987,6 +995,17 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         })
         .attr("text-anchor", "middle")
         .text("?");
+    contextGroups.append("text")
+        .attr("class", "roomphones")
+        .attr("x", function (d, idx) {
+            return getLocation(idx, 0)[0];
+        })
+        .attr("y", function (d, idx) {
+            return 40 + getLocation(idx, 0)[1];
+        })
+        .attr("text-anchor", "middle")
+        .style("opacity", 0)
+        .text("\u260E");
     contextGroups.append("rect")
         .attr("width", 20)
         .attr("height", 20)
