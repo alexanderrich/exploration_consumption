@@ -1,6 +1,5 @@
 # this file imports custom routes into the experiment server
 
-import random
 from flask import Blueprint, render_template, request, jsonify, Response, abort, current_app
 from jinja2 import TemplateNotFound
 from functools import wraps
@@ -14,8 +13,6 @@ from psiturk.user_utils import PsiTurkAuthorization, nocache
 from psiturk.db import db_session, init_db
 from psiturk.models import Participant
 from json import dumps, loads
-
-import stimuli_generator
 
 # load the configuration options
 config = PsiturkConfig()
