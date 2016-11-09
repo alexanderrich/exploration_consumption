@@ -1297,6 +1297,9 @@ function questionnaire(psiTurk) {
         $("select").each(function () {
             psiTurk.recordUnstructuredData(this.id, this.value);
         });
+        $("input").each(function () {
+            psiTurk.recordUnstructuredData(this.id, this.value);
+        });
     };
 
     promptResubmit = function () {
