@@ -7,7 +7,9 @@
  */
 
 /*jslint browser: true*/
-/*global counterbalance, uniqueId, adServerLoc, mode, document, PsiTurk, $, _, d3, Phaser, window, setTimeout, clearTimeout, setInterval, clearInterval*/
+/*global condition, uniqueId, adServerLoc, mode, document, PsiTurk, $, _, d3, Phaser, window, setTimeout, clearTimeout, setInterval, clearInterval*/
+
+condition = parseInt(condition);
 
 function Game(popupCreator) {
     "use strict";
@@ -527,10 +529,10 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     "use strict";
     var responseFn,
         contexts,
-        committed,
+        // committed,
         resetArray,
         i,
-        trial = -1,
+        trial = -2,
         choiceNumber = -1,
         functionList = [],
         runChoice,
@@ -609,7 +611,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                                  trialChoice: trial + 4 * advanced,
                                  trialOutcome: choiceNumber,
                                  uniqueid: uniqueId,
-                                 counterbalance: counterbalance,
+                                 condition: condition,
                                  context: context,
                                  response: choiceId === "explore" ? 1 : 0,
                                  advanced: advanced,
@@ -784,73 +786,124 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
 
     this.run = function() {
         trial++;
-        functionList.push(function () {
-            showOutcome(trial % 6);
-        });
-        if (!committed[trial]) {
-            functionList.push(function () {
-                runChoice(trial % 6);
+        if (trial < 0) {
+            functionList.push(function() {
+                $("#explorediv").hide();
+                callback(0, trial);
             });
-        } else {
-            functionList.push(function () {
-                preCommitted(trial % 6);
-            });
+            if (condition === 1 && trial + 4 >= 0) {
+                // make pre-choice
+                contextGroups.select(".advanced")
+                    .style("opacity", 1);
+                functionList.push(function () {
+                    preCommitted((trial + 4) % 6);
+                });
+                functionList.push(function () {
+                    runChoice((trial + 4) % 6);
+                });
+                functionList.push(function () {
+                    enterRoom((trial + 4) % 6);
+                });
+            }
         }
-        functionList.push(function () {
-            enterRoom(trial % 6);
-        });
-        if (committed[trial + 4]) {
-            contextGroups.select(".advanced")
-                .style("opacity", 1);
+        else {
             functionList.push(function () {
-                preCommitted((trial + 4) % 6);
+                showOutcome(trial % 6);
             });
-            functionList.push(function () {
-                runChoice((trial + 4) % 6);
-            });
-            functionList.push(function () {
-                enterRoom((trial + 4) % 6);
-            });
-        } else {
-            contextGroups.select(".advanced")
-                .style("opacity", 0);
+            if (condition === 0) {
+                functionList.push(function () {
+                    runChoice(trial % 6);
+                });
+                functionList.push(function () {
+                    enterRoom(trial % 6);
+                });
+            } else {
+                functionList.push(function () {
+                    preCommitted(trial % 6);
+                });
+                functionList.push(function () {
+                    enterRoom(trial % 6);
+                });
+                contextGroups.select(".advanced")
+                    .style("opacity", 1);
+                functionList.push(function () {
+                    preCommitted((trial + 4) % 6);
+                });
+                functionList.push(function () {
+                    runChoice((trial + 4) % 6);
+                });
+                functionList.push(function () {
+                    enterRoom((trial + 4) % 6);
+                });
+            }
         }
-        if (resetArray[trial - 1]) {
-            functionList.push(function () {
-                resetContext((trial - 1) % 6);
-            });
-        }
+        // functionList.push(function () {
+        //     showOutcome(trial % 6);
+        // });
+        // if (condition === 0) {
+        //     functionList.push(function () {
+        //         runChoice(trial % 6);
+        //     });
+        // } else {
+        //     functionList.push(function () {
+        //         preCommitted(trial % 6);
+        //     });
+        // }
+        // functionList.push(function () {
+        //     enterRoom(trial % 6);
+        // });
+        // if (committed[trial + 4]) {
+        //     contextGroups.select(".advanced")
+        //         .style("opacity", 1);
+        //     functionList.push(function () {
+        //         preCommitted((trial + 4) % 6);
+        //     });
+        //     functionList.push(function () {
+        //         runChoice((trial + 4) % 6);
+        //     });
+        //     functionList.push(function () {
+        //         enterRoom((trial + 4) % 6);
+        //     });
+        // } else {
+        //     contextGroups.select(".advanced")
+        //         .style("opacity", 0);
+        // }
+        // if (resetArray[trial - 1]) {
+        //     functionList.push(function () {
+        //         resetContext((trial - 1) % 6);
+        //     });
+        // }
         functionList.pop()();
         $("#inforeminder").hide();
     };
 
     $("#inforeminderbutton").click(function () {$("#inforeminder").toggle(400); });
-    committed = [];
-    if (taskType === "practice") {
-        for (i = 0; i < nTrials; i++) {
-            if (i < 6) {
-                committed.push(0);
-                // committed.push(1);
-            } else if (i < 12){
-                committed.push(1);
-            } else {
-                committed.push(0);
-            }
-        }
-        $("#timediv").css("opacity", 0);
-        $("#pointsdiv").css("opacity", 0);
-        $("#popuppctdiv").css("opacity", 0);
-    } else {
-        for (i = 0; i < nTrials; i++) {
-            if (i < 6) {
-                committed.push(0);
-            } else if (i < 54){
-                committed.push((Math.floor((i - 6) / 12) + parseInt(counterbalance)) % 2);
-            } else {
-                committed.push((Math.floor((i - 6) / 6) + parseInt(counterbalance)) % 2);
-            }
-        }
-    }
+    // committed = [];
+    // if (taskType === "practice") {
+    //     for (i = 0; i < nTrials; i++) {
+    //         if (i < 6) {
+    //             committed.push(0);
+    //             // committed.push(1);
+    //         } else if (i < 12){
+    //             committed.push(1);
+    //         } else {
+    //             committed.push(0);
+    //         }
+    //     }
+    //     $("#timediv").css("opacity", 0);
+    //     $("#pointsdiv").css("opacity", 0);
+    //     $("#popuppctdiv").css("opacity", 0);
+    // } else {
+    //     for (i = 0; i < nTrials; i++) {
+    //         if (i < 6) {
+    //             committed.push(0);
+    //         } else if (i < 54){
+    //             committed.push((Math.floor((i - 6) / 12) + parseInt(condition)) % 2);
+    //         } else {
+    //             committed.push((Math.floor((i - 6) / 6) + parseInt(condition)) % 2);
+    //         }
+    //     }
+    // }
     (function () {
         var lastchosen = -1,
             chosen = -1;
@@ -1078,7 +1131,7 @@ function ConsumptionRewards(psiTurk, callback) {
                                  trialType: "consumption",
                                  trial: trialNum,
                                  uniqueid: uniqueId,
-                                 counterbalance: counterbalance,
+                                 condition: condition,
                                  outcome: rewardAmount,
                                  points: gameData.points,
                                  lastRunPoints: gameData.lastRunPoints,
@@ -1196,7 +1249,7 @@ function phaseDriver(nTrials, ExploreFn, RewardFn, taskType, psiTurk, callback) 
 
     rewards = new RewardFn(psiTurk, nextChoice);
     exploreExploit = new ExploreFn(nTrials, taskType, psiTurk, rewards.setReward);
-    nextChoice();
+    setTimeout(nextChoice, 1000);
 }
 
 function instructionDriver(instructionPages, quizPage, answerKey, psiTurk, callback) {
@@ -1275,7 +1328,7 @@ function endingQuestions(psiTurk, callback) {
     $("#missloss").html(missloss.toFixed(2));
     psiTurk.recordUnstructuredData("bonus", bonus);
     psiTurk.recordUnstructuredData("uniqueid", uniqueId);
-    psiTurk.recordUnstructuredData("counterbalance", counterbalance);
+    psiTurk.recordUnstructuredData("condition", condition);
     $("#totalbonus").html(bonus.toFixed(2));
     $("#continue").click(function () {
         recordResponses();
