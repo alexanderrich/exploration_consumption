@@ -159,7 +159,7 @@ strong {
     width: 150px;
 }
 
-#popuppctdiv {
+#sliderpctdiv {
     float: left;
     width: 180px;
 }
@@ -314,23 +314,6 @@ strong {
 
 #arrowinstructions {
     text-align: center;
-}
-
-/* popup */
-#popup {
-    position: absolute;
-    text-align: center;
-    padding-top: 80px;
-    font-size: 28px;
-    left: 195px;
-    top: 140px;
-    width: 300px;
-    height: 200px;
-    margin: 5px;
-    border-radius: 5px;
-    padding-top: 15px;
-    border: 5px solid black;
-    background: yellow;
 }
 
 .progress {
