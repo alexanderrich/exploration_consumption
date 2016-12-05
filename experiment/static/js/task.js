@@ -353,7 +353,8 @@ function Game(popupCreator) {
         game = new Phaser.Game(700, 500, Phaser.AUTO, "gamediv", {preload: preload, create: create, update: update});
     };
 
-    this.run = function (time, callback) {
+    this.run = function () {
+        $("#rewards").show();
         lastRunPoints = 0;
         lastRunBricks = 0;
         lastRunDeaths = 0;
@@ -362,17 +363,22 @@ function Game(popupCreator) {
         ballOnPaddle = true;
         ball.reset(paddle.body.x + 26, paddle.y - 16);
         game.time.events.add(1000, releaseBall, this);
-        setTimeout(function () {
-            if (popupCreator.isUp()) {
-                popupCreator.clear(true);
-            }
-            game.paused = true;
-            callback();
-        }, time * 1000);
+        // setTimeout(function () {
+        //     if (popupCreator.isUp()) {
+        //         popupCreator.clear(true);
+        //     }
+        //     game.paused = true;
+        //     callback();
+        // }, 30);
         // make sure there aren't bonuses falling when time runs out
-        setTimeout(function () {
-            stopBonuses = true;
-        }, time * 1000 - 5000);
+        // setTimeout(function () {
+        //     stopBonuses = true;
+        // }, 30 * 1000 - 5000);
+    };
+
+    this.stop = function () {
+        $("#rewards").hide();
+        game.paused = true;
     };
 
     this.getStats = function () {
@@ -524,6 +530,63 @@ function PopupCreator (length) {
     $("#popuppct").html("0");
 }
 
+function SliderTask() {
+
+
+    $(".sliderdiv").each(function () {
+        var div = $(this);
+        div.children(".slider").on("input", function () {
+            div.children(".sliderlabel").html($(this).val());
+            if($(this).val() !== "50") {
+                div.css("background-color", "");
+            }
+        });
+        div.children(".slider").on("change", function () {
+            if($(this).val() === "50") {
+                div.css("background-color", "#98ff98");
+            }
+        });
+    });
+
+    this.run = function () {
+        $("#sliders").show();
+        $(".sliderdiv").each(function () {
+            var div = $(this),
+                initial = Math.floor(Math.random() * 101);
+            if(initial === 50) {
+                initial++;
+            }
+            div.css("padding-left", (200*Math.random()).toString() + "px");
+            div.children(".slider").val(initial);
+        });
+        $(".slider").trigger("input");
+        $(".sliderdiv").css("background-color", "gray");
+        $(".slider").prop("disabled", true);
+        $("#slider1").prop("disabled", false);
+        $("#sliderdiv1").css("background-color", "");
+        setTimeout(function () {
+            $("#slider2").prop("disabled", false);
+            $("#sliderdiv2").css("background-color", "");
+        }, 5000);
+        setTimeout(function () {
+            $("#slider3").prop("disabled", false);
+            $("#sliderdiv3").css("background-color", "");
+        }, 10000);
+        setTimeout(function () {
+            $("#slider4").prop("disabled", false);
+            $("#sliderdiv4").css("background-color", "");
+        }, 15000);
+        setTimeout(function () {
+            $("#slider5").prop("disabled", false);
+            $("#sliderdiv5").css("background-color", "");
+        }, 20000);
+
+    };
+
+    this.stop = function () {
+        $("#sliders").hide();
+    };
+}
 
 function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     "use strict";
@@ -532,7 +595,8 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         // committed,
         resetArray,
         i,
-        trial = -2,
+        // trial = -10,
+        trial = -1,
         choiceNumber = -1,
         functionList = [],
         runChoice,
@@ -563,19 +627,19 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
 
     updateCards = function (exploitVal, exploreVal) {
         var widthpct;
-        $("#exploittext").html(exploitVal.toFixed());
-        $("#gametimenote").html(exploitVal.toFixed());
-        $("#popuptimenote").html((36 - exploitVal).toFixed());
-        widthpct = Math.ceil(exploitVal/.36);
+        $("#exploittext").html(exploitVal.toFixed(2));
+        // $("#gametimenote").html(exploitVal.toFixed());
+        // $("#popuptimenote").html((36 - exploitVal).toFixed());
+        widthpct = exploitVal * 100;
         $("#exploitprogress :nth-child(1)").css("width", widthpct.toFixed() + "%");
         $("#exploitprogress :nth-child(2)").css("width", (100-widthpct).toFixed() + "%");
         if (exploreVal === "?") {
             $("#exploretext").html("?");
             $("#exploreprogress").css("opacity", "0");
         } else {
-            $("#exploretext").html(exploreVal.toFixed());
+            $("#exploretext").html(exploreVal.toFixed(2));
             $("#exploreprogress").css("opacity", "1");
-            widthpct = Math.ceil(exploreVal/.36);
+            widthpct = exploreVal * 100;
             $("#exploreprogress :nth-child(1)").css("width", widthpct.toFixed() + "%");
             $("#exploreprogress :nth-child(2)").css("width", (100-widthpct).toFixed() + "%");
         }
@@ -595,11 +659,13 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                 .style("stroke-width", 4);
             contextObj.nextChoice = "explore";
             if (Math.random() > .333) {
-                contextObj.nextValue = 3 * (3 + Math.ceil(Math.random() * 9));
+                contextObj.nextValue = .333 + .667 * Math.random();
+                console.log(contextObj.nextValue);
             } else {
                 contextObj.nextValue = 0;
             }
         }
+        contextObj.outcome = Math.random() < contextObj.nextValue;
         if (advanced) {
             d3.select("#context" + context + " .roomphones")
                 .style("opacity", 1);
@@ -617,7 +683,8 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                                  advanced: advanced,
                                  rt: new Date().getTime() - timeStamp,
                                  currentValue: contextObj.value,
-                                 outcome: contextObj.nextValue
+                                 nextValue: contextObj.nextValue,
+                                 outcome: contextObj.outcome
                                 });
         setTimeout(
             function () {
@@ -722,7 +789,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             $("#trialtype").off("click");
             $("#trialtype").css("background", "white");
             $("#trialtype").css("border", "");
-            $("#trialtype").html("Outcome: <strong>" + contextObj.nextValue.toFixed() + "</strong>");
+            $("#trialtype").html("Outcome: <strong>" + contextObj.nextValue.toFixed(2) + "</strong>");
             $(".card").css({"border": "5px solid black",
                             "margin": "0px"});
             d3.select("#context" + context + " .contextcard")
@@ -745,24 +812,24 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                     d3.select("#context" + context + " .contextcard")
                         .style("fill", "lime");
                     d3.select("#context" + context + " .contextvalue")
-                        .text(contextObj.value);
+                        .text(contextObj.value.toFixed(2));
                 }
             }
             d3.select("#context" + context + " .contextvalue")
-                .text(contextObj.value);
+                .text(contextObj.value.toFixed(2));
             setTimeout(function () {
                 $("#explorediv").hide();
                 d3.select("#context" + context + " .contextcard")
                     .style("fill", "white");
                 $("#exploit").css("background", "gainsboro");
-                callback(contextObj.nextValue, trial);
+                callback(contextObj.nextValue, contextObj.outcome, trial);
             }, 2000);
         });
     };
 
     resetContext = function (context) {
         var contextObj = contexts[context];
-        contextObj.value = 3 * (3 + Math.ceil(Math.random() * 3));
+        contextObj.value = .333 + .333 * Math.random();
         $("#trialtype").html("<strong>room reset</strong>");
         updateCards(contextObj.value, "?");
         $(".card").css({"border": "5px solid black",
@@ -773,7 +840,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             $("#exploit").css("background", "gainsboro");
         }, 1000);
         d3.select("#context" + context + " .contextvalue")
-            .text(contextObj.value);
+            .text(contextObj.value.toFixed(2));
         d3.select("#context" + context + " .contextcard")
             .style("fill", "gray")
             .transition()
@@ -789,7 +856,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         if (trial < 0) {
             functionList.push(function() {
                 $("#explorediv").hide();
-                callback(0, trial);
+                callback(0, 0, trial);
             });
             if (condition === 1 && trial + 4 >= 0) {
                 // make pre-choice
@@ -925,7 +992,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                 {color: "#A000A0", colorName: "purple"}];
     contexts = _.shuffle(contexts);
     contexts = contexts.map(function (obj) {
-        obj.value = 3 * (3 + Math.ceil(Math.random() * 3));
+        obj.value = .333 + .333 * Math.random();
         obj.nextValue = 0;
         obj.advanced = false;
         return obj;
@@ -1037,7 +1104,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             return 6 + getLocation(idx, 0)[1];
         })
         .attr("text-anchor", "middle")
-        .text(function (d) {return d.value.toString(); });
+        .text(function (d) {return d.value.toFixed(2); });
     contextGroups.append("text")
         .attr("class", "mysteryvalue")
         .attr("x", function (d, idx) {
@@ -1088,74 +1155,83 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
 function ConsumptionRewards(psiTurk, callback) {
     "use strict";
     var game,
-        baselength = 3,
-        maxReward = 36,
         trialNum,
-        rewardAmount,
-        popupCreator,
-        nextReward,
-        nextPunishment,
-        totalTime = maxReward,
+        rewardProb,
+        reward,
+        sliderTask,
+        // nextReward,
+        // nextPunishment,
+        currentTask,
+        totalTime = 30,
         timeLeft,
         decrementTime,
         recordData,
         timeInterval;
 
-    nextReward = function (length) {
-        $("#time").html(length);
-        timeLeft = length;
-        timeInterval = setInterval(decrementTime, 1000);
-        game.run(length, function () {
-            clearInterval(timeInterval);
-            nextPunishment(maxReward - length);
-        });
-    };
+    // nextReward = function (length) {
+    //     $("#time").html(length);
+    //     timeLeft = length;
+    //     timeInterval = setInterval(decrementTime, 1000);
+    //     game.run(length, function () {
+    //         clearInterval(timeInterval);
+    //         nextPunishment(maxReward - length);
+    //     });
+    // };
 
-    nextPunishment = function (length) {
-        $("#time").html(length);
-        timeLeft = length;
-        timeInterval = setInterval(decrementTime, 1000);
-        popupCreator.runMultiple(length / 3, function () {
-            $("#rewards").hide();
-            clearInterval(timeInterval);
-            recordData();
-        });
-    };
+    // nextPunishment = function (length) {
+    //     $("#time").html(length);
+    //     timeLeft = length;
+    //     timeInterval = setInterval(decrementTime, 1000);
+    //     popupCreator.runMultiple(length / 3, function () {
+    //         $("#rewards").hide();
+    //         clearInterval(timeInterval);
+    //         recordData();
+    //     });
+    // };
 
     recordData = function () {
         var gameData,
             popupData;
         gameData = game.getStats();
         popupData = popupCreator.getStats();
-        psiTurk.recordTrialData({phase: "EXPERIMENT",
-                                 trialType: "consumption",
-                                 trial: trialNum,
-                                 uniqueid: uniqueId,
-                                 condition: condition,
-                                 outcome: rewardAmount,
-                                 points: gameData.points,
-                                 lastRunPoints: gameData.lastRunPoints,
-                                 lastRunBricks: gameData.lastRunBricks,
-                                 endingSpeed: gameData.endingSpeed,
-                                 level: gameData.level,
-                                 bricksLeft: gameData.bricksLeft,
-                                 deaths: gameData.deaths,
-                                 deathCompletes: popupData.deathCompletes,
-                                 deathMisses: popupData.deathMisses,
-                                 deathCancels: popupData.deathCancels,
-                                 penaltyPopups: popupData.penaltyPopups,
-                                 penaltyCompletes: popupData.penaltyCompletes,
-                                 penaltyMisses: popupData.penaltyMisses
-        });
+        // psiTurk.recordTrialData({phase: "EXPERIMENT",
+        //                          trialType: "consumption",
+        //                          trial: trialNum,
+        //                          uniqueid: uniqueId,
+        //                          condition: condition,
+        //                          outcome: rewardAmount,
+        //                          points: gameData.points,
+        //                          lastRunPoints: gameData.lastRunPoints,
+        //                          lastRunBricks: gameData.lastRunBricks,
+        //                          endingSpeed: gameData.endingSpeed,
+        //                          level: gameData.level,
+        //                          bricksLeft: gameData.bricksLeft,
+        //                          deaths: gameData.deaths,
+        //                          deathCompletes: popupData.deathCompletes,
+        //                          deathMisses: popupData.deathMisses,
+        //                          deathCancels: popupData.deathCancels,
+        //                          penaltyPopups: popupData.penaltyPopups,
+        //                          penaltyCompletes: popupData.penaltyCompletes,
+        //                          penaltyMisses: popupData.penaltyMisses
+        // });
         callback();
     };
 
-    this.setReward = function(reward, trial) {
-        rewardAmount = reward;
+    this.setReward = function(_rewardProb, _reward, trial) {
+        reward = _reward;
+        rewardProb = _rewardProb;
         trialNum = trial;
-        $("#rewards").show();
-        popupCreator.reset();
-        nextReward(reward);
+        $("#time").html(30);
+        timeLeft = 30;
+        timeInterval = setInterval(decrementTime, 1000);
+        if (reward) {
+            currentTask = game;
+        } else {
+            currentTask = sliderTask;
+        }
+        currentTask.run();
+        // popupCreator.reset();
+        // nextReward(reward);
     };
 
     this.recordFinal = function(taskType) {
@@ -1168,9 +1244,16 @@ function ConsumptionRewards(psiTurk, callback) {
         if (timeLeft >= 0) {
             $("#time").html(timeLeft);
         }
+        if (timeLeft === 0) {
+            currentTask.stop();
+            clearInterval(timeInterval);
+            recordData();
+        }
     };
 
-    popupCreator = new PopupCreator(baselength);
+    var popupCreator;
+    popupCreator = new PopupCreator(3);
+    sliderTask = new SliderTask();
     game = new Game(popupCreator);
     game.setup();
     $("#points").html("0");
@@ -1246,10 +1329,11 @@ function phaseDriver(nTrials, ExploreFn, RewardFn, taskType, psiTurk, callback) 
 
     psiTurk.showPage("stage.html");
     $("#rewards").hide();
+    $("#sliders").hide();
 
     rewards = new RewardFn(psiTurk, nextChoice);
     exploreExploit = new ExploreFn(nTrials, taskType, psiTurk, rewards.setReward);
-    setTimeout(nextChoice, 1000);
+    nextChoice();
 }
 
 function instructionDriver(instructionPages, quizPage, answerKey, psiTurk, callback) {
