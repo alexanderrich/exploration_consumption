@@ -456,6 +456,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     "use strict";
     var responseFn,
         contexts,
+        locations,
         resetArray,
         i,
         // trial = -10,
@@ -480,8 +481,9 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         // $("#gametimenote").html(exploitVal.toFixed());
         // $("#popuptimenote").html((36 - exploitVal).toFixed());
         widthpct = exploitVal * 100;
-        $("#exploitprogress :nth-child(1)").css("width", widthpct.toFixed() + "%");
-        $("#exploitprogress :nth-child(2)").css("width", (100-widthpct).toFixed() + "%");
+        // $("#exploitprogress :nth-child(1)").css("width", widthpct.toFixed() + "%");
+        // $("#exploitprogress :nth-child(2)").css("width", (100-widthpct).toFixed() + "%");
+        $("#exploitprobability :nth-child(1)").css("width", widthpct.toFixed() + "%");
         if (exploreVal === "?") {
             $("#exploretext").html("?");
             $("#exploreprogress").css("opacity", "0");
@@ -496,7 +498,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
 
     responseFn = function (choiceId, context) {
         var contextObj = contexts[context],
-            advanced = context === (trial + 4) % 6;
+            advanced = condition === 1;
         $("#" + choiceId).css({"border": "10px solid black"});
         if (choiceId === "exploit") {
             d3.select("#context" + context + " .contextcard")
@@ -509,16 +511,11 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             contextObj.nextChoice = "explore";
             if (Math.random() > .333) {
                 contextObj.nextValue = .333 + .667 * Math.random();
-                console.log(contextObj.nextValue);
             } else {
                 contextObj.nextValue = 0;
             }
         }
         contextObj.outcome = Math.random() < contextObj.nextValue;
-        if (advanced) {
-            d3.select("#context" + context + " .roomphones")
-                .style("opacity", 1);
-        }
         $(".card").off("click");
         psiTurk.recordTrialData({phase: "EXPERIMENT",
                                  trialType: "exploreexploit",
@@ -538,9 +535,14 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         setTimeout(
             function () {
                 if (advanced) {
-                    d3.select("#context" + context + " .advancedpointer")
-                        .style("opacity", 0);
+                    d3.select("#context" + context + " .contextbox")
+                        .style("fill", "#2222BB");
                 }
+                contexts = contexts.map(function (obj) {
+                    obj.loc = (obj.loc + 5) % 6;
+                    return obj;
+                });
+                console.log(contexts);
                 functionList.pop()();
             }, 1000);
     };
@@ -548,17 +550,33 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     enterRoom = function (context) {
         var contextObj = contexts[context];
         $("#contextcontents").hide();
+        if(context === (trial + 4) % 6 || condition === 0) {
+            d3.select("#context" + context + " .contextbox")
+                .style("fill", "#444444");
+        } else {
+            d3.select("#context" + context + " .contextbox")
+                .style("fill", "#22BB22");
+        }
         $("#carddiv").css("background-color", "white");
         $("#alternativecontents").show();
         $("#alternativecontents").html("Click circled room");
-        contextMarker.style("opacity", 1);
-        contextMarker.attr("cx", contextObj.location[0])
-            .attr("cy", contextObj.location[1]);
+        if(trial < 6) {
+            $("#context" + context).css("opacity", 1);
+        }
+        contextGroups.transition()
+            .duration(1500)
+            .attr("transform", function(d) {
+                return "translate(" + locations[d.loc][0] +
+                    "," + locations[d.loc][1] + ")";
+            });
         playerMarker.transition()
             .duration(1500)
-            .attr("transform", "translate(" + (35 + contextObj.location[0]) +
-                  "," + (-35 + contextObj.location[1] ) + ")");
-        $("#explorediv").show();
+            .attr("transform", "translate(" + (35 + locations[contextObj.loc][0]) +
+                  "," + (-35 + locations[contextObj.loc][1] ) + ")");
+        contextMarker.style("opacity", 1);
+        contextMarker.attr("cx", locations[contextObj.loc][0])
+            .attr("cy", locations[contextObj.loc][1]);
+        $("#exploreexploitdiv").show();
         $("#contextmarker, #context" + context).click(function () {
             $("#contextmarker, #context" + context).off("click");
             $("#contextcontents").show();
@@ -572,12 +590,11 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     preCommitted = function (context) {
         $("#contextcontents").hide();
         $("#alternativecontents").show();
-        $("#carddiv").css("background", contexts[context].color);
+        // $("#carddiv").css("background", contexts[context].color);
         if(context === trial % 6) {
             $("#alternativecontents").html("Choice <strong>called ahead</strong> <br/> &#x260E;");
         } else {
             $("#alternativecontents").html("<strong>Call-ahead</strong> confirmed <br/> &#x260E;");
-            $("#callahead").css("opacity", 0);
         }
         setTimeout(functionList.pop(), 1500);
     };
@@ -588,18 +605,16 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         var contextObj = contexts[context];
         timeStamp = new Date().getTime();
         choiceNumber++;
-        $("#context").html(contextObj.colorName + " room");
+        // $("#context").html("blah" + " room");
         if (context === trial % 6) {
             $("#trialtype").html("&nbsp;");
         } else {
             $("#trialtype").html("<strong>call-ahead</strong> choice");
-            $("#callahead").css("opacity", 1);
-            contextObj.advanced = true;
         }
         updateCards(contextObj.value, "?");
         $(".card").css({"border": "5px solid black",
                         "margin": "0px"});
-        $("#carddiv").css("background", contextObj.color);
+        // $("#carddiv").css("background", contextObj.color);
         $(".card").click(function () {responseFn(this.id, context); });
     };
 
@@ -607,22 +622,17 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         $("#contextcontents").show();
         $("#alternativecontents").hide();
         var contextObj = contexts[context];
-        $("#context").html(contextObj.colorName + " room");
+        // $("#context").html("blah" + " room");
         $("#trialtype").html("<strong>click</strong> for <strong>outcome</strong>");
         $("#trialtype").css("background", "gainsboro");
         $("#trialtype").css({"border": "5px solid black", "border-radius": "5px"});
         updateCards(contextObj.value, "?");
         $(".card").css({"border": "5px solid black",
                         "margin": "0px"});
-        $("#carddiv").css("background", contextObj.color);
+        // $("#carddiv").css("background", contextObj.color);
         $("#" + contextObj.nextChoice).css({"border": "10px solid black"});
-        $("#explorediv").show();
+        $("#exploreexploitdiv").show();
         $("#trialtype").click(function () {
-            if (contextObj.advanced) {
-                contextObj.advanced = false;
-                d3.select("#context" + context + " .roomphones")
-                    .style("opacity", 0);
-            }
             $("#trialtype").off("click");
             $("#trialtype").css("background", "white");
             $("#trialtype").css("border", "");
@@ -655,10 +665,12 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             d3.select("#context" + context + " .contextvalue")
                 .text(contextObj.value.toFixed(2));
             setTimeout(function () {
-                $("#explorediv").hide();
+                $("#exploreexploitdiv").hide();
                 d3.select("#context" + context + " .contextcard")
                     .style("fill", "white");
                 $("#exploit").css("background", "gainsboro");
+                d3.select("#context" + context + " .contextbox")
+                    .style("fill", "#BB2222");
                 callback(contextObj.nextValue, contextObj.outcome, trial);
             }, 2000);
         });
@@ -671,7 +683,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         updateCards(contextObj.value, "?");
         $(".card").css({"border": "5px solid black",
                         "margin": "0px"});
-        $("#carddiv").css("background", contextObj.color);
+        // $("#carddiv").css("background", contextObj.color);
         $("#exploit").css("background", "gray");
         setTimeout(function () {
             $("#exploit").css("background", "gainsboro");
@@ -684,7 +696,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             .delay(1000)
             .duration(0)
             .style("fill", "white");
-        $("#explorediv").show();
+        $("#exploreexploitdiv").show();
         setTimeout(functionList.pop(), 2000);
     };
 
@@ -692,13 +704,11 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         trial++;
         if (trial < 0) {
             functionList.push(function() {
-                $("#explorediv").hide();
+                $("#exploreexploitdiv").hide();
                 callback(0, 0, trial);
             });
             if (condition === 1 && trial + 4 >= 0) {
                 // make pre-choice
-                contextGroups.select(".advanced")
-                    .style("opacity", 1);
                 functionList.push(function () {
                     preCommitted((trial + 4) % 6);
                 });
@@ -728,8 +738,6 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                 functionList.push(function () {
                     enterRoom(trial % 6);
                 });
-                contextGroups.select(".advanced")
-                    .style("opacity", 1);
                 functionList.push(function () {
                     preCommitted((trial + 4) % 6);
                 });
@@ -759,20 +767,20 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             lastchosen = chosen;
         }
     })();
-    contexts = [{color: "red", colorName: "red"},
-                {color: "orange", colorName: "orange"},
-                {color: "yellow", colorName: "yellow"},
-                {color: "green", colorName: "green"},
-                {color: "#4444FF", colorName: "blue"},
-                {color: "#A000A0", colorName: "purple"}];
+    locations = _.range(6).map(function (i) {
+        return [170 * ((2.5-Math.abs(i - 2.5)) % 3), 150 * Math.floor(i/3)];
+    });
+    console.log(locations);
+    contexts = [{}, {}, {}, {}, {}, {}];
     contexts = _.shuffle(contexts);
     contexts = contexts.map(function (obj, i) {
         obj.value = .333 + .333 * Math.random();
         obj.nextValue = 0;
-        obj.advanced = false;
-        obj.location = [170 * (i % 3), 150 * Math.floor(i/3)];
+        // obj.location = [170 * (i % 3), 150 * Math.floor(i/3)];
+        obj.loc = i;
         return obj;
     });
+
     maze.attr("transform", "translate(80, 80)");
     contextMarker = maze.append("circle")
         .attr("id", "contextmarker")
@@ -786,33 +794,29 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         .enter()
         .append("g")
         .attr("class", "context")
+        .attr("transform", function(d) {
+            return "translate(" + locations[d.loc][0] +
+                "," + locations[d.loc][1] + ")";
+        })
         .attr("id", function (d, idx) {
             return "context" + idx;
-        });
+        })
+        .style("opacity", 0);
     contextGroups.append("rect")
+        .attr("class", "contextbox")
         .attr("width", 84)
         .attr("height", 44)
-        .attr("x", function (d, idx) {
-            return -42 + d.location[0];
-        })
-        .attr("y", function (d, idx) {
-            return -22 + d.location[1];
-        })
-        .style("fill", function (d) {
-            return d.color;
-        })
+        .attr("x", -42)
+        .attr("y", -22)
+        .style("fill", "#444444")
         .style("stroke", "black")
         .style("stroke-width", 1);
     contextGroups.append("rect")
         .attr("class", "contextcard")
         .attr("width", 30)
         .attr("height", 30)
-        .attr("x", function (d, idx) {
-            return -35 + d.location[0];
-        })
-        .attr("y", function (d, idx) {
-            return -15 + d.location[1];
-        })
+        .attr("x", -35)
+        .attr("y", -15)
         .style("fill", "white")
         .style("stroke", "black")
         .style("stroke-width", 1);
@@ -820,39 +824,27 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         .attr("class", "mysterycard")
         .attr("width", 30)
         .attr("height", 30)
-        .attr("x", function (d, idx) {
-            return 5 + d.location[0];
-        })
-        .attr("y", function (d, idx) {
-            return -15 + d.location[1];
-        })
+        .attr("x", 5)
+        .attr("y", -15)
         .style("fill", "white")
         .style("stroke", "black")
         .style("stroke-width", 1);
     contextGroups.append("text")
         .attr("class", "contextvalue")
-        .attr("x", function (d, idx) {
-            return -20 + d.location[0];
-        })
-        .attr("y", function (d, idx) {
-            return 6 + d.location[1];
-        })
+        .attr("x", -20)
+        .attr("y", 6)
         .attr("text-anchor", "middle")
         .text(function (d) {return d.value.toFixed(2); });
     contextGroups.append("text")
         .attr("class", "mysteryvalue")
-        .attr("x", function (d, idx) {
-            return 20 + d.location[0];
-        })
-        .attr("y", function (d, idx) {
-            return 6 + d.location[1];
-        })
+        .attr("x", 20)
+        .attr("y", 6)
         .attr("text-anchor", "middle")
         .text("?");
     playerMarker = maze.append("g")
         .attr("id", "marker")
-        .attr("transform", "translate(" + (35 + contexts[0].location[0]) +
-              "," + (-35 + contexts[0].location[1] ) + ")");
+        .attr("transform", "translate(" + (35 + locations[0][0]) +
+              "," + (-35 + locations[0][1] ) + ")");
     d3.xml("/static/images/player.svg", function(xml) {
         var importedNode = document.importNode(xml.documentElement, true);
         document.getElementById("marker").appendChild(importedNode.cloneNode(true));
