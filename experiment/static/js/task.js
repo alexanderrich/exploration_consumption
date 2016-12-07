@@ -542,14 +542,13 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                     obj.loc = (obj.loc + 5) % 6;
                     return obj;
                 });
-                console.log(contexts);
                 functionList.pop()();
             }, 1000);
     };
 
     enterRoom = function (context) {
         var contextObj = contexts[context];
-        $("#contextcontents").hide();
+        $("#exploreexploitdiv").hide();
         if(context === (trial + 4) % 6 || condition === 0) {
             d3.select("#context" + context + " .contextbox")
                 .style("fill", "#444444");
@@ -557,7 +556,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             d3.select("#context" + context + " .contextbox")
                 .style("fill", "#22BB22");
         }
-        $("#carddiv").css("background-color", "white");
+
         $("#alternativecontents").show();
         $("#alternativecontents").html("Click circled room");
         if(trial < 6) {
@@ -576,21 +575,18 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         contextMarker.style("opacity", 1);
         contextMarker.attr("cx", locations[contextObj.loc][0])
             .attr("cy", locations[contextObj.loc][1]);
-        $("#exploreexploitdiv").show();
         $("#contextmarker, #context" + context).click(function () {
             $("#contextmarker, #context" + context).off("click");
-            $("#contextcontents").show();
             $("#alternativecontents").hide();
+            $("#exploreexploitdiv").show();
             contextMarker.style("opacity", 0);
-            $("#carddiv").css("opacity", 1);
             functionList.pop()();
         });
     };
 
     preCommitted = function (context) {
-        $("#contextcontents").hide();
+        $("#exploreexploitdiv").hide();
         $("#alternativecontents").show();
-        // $("#carddiv").css("background", contexts[context].color);
         if(context === trial % 6) {
             $("#alternativecontents").html("Choice <strong>called ahead</strong> <br/> &#x260E;");
         } else {
@@ -600,12 +596,11 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     };
 
     runChoice = function (context) {
-        $("#contextcontents").show();
         $("#alternativecontents").hide();
+        $("#exploreexploit").show();
         var contextObj = contexts[context];
         timeStamp = new Date().getTime();
         choiceNumber++;
-        // $("#context").html("blah" + " room");
         if (context === trial % 6) {
             $("#trialtype").html("&nbsp;");
         } else {
@@ -614,22 +609,19 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         updateCards(contextObj.value, "?");
         $(".card").css({"border": "5px solid black",
                         "margin": "0px"});
-        // $("#carddiv").css("background", contextObj.color);
         $(".card").click(function () {responseFn(this.id, context); });
     };
 
     showOutcome = function (context) {
-        $("#contextcontents").show();
         $("#alternativecontents").hide();
+        $("#exploreexploitdiv").show();
         var contextObj = contexts[context];
-        // $("#context").html("blah" + " room");
         $("#trialtype").html("<strong>click</strong> for <strong>outcome</strong>");
         $("#trialtype").css("background", "gainsboro");
         $("#trialtype").css({"border": "5px solid black", "border-radius": "5px"});
         updateCards(contextObj.value, "?");
         $(".card").css({"border": "5px solid black",
                         "margin": "0px"});
-        // $("#carddiv").css("background", contextObj.color);
         $("#" + contextObj.nextChoice).css({"border": "10px solid black"});
         $("#exploreexploitdiv").show();
         $("#trialtype").click(function () {
@@ -683,7 +675,6 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         updateCards(contextObj.value, "?");
         $(".card").css({"border": "5px solid black",
                         "margin": "0px"});
-        // $("#carddiv").css("background", contextObj.color);
         $("#exploit").css("background", "gray");
         setTimeout(function () {
             $("#exploit").css("background", "gainsboro");
@@ -770,7 +761,6 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     locations = _.range(6).map(function (i) {
         return [170 * ((2.5-Math.abs(i - 2.5)) % 3), 150 * Math.floor(i/3)];
     });
-    console.log(locations);
     contexts = [{}, {}, {}, {}, {}, {}];
     contexts = _.shuffle(contexts);
     contexts = contexts.map(function (obj, i) {

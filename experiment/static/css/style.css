@@ -166,18 +166,12 @@ strong {
 
 /* card task */
 
-#exploreexploitdiv {
-    position: relative;
-    margin-left: auto;
-    margin-right: auto;
-    width: 600px;
-    height: 350px;
-}
-
 #alternativecontents {
     text-align: center;
     padding-top: 100px;
     font-size: 30px;
+    width: 600px;
+    height: 350px;
 }
 
 #maze {
@@ -185,7 +179,7 @@ strong {
     height: 300px;
 }
 
-#carddiv {
+#exploreexploitdiv {
     position: relative;
     padding-top: 25px;
     /* border: 1px solid black; */
@@ -196,37 +190,10 @@ strong {
     overflow: auto;
 }
 
-/* #innercarddiv { */
-/*     border: 1px solid black; */
-/*     background: white; */
-/*     margin-left: 25px; */
-/*     margin-right: 25px; */
-/*     margin-top: 25px; */
-/*     width: 550px; */
-/*     height: 300px; */
-/*     text-align: center; */
-/*     font-size: 30px; */
-/*     overflow: auto; */
-/* } */
-
 .cardholder {
     position: absolute;
     /* width: 130px; */
 }
-
-/* .carddeck { */
-/*     position: absolute; */
-/* } */
-
-/* #card1 { */
-/*     top: 14px; */
-/*     left: 14px; */
-/* } */
-
-/* #card2 { */
-/*     top: 7px; */
-/*     left: 7px; */
-/* } */
 
 .card {
     position: absolute;
@@ -251,28 +218,11 @@ strong {
     width: 120px;
 }
 
-#context {
-    margin-left: auto;
-    margin-right: auto;
-}
-
-#callahead {
-    position: absolute;
-    left: 280px;
-    top: 225px;
-    opacity: 0;
-}
-
 #trialtype {
     margin-left: auto;
     margin-right: auto;
     margin-top: 190px;
     width: 300px;
-}
-
-.undercard {
-    font-size: 16px;
-    padding-top: 135px;
 }
 
 #inforeminderbutton {
