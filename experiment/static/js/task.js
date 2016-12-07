@@ -195,7 +195,6 @@ function Game() {
         case 0:
             for (y = 0; y < 10; y++) {
                 for (x = 0; x < 14; x++) {
-                    // if (y % 2 === 0) {
                     if (y > 3 && y < 8) {
                         bricks.getChildAt(y * 14 + x).revive();
                     }
@@ -457,7 +456,6 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     "use strict";
     var responseFn,
         contexts,
-        // committed,
         resetArray,
         i,
         // trial = -10,
@@ -470,25 +468,11 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         playerMarker,
         contextMarker,
         updateCards,
-        getLocation,
         enterRoom,
         preCommitted,
         resetContext,
         timeStamp,
         showOutcome;
-
-    getLocation = function (context, advanced) {
-        var x,
-            y;
-        if (advanced) {
-            x = .87 * 180 * -Math.cos(Math.PI * (context / 3 - 5 / 6));
-            y = .87 * 100 * -Math.sin(Math.PI * (context / 3 - 5 / 6));
-        } else {
-            x = 180 * -Math.cos(Math.PI * (context / 3 - 4 / 3));
-            y = 100 * -Math.sin(Math.PI * (context / 3 - 4 / 3));
-        }
-        return [x, y];
-    };
 
     updateCards = function (exploitVal, exploreVal) {
         var widthpct;
@@ -562,30 +546,18 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     };
 
     enterRoom = function (context) {
+        var contextObj = contexts[context];
         $("#contextcontents").hide();
         $("#carddiv").css("background-color", "white");
         $("#alternativecontents").show();
         $("#alternativecontents").html("Click circled room");
         contextMarker.style("opacity", 1);
-        contextMarker.attr("cx", getLocation(context, 0)[0])
-            .attr("cy", getLocation(context, 0)[1]);
-        if (context === trial % 6) {
-            playerMarker.attr("cx", getLocation(context, 0)[0])
-                .attr("cy", getLocation(context, 0)[1]);
-            playerMarker.transition()
-                .duration(1500)
-                .attr("transform", "translate(" + (-12 + 1.3 * getLocation(context, 0)[0]) +
-                      "," + (-35 + 1.3 * getLocation(context, 0)[1] ) + ")");
-        } else {
-            d3.select("#context" + context + " .advancedpointer")
-                .style("opacity", 1);
-            playerMarker.attr("cx", getLocation(context, 1)[0])
-                .attr("cy", getLocation(context, 1)[1]);
-            playerMarker.transition()
-                .duration(1500)
-                .attr("transform", "translate(" + (-12 + 1.3 * getLocation(context, 1)[0]) +
-                      "," + (-35 + 1.3 * getLocation(context, 1)[1] ) + ")");
-        }
+        contextMarker.attr("cx", contextObj.location[0])
+            .attr("cy", contextObj.location[1]);
+        playerMarker.transition()
+            .duration(1500)
+            .attr("transform", "translate(" + (35 + contextObj.location[0]) +
+                  "," + (-35 + contextObj.location[1] ) + ")");
         $("#explorediv").show();
         $("#contextmarker, #context" + context).click(function () {
             $("#contextmarker, #context" + context).off("click");
@@ -769,73 +741,11 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                 });
             }
         }
-        // functionList.push(function () {
-        //     showOutcome(trial % 6);
-        // });
-        // if (condition === 0) {
-        //     functionList.push(function () {
-        //         runChoice(trial % 6);
-        //     });
-        // } else {
-        //     functionList.push(function () {
-        //         preCommitted(trial % 6);
-        //     });
-        // }
-        // functionList.push(function () {
-        //     enterRoom(trial % 6);
-        // });
-        // if (committed[trial + 4]) {
-        //     contextGroups.select(".advanced")
-        //         .style("opacity", 1);
-        //     functionList.push(function () {
-        //         preCommitted((trial + 4) % 6);
-        //     });
-        //     functionList.push(function () {
-        //         runChoice((trial + 4) % 6);
-        //     });
-        //     functionList.push(function () {
-        //         enterRoom((trial + 4) % 6);
-        //     });
-        // } else {
-        //     contextGroups.select(".advanced")
-        //         .style("opacity", 0);
-        // }
-        // if (resetArray[trial - 1]) {
-        //     functionList.push(function () {
-        //         resetContext((trial - 1) % 6);
-        //     });
-        // }
         functionList.pop()();
         $("#inforeminder").hide();
     };
 
     $("#inforeminderbutton").click(function () {$("#inforeminder").toggle(400); });
-    // committed = [];
-    // if (taskType === "practice") {
-    //     for (i = 0; i < nTrials; i++) {
-    //         if (i < 6) {
-    //             committed.push(0);
-    //             // committed.push(1);
-    //         } else if (i < 12){
-    //             committed.push(1);
-    //         } else {
-    //             committed.push(0);
-    //         }
-    //     }
-    //     $("#timediv").css("opacity", 0);
-    //     $("#pointsdiv").css("opacity", 0);
-    //     $("#sliderpctdiv").css("opacity", 0);
-    // } else {
-    //     for (i = 0; i < nTrials; i++) {
-    //         if (i < 6) {
-    //             committed.push(0);
-    //         } else if (i < 54){
-    //             committed.push((Math.floor((i - 6) / 12) + parseInt(condition)) % 2);
-    //         } else {
-    //             committed.push((Math.floor((i - 6) / 6) + parseInt(condition)) % 2);
-    //         }
-    //     }
-    // }
     (function () {
         var lastchosen = -1,
             chosen = -1;
@@ -856,13 +766,14 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                 {color: "#4444FF", colorName: "blue"},
                 {color: "#A000A0", colorName: "purple"}];
     contexts = _.shuffle(contexts);
-    contexts = contexts.map(function (obj) {
+    contexts = contexts.map(function (obj, i) {
         obj.value = .333 + .333 * Math.random();
         obj.nextValue = 0;
         obj.advanced = false;
+        obj.location = [170 * (i % 3), 150 * Math.floor(i/3)];
         return obj;
     });
-    maze.attr("transform", "translate(300, 150)");
+    maze.attr("transform", "translate(80, 80)");
     contextMarker = maze.append("circle")
         .attr("id", "contextmarker")
         .attr("r", "50")
@@ -870,17 +781,6 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         .style("opacity", 0)
         .style("stroke", "black")
         .style("stroke-width", 1);
-    maze.selectAll("path").data(contexts)
-        .enter()
-        .append("path")
-        .attr("d", function (d, idx) {
-            return "M " + getLocation(idx, 0)[0] +
-                " " + getLocation(idx, 0)[1] +
-                " L " + getLocation(idx + 1, 0)[0] +
-                " " + getLocation(idx + 1, 0)[1];
-        })
-        .style("stroke", "black")
-        .style("stroke-width", 3);
     contextGroups = maze.selectAll(".context")
         .data(contexts)
         .enter()
@@ -889,45 +789,14 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         .attr("id", function (d, idx) {
             return "context" + idx;
         });
-    maze.append("svg:defs").append("svg:marker")
-        .attr("id", "triangle")
-        .attr("refX", 3)
-        .attr("refY", 3)
-        .attr("markerWidth", 15)
-        .attr("markerHeight", 15)
-        .attr("orient", "auto")
-        .append("path")
-        .attr("d", "M 0 0 6 3 0 6")
-        .style("fill", "black");
-    contextGroups.append("line")
-        .attr("class", "advancedpointer")
-        .attr("x1", function (d, idx) {
-            return getLocation(idx, 1)[0];
-        })
-        .attr("y1", function (d, idx) {
-            return getLocation(idx, 1)[1];
-        })
-        .attr("x2", function (d, idx) {
-            return .25 * getLocation(idx, 1)[0] +
-                .75 * getLocation(idx, 0)[0];
-        })
-        .attr("y2", function (d, idx) {
-            return .25 * getLocation(idx, 1)[1] +
-                .75 * getLocation(idx, 0)[1];
-        })
-        .attr("stroke-width", 3)
-        .attr("stroke", "black")
-        .attr("stroke-dasharray", "5, 5")
-        .attr("marker-end", "url(#triangle)")
-        .style("opacity", 0);
     contextGroups.append("rect")
         .attr("width", 84)
         .attr("height", 44)
         .attr("x", function (d, idx) {
-            return -42 + getLocation(idx, 0)[0];
+            return -42 + d.location[0];
         })
         .attr("y", function (d, idx) {
-            return -22 + getLocation(idx, 0)[1];
+            return -22 + d.location[1];
         })
         .style("fill", function (d) {
             return d.color;
@@ -939,10 +808,10 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         .attr("width", 30)
         .attr("height", 30)
         .attr("x", function (d, idx) {
-            return -35 + getLocation(idx, 0)[0];
+            return -35 + d.location[0];
         })
         .attr("y", function (d, idx) {
-            return -15 + getLocation(idx, 0)[1];
+            return -15 + d.location[1];
         })
         .style("fill", "white")
         .style("stroke", "black")
@@ -952,10 +821,10 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         .attr("width", 30)
         .attr("height", 30)
         .attr("x", function (d, idx) {
-            return 5 + getLocation(idx, 0)[0];
+            return 5 + d.location[0];
         })
         .attr("y", function (d, idx) {
-            return -15 + getLocation(idx, 0)[1];
+            return -15 + d.location[1];
         })
         .style("fill", "white")
         .style("stroke", "black")
@@ -963,54 +832,27 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     contextGroups.append("text")
         .attr("class", "contextvalue")
         .attr("x", function (d, idx) {
-            return -20 + getLocation(idx, 0)[0];
+            return -20 + d.location[0];
         })
         .attr("y", function (d, idx) {
-            return 6 + getLocation(idx, 0)[1];
+            return 6 + d.location[1];
         })
         .attr("text-anchor", "middle")
         .text(function (d) {return d.value.toFixed(2); });
     contextGroups.append("text")
         .attr("class", "mysteryvalue")
         .attr("x", function (d, idx) {
-            return 20 + getLocation(idx, 0)[0];
+            return 20 + d.location[0];
         })
         .attr("y", function (d, idx) {
-            return 6 + getLocation(idx, 0)[1];
+            return 6 + d.location[1];
         })
         .attr("text-anchor", "middle")
         .text("?");
-    contextGroups.append("text")
-        .attr("class", "roomphones")
-        .attr("x", function (d, idx) {
-            return getLocation(idx, 0)[0];
-        })
-        .attr("y", function (d, idx) {
-            return 40 + getLocation(idx, 0)[1];
-        })
-        .attr("text-anchor", "middle")
-        .style("opacity", 0)
-        .text("\u260E");
-    contextGroups.append("rect")
-        .attr("width", 20)
-        .attr("height", 20)
-        .attr("class", "advanced")
-        .attr("x", function (d, idx) {
-            return -10 + getLocation(idx, 1)[0];
-        })
-        .attr("y", function (d, idx) {
-            return -10 + getLocation(idx, 1)[1];
-        })
-        .style("opacity", 0)
-        .style("fill", function (d) {
-            return d.color;
-        })
-        .style("stroke", "black")
-        .style("stroke-width", 1);
     playerMarker = maze.append("g")
         .attr("id", "marker")
-        .attr("transform", "translate(" + (-12 + 1.3 * getLocation(0, 0)[0]) +
-              "," + (-35 + 1.3 * getLocation(0, 0)[1] ) + ")");
+        .attr("transform", "translate(" + (35 + contexts[0].location[0]) +
+              "," + (-35 + contexts[0].location[1] ) + ")");
     d3.xml("/static/images/player.svg", function(xml) {
         var importedNode = document.importNode(xml.documentElement, true);
         document.getElementById("marker").appendChild(importedNode.cloneNode(true));
@@ -1024,8 +866,6 @@ function ConsumptionRewards(psiTurk, callback) {
         rewardProb,
         reward,
         sliderTask,
-        // nextReward,
-        // nextPunishment,
         currentTask,
         totalTime = 30,
         timeLeft,
@@ -1125,7 +965,7 @@ function ConsumptionRewards(psiTurk, callback) {
 function PracticeRewards (psiTurk, callback) {
     "use strict";
 
-    this.setReward = function (reward) {
+    this.setReward = function (rewardProb, reward, trial) {
         callback();
     };
 
@@ -1316,7 +1156,6 @@ function questionnaire(psiTurk) {
                 psiTurk.computeBonus("compute_bonus", function () {
                     psiTurk.completeHIT();
                 });
-                // psiTurk.completeHIT();
             },
             error: promptResubmit
         });
