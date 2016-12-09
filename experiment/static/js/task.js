@@ -475,9 +475,9 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         updateMachine,
         spinMachine,
         upgradeMachine,
-        enterRoom,
-        preCommitted,
+        enterContext,
         resetContext,
+        incrementContexts,
         timeStamp,
         showOutcome;
 
@@ -587,10 +587,6 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                                  nextValue: contextObj.nextValue,
                                  outcome: contextObj.outcome
                                 });
-        contexts = contexts.map(function (obj) {
-            obj.loc = (obj.loc + 5) % 6;
-            return obj;
-        });
         setTimeout(
             function () {
                 if (advanced) {
@@ -601,7 +597,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             }, 1000);
     };
 
-    enterRoom = function (context) {
+    enterContext = function (context) {
         var contextObj = contexts[context];
         $("#exploreexploitdiv").hide();
         if(context === (trial + 4) % 6 || condition === 0) {
@@ -638,22 +634,11 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         });
     };
 
-    preCommitted = function (context) {
-        $("#exploreexploitdiv").hide();
-        $("#alternativecontents").show();
-        if(context === trial % 6) {
-            $("#alternativecontents").html("Choice <strong>called ahead</strong> <br/> &#x260E;");
-        } else {
-            $("#alternativecontents").html("<strong>Call-ahead</strong> confirmed <br/> &#x260E;");
-        }
-        setTimeout(functionList.pop(), 1500);
-    };
-
     runChoice = function (context) {
         $("#alternativecontents").hide();
         $(".machinebutton").removeClass("clicked");
         $("#start").prop("disabled", true);
-        $("#machinescreen").html("");
+        $("#machinescreen").html("Select setting.");
         $("#machineid").html(context + 1);
         updateMachine(contexts[context].value, "?");
         $("#exploreexploit").show();
@@ -683,15 +668,15 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                     $("#machinescreen").html("new setting not saved");
                 }
             }
-            setTimeout(function (){
+            setTimeout(function () {
                 $("#machinescreen").html("running...");
                 spinMachine(contextObj.nextChoice, contextObj.nextValue, contextObj.outcome);
             }, extraTime);
             setTimeout(function () {
                 if (contextObj.outcome) {
-                    $("#machinescreen").html("Success!<br/>Press START to begin game.");
+                    $("#machinescreen").html("Machine succeeded!<br/>Press START to begin game.");
                 } else {
-                    $("#machinescreen").html("Failure.<br/>Press START to begin task.");
+                    $("#machinescreen").html("Machine failed.<br/>Press START to begin task.");
                 }
                 $("#start").prop("disabled", false);
                 $("#start").click(function () {
@@ -721,60 +706,51 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         setTimeout(functionList.pop(), 4000);
     };
 
+    incrementContexts = function () {
+        contexts = contexts.map(function (obj) {
+            obj.loc = (obj.loc + 5) % 6;
+            return obj;
+        });
+        functionList.pop()();
+    };
+
     this.run = function() {
         trial++;
-        if (trial < 0) {
-            functionList.push(function() {
-                $("#exploreexploitdiv").hide();
-                callback(0, 0, trial);
-            });
-            if (condition === 1 && trial + 4 >= 0) {
-                // make pre-choice
-                functionList.push(function () {
-                    preCommitted((trial + 4) % 6);
-                });
-                functionList.push(function () {
-                    runChoice((trial + 4) % 6);
-                });
-                functionList.push(function () {
-                    enterRoom((trial + 4) % 6);
-                });
-            }
+        if (trial < 0 && condition === 1 && trial + 4 >= 0) {
+            functionList = [function () {$("#exploreexploitdiv").hide();
+                                         callback(0, 0, trial); },
+                            function () {incrementContexts(); },
+                            function () {runChoice((trial + 4) % 6); },
+                            function () {enterContext((trial + 4) % 6); }];
+        } else if (trial < 0) {
+            functionList = [function () {$("#exploreexploitdiv").hide();
+                                         callback(0, 0, trial);}];
+        } else if (condition === 0) {
+            functionList = [
+                function () {showOutcome(trial % 6); },
+                function () {incrementContexts(); },
+                function () {runChoice(trial % 6); },
+                function () {enterContext(trial % 6); },
+            ];
+        } else if (condition === 1 && trial < nTrials - 4){
+            functionList = [
+                function () {showOutcome(trial % 6); },
+                function () {incrementContexts(); },
+                function () {enterContext(trial % 6); },
+                function () {runChoice((trial + 4) % 6); },
+                function () {enterContext((trial + 4) % 6); },
+            ];
+        } else {
+            functionList = [
+                function () {showOutcome(trial % 6); },
+                function () {incrementContexts(); },
+                function () {enterContext(trial % 6); },
+            ];
         }
-        else {
-            functionList.push(function () {
-                showOutcome(trial % 6);
-            });
-            if (condition === 0) {
-                functionList.push(function () {
-                    runChoice(trial % 6);
-                });
-                functionList.push(function () {
-                    enterRoom(trial % 6);
-                });
-            } else {
-                functionList.push(function () {
-                    preCommitted(trial % 6);
-                });
-                functionList.push(function () {
-                    enterRoom(trial % 6);
-                });
-                functionList.push(function () {
-                    preCommitted((trial + 4) % 6);
-                });
-                functionList.push(function () {
-                    runChoice((trial + 4) % 6);
-                });
-                functionList.push(function () {
-                    enterRoom((trial + 4) % 6);
-                });
-            }
-            if (trial > 0 && resetArray[trial - 1]) {
-                functionList.push(function () {
-                    resetContext((trial - 1) % 6);
-                });
-            }
+        if (trial > 0 && resetArray[trial - 1]) {
+            functionList.push(function () {resetContext((trial - 1) % 6); });
         }
+
         functionList.pop()();
         $("#inforeminder").hide();
     };
@@ -801,7 +777,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     contexts = contexts.map(function (obj, i) {
         obj.value = .333 + .333 * Math.random();
         obj.nextValue = 0;
-        obj.loc = i;
+        obj.loc = (i + 2 * condition ) % 6;
         return obj;
     });
 
