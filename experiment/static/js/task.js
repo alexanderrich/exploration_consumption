@@ -651,6 +651,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         var contextObj = contexts[context];
         updateMachine(contextObj.value, "?");
         $("#machineid").html(context + 1);
+        $(".choicebutton").removeClass("clicked");
         $("#" + contextObj.nextChoice).addClass("clicked");
         $("#machinescreen").html("processing...");
         $("#alternativecontents").hide();
