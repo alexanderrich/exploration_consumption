@@ -52,33 +52,29 @@
     </div>
 
     <div id="exploreexploitdiv">
-        <div class="cardholder" id="outerexploitdiv">
-            <div class="card" id="exploit">
-                <div id="exploittext" ></div>
-                <div id="exploitprobability" class="probability">
-                    <div class="probability-bar">
-                    </div>
-                </div>
-                <!-- <div id="exploitprogress" class="progress">
-                     <div class="progress-bar progress-bar-success" role="progressbar">
-                     </div>
-                     <div class="progress-bar progress-bar-danger" role="progressbar">
-                     </div>
-                     </div> -->
-            </div>
+        <div id="exploitdiv" class="choicedivs">
+            Machine setting
+            <svg id="exploitsvg" class="machinesvg">
+            </svg>
+            <button id="exploit" class="choicebutton machinebutton">
+                run <br/> machine
+            </button>
         </div>
-        <div class="cardholder" id="outerexplorediv">
-            <div class="card" id="explore">
-                <div id="exploretext" ></div>
-                <div id="exploreprogress" class="progress">
-                    <div class="progress-bar progress-bar-success" role="progressbar" >
-                    </div>
-                    <div class="progress-bar progress-bar-danger" role="progressbar" >
-                    </div>
-                </div>
-            </div>
+        <div id="explorediv" class="choicedivs">
+            New setting
+            <svg id="exploresvg" class="machinesvg">
+            </svg>
+            <button id="explore" class="choicebutton machinebutton">
+                run new <br/> setting
+            </button>
         </div>
-        <div id="trialtype">
+        <div id="screendiv">
+            MACHINE #<span id="machineid"></span>
+            <div id="machinescreen">
+            </div>
+            <button id="start" class="machinebutton">
+                START
+            </button>
         </div>
     </div>
 

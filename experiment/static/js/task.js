@@ -465,41 +465,96 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         functionList = [],
         runChoice,
         maze = d3.select("#maze").append("g"),
+        tau = 2 * Math.PI,
+        arc = d3.arc().innerRadius(0).outerRadius(70).startAngle(0),
         contextGroups,
         playerMarker,
         contextMarker,
-        updateCards,
+        exploitSvgGroup,
+        exploreSvgGroup,
+        updateMachine,
+        spinMachine,
+        upgradeMachine,
         enterRoom,
         preCommitted,
         resetContext,
         timeStamp,
         showOutcome;
 
-    updateCards = function (exploitVal, exploreVal) {
+    updateMachine = function (exploitVal, exploreVal) {
         var widthpct;
-        $("#exploittext").html(exploitVal.toFixed(2));
-        // $("#gametimenote").html(exploitVal.toFixed());
-        // $("#popuptimenote").html((36 - exploitVal).toFixed());
-        widthpct = exploitVal * 100;
-        // $("#exploitprogress :nth-child(1)").css("width", widthpct.toFixed() + "%");
-        // $("#exploitprogress :nth-child(2)").css("width", (100-widthpct).toFixed() + "%");
-        $("#exploitprobability :nth-child(1)").css("width", widthpct.toFixed() + "%");
+        exploitSvgGroup.attr("transform", "translate(75, 75)");
+        exploreSvgGroup.attr("transform", "translate(75, 75)");
+        exploitSvgGroup.select(".winningArc")
+            .datum({endAngle: exploitVal * tau})
+            .attr("d", arc);
         if (exploreVal === "?") {
-            $("#exploretext").html("?");
-            $("#exploreprogress").css("opacity", "0");
+            exploreSvgGroup.select("#questionMark")
+                .style("opacity", 1);
+            exploreSvgGroup.select(".winningArc")
+                .style("opacity", 0);
+            exploreSvgGroup.select("#losingLine")
+                .style("opacity", 0);
         } else {
-            $("#exploretext").html(exploreVal.toFixed(2));
-            $("#exploreprogress").css("opacity", "1");
-            widthpct = exploreVal * 100;
-            $("#exploreprogress :nth-child(1)").css("width", widthpct.toFixed() + "%");
-            $("#exploreprogress :nth-child(2)").css("width", (100-widthpct).toFixed() + "%");
+            exploreSvgGroup.select("#questionMark")
+                .style("opacity", 0);
+            if (exploreVal > 0) {
+                exploreSvgGroup.select(".winningArc")
+                    .style("opacity", 1);
+                exploreSvgGroup.select(".winningArc")
+                    .datum({endAngle: exploreVal * tau})
+                    .attr("d", arc);
+            } else {
+                exploreSvgGroup.select("#losingLine")
+                    .style("opacity", 1);
+            }
         }
+    };
+
+    spinMachine = function (choiceId, choiceVal, outcome) {
+        var group,
+            r;
+        if (choiceId === "explore") {
+            group = exploreSvgGroup;
+        } else {
+            group = exploitSvgGroup;
+        }
+        if (outcome) {
+            r = 1440 - 360 * choiceVal * (.02 + .98 * Math.random());
+        } else {
+            r = 1440 - 360 * (choiceVal + (1 - choiceVal) * (.02 + .98 * Math.random()));
+        }
+        group.transition()
+            .duration(2000)
+            .attrTween("transform", function() {
+                var intrp = d3.interpolate(0, r);
+                return function (t){
+                    return "translate(75, 75) rotate(" + intrp(t) + ")";
+                };
+            });
+    };
+
+    upgradeMachine = function (newVal) {
+        var arcTween = function (newAngle) {
+            return function(d) {
+                var interpolate = d3.interpolate(d.endAngle, newAngle);
+                return function(t) {
+                    d.endAngle = interpolate(t);
+                    return arc(d);
+                };
+            };
+        };
+        exploitSvgGroup.select(".winningArc")
+            .transition()
+            .duration(1000)
+            .attrTween("d", arcTween(newVal * tau));
     };
 
     responseFn = function (choiceId, context) {
         var contextObj = contexts[context],
             advanced = condition === 1;
-        $("#" + choiceId).css({"border": "10px solid black"});
+        $("#" + choiceId).addClass("clicked");
+        $("#machinescreen").html("processing...");
         if (choiceId === "exploit") {
             d3.select("#context" + context + " .contextcard")
                 .style("stroke-width", 4);
@@ -516,7 +571,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             }
         }
         contextObj.outcome = Math.random() < contextObj.nextValue;
-        $(".card").off("click");
+        $(".choicebutton").off("click");
         psiTurk.recordTrialData({phase: "EXPERIMENT",
                                  trialType: "exploreexploit",
                                  taskType: taskType,
@@ -532,16 +587,16 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                                  nextValue: contextObj.nextValue,
                                  outcome: contextObj.outcome
                                 });
+        contexts = contexts.map(function (obj) {
+            obj.loc = (obj.loc + 5) % 6;
+            return obj;
+        });
         setTimeout(
             function () {
                 if (advanced) {
                     d3.select("#context" + context + " .contextbox")
                         .style("fill", "#2222BB");
                 }
-                contexts = contexts.map(function (obj) {
-                    obj.loc = (obj.loc + 5) % 6;
-                    return obj;
-                });
                 functionList.pop()();
             }, 1000);
     };
@@ -556,9 +611,8 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             d3.select("#context" + context + " .contextbox")
                 .style("fill", "#22BB22");
         }
-
         $("#alternativecontents").show();
-        $("#alternativecontents").html("Click circled room");
+        $("#alternativecontents").html("Click circled machine");
         if(trial < 6) {
             $("#context" + context).css("opacity", 1);
         }
@@ -597,98 +651,74 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
 
     runChoice = function (context) {
         $("#alternativecontents").hide();
+        $(".machinebutton").removeClass("clicked");
+        $("#start").prop("disabled", true);
+        $("#machinescreen").html("");
+        $("#machineid").html(context + 1);
+        updateMachine(contexts[context].value, "?");
         $("#exploreexploit").show();
-        var contextObj = contexts[context];
         timeStamp = new Date().getTime();
         choiceNumber++;
-        if (context === trial % 6) {
-            $("#trialtype").html("&nbsp;");
-        } else {
-            $("#trialtype").html("<strong>call-ahead</strong> choice");
-        }
-        updateCards(contextObj.value, "?");
-        $(".card").css({"border": "5px solid black",
-                        "margin": "0px"});
-        $(".card").click(function () {responseFn(this.id, context); });
+        $(".choicebutton").click(function () {responseFn(this.id, context); });
     };
 
     showOutcome = function (context) {
+        var contextObj = contexts[context];
+        updateMachine(contextObj.value, "?");
+        $("#machineid").html(context + 1);
+        $("#" + contextObj.nextChoice).addClass("clicked");
+        $("#machinescreen").html("processing...");
         $("#alternativecontents").hide();
         $("#exploreexploitdiv").show();
-        var contextObj = contexts[context];
-        $("#trialtype").html("<strong>click</strong> for <strong>outcome</strong>");
-        $("#trialtype").css("background", "gainsboro");
-        $("#trialtype").css({"border": "5px solid black", "border-radius": "5px"});
-        updateCards(contextObj.value, "?");
-        $(".card").css({"border": "5px solid black",
-                        "margin": "0px"});
-        $("#" + contextObj.nextChoice).css({"border": "10px solid black"});
-        $("#exploreexploitdiv").show();
-        $("#trialtype").click(function () {
-            $("#trialtype").off("click");
-            $("#trialtype").css("background", "white");
-            $("#trialtype").css("border", "");
-            $("#trialtype").html("Outcome: <strong>" + contextObj.nextValue.toFixed(2) + "</strong>");
-            $(".card").css({"border": "5px solid black",
-                            "margin": "0px"});
-            d3.select("#context" + context + " .contextcard")
-                .style("stroke-width", 1);
-            d3.select("#context" + context + " .mysterycard")
-                .style("stroke-width", 1);
+        setTimeout(function () {
+            var extraTime = 0;
             if (contextObj.nextChoice === "explore") {
-                updateCards(contextObj.value, contextObj.nextValue);
+                extraTime = 1500;
+                updateMachine(contextObj.value, contextObj.nextValue);
                 if (contextObj.nextValue > contextObj.value) {
+                    $("#machinescreen").html("new setting saved!");
                     contextObj.value = contextObj.nextValue;
-                    $("#explore").css("background", "lime");
-                    $("#explore").animate({"margin-left": "-220px"}, 1000, "swing",
-                                          function () {
-                                              $("#explore").css("margin-left", "");
-                                              $("#explore").css("background", "gainsboro");
-                                              updateCards(contextObj.value, "?");
-                                              $("#popuptimenote").html((36 - contextObj.value).toFixed());
-                                              $("#exploit").css("background", "lime");
-                                          });
-                    d3.select("#context" + context + " .contextcard")
-                        .style("fill", "lime");
-                    d3.select("#context" + context + " .contextvalue")
-                        .text(contextObj.value.toFixed(2));
+                    upgradeMachine(contextObj.value);
+                } else {
+                    $("#machinescreen").html("new setting not saved");
                 }
             }
+            setTimeout(function (){
+                $("#machinescreen").html("running...");
+                spinMachine(contextObj.nextChoice, contextObj.nextValue, contextObj.outcome);
+            }, extraTime);
+            setTimeout(function () {
+                if (contextObj.outcome) {
+                    $("#machinescreen").html("Success!<br/>Press START to begin game.");
+                } else {
+                    $("#machinescreen").html("Failure.<br/>Press START to begin task.");
+                }
+                $("#start").prop("disabled", false);
+                $("#start").click(function () {
+                    $("#start").off("click");
+                    $("#exploreexploitdiv").hide();
+                    d3.select("#context" + context + " .contextcard")
+                        .style("fill", "white");
+                    d3.select("#context" + context + " .contextbox")
+                        .style("fill", "#BB2222");
+                    callback(contextObj.nextValue, contextObj.outcome, trial);
+                });
+            }, 2000 + extraTime);
             d3.select("#context" + context + " .contextvalue")
                 .text(contextObj.value.toFixed(2));
-            setTimeout(function () {
-                $("#exploreexploitdiv").hide();
-                d3.select("#context" + context + " .contextcard")
-                    .style("fill", "white");
-                $("#exploit").css("background", "gainsboro");
-                d3.select("#context" + context + " .contextbox")
-                    .style("fill", "#BB2222");
-                callback(contextObj.nextValue, contextObj.outcome, trial);
-            }, 2000);
-        });
+        }, 500);
     };
 
     resetContext = function (context) {
         var contextObj = contexts[context];
         contextObj.value = .333 + .333 * Math.random();
-        $("#trialtype").html("<strong>room reset</strong>");
-        updateCards(contextObj.value, "?");
-        $(".card").css({"border": "5px solid black",
-                        "margin": "0px"});
-        $("#exploit").css("background", "gray");
+        $("#machinescreen").html("Machine<br/>RESET");
+        updateMachine(0, "?");
         setTimeout(function () {
-            $("#exploit").css("background", "gainsboro");
+            upgradeMachine(contextObj.value);
         }, 1000);
-        d3.select("#context" + context + " .contextvalue")
-            .text(contextObj.value.toFixed(2));
-        d3.select("#context" + context + " .contextcard")
-            .style("fill", "gray")
-            .transition()
-            .delay(1000)
-            .duration(0)
-            .style("fill", "white");
         $("#exploreexploitdiv").show();
-        setTimeout(functionList.pop(), 2000);
+        setTimeout(functionList.pop(), 4000);
     };
 
     this.run = function() {
@@ -739,6 +769,11 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                     enterRoom((trial + 4) % 6);
                 });
             }
+            if (trial > 0 && resetArray[trial - 1]) {
+                functionList.push(function () {
+                    resetContext((trial - 1) % 6);
+                });
+            }
         }
         functionList.pop()();
         $("#inforeminder").hide();
@@ -766,7 +801,6 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     contexts = contexts.map(function (obj, i) {
         obj.value = .333 + .333 * Math.random();
         obj.nextValue = 0;
-        // obj.location = [170 * (i % 3), 150 * Math.floor(i/3)];
         obj.loc = i;
         return obj;
     });
@@ -839,6 +873,60 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         var importedNode = document.importNode(xml.documentElement, true);
         document.getElementById("marker").appendChild(importedNode.cloneNode(true));
     });
+
+    function arcTween (newAngle) {
+        return function (d) {
+            var interpolate = d3.interpolate(d.endAngle, newAngle);
+            return function (t) {
+                d.endAngle = interpolate(t);
+                return arc(d);
+            };
+        };
+    }
+    exploitSvgGroup = d3.select("#exploitsvg")
+            .append("g")
+            .attr("transform", "translate(75, 75)");
+    exploitSvgGroup.append("path")
+        .datum({endAngle: tau})
+        .style("fill", "#222222")
+        .attr("d", arc);
+    exploitSvgGroup.append("path")
+        .datum({endAngle: 0.127 * tau})
+        .attr("class", "winningArc")
+        .style("fill", "orange")
+        .attr("d", arc);
+    exploreSvgGroup = d3.select("#exploresvg")
+        .append("g")
+        .attr("transform", "translate(75, 75)");
+    exploreSvgGroup.append("path")
+        .datum({endAngle: tau})
+        .style("fill", "#222222")
+        .attr("d", arc);
+    exploreSvgGroup.append("path")
+        .datum({endAngle: 0})
+        .attr("class", "winningArc")
+        .style("fill", "orange")
+        .attr("d", arc);
+    exploreSvgGroup.append("line")
+        .attr("id", "losingLine")
+        .attr("y2", -70)
+        .style("stroke-width", 1)
+        .style("stroke", "gold");
+    exploreSvgGroup.append("text")
+        .attr("id", "questionMark")
+        .text("?")
+        .attr("text-anchor", "middle")
+        .attr("y", "10px")
+        .style("font-family", "sans-serif")
+        .style("font-size", "30px")
+        .style("fill", "lightgray");
+    d3.selectAll(".machinesvg")
+        .append("polygon")
+        .attr("points", "65 0, 85 0, 75 20")
+        .style("fill", "black")
+        .style("stroke", "gray")
+        .style("stroke-width", 2);
+
 }
 
 function ConsumptionRewards(psiTurk, callback) {
@@ -896,7 +984,7 @@ function ConsumptionRewards(psiTurk, callback) {
                                     });
         }
         missPct = sliderTask.missPct();
-        $("#sliderpct").html(missPct.toString());
+        $("#sliderpct").html(missPct.toFixed());
         if (missPct > 10) {
             $("#sliderpctdiv").css("color", "red");
         } else {
