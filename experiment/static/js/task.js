@@ -468,10 +468,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         tau = 2 * Math.PI,
         arc = d3.arc().innerRadius(0).outerRadius(70).startAngle(0),
         contextGroups,
-        playerMarker,
         contextMarker,
-        exploitSvgGroup,
-        exploreSvgGroup,
         updateMachine,
         spinMachine,
         upgradeMachine,
@@ -481,8 +478,14 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         timeStamp,
         showOutcome;
 
-    updateMachine = function (exploitVal, exploreVal) {
-        var widthpct;
+    updateMachine = function (exploitVal, exploreVal, context) {
+        var widthpct,
+            exploitSvgGroup = d3.select("#exploitcirclegroup" + context),
+            exploreSvgGroup = d3.select("#explorecirclegroup" + context);
+        d3.selectAll(".exploitgroupouter").style("opacity", 0);
+        d3.select("#exploitgroupouter" + context).style("opacity", 1);
+        d3.selectAll(".exploregroupouter").style("opacity", 0);
+        d3.select("#exploregroupouter" + context).style("opacity", 1);
         exploitSvgGroup.attr("transform", "translate(75, 75)");
         exploreSvgGroup.attr("transform", "translate(75, 75)");
         exploitSvgGroup.select(".winningArc")
@@ -511,9 +514,11 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         }
     };
 
-    spinMachine = function (choiceId, choiceVal, outcome) {
+    spinMachine = function (choiceId, choiceVal, outcome, context) {
         var group,
-            r;
+            r,
+            exploitSvgGroup = d3.select("#exploitcirclegroup" + context),
+            exploreSvgGroup = d3.select("#explorecirclegroup" + context);
         if (choiceId === "explore") {
             group = exploreSvgGroup;
         } else {
@@ -534,8 +539,9 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             });
     };
 
-    upgradeMachine = function (newVal) {
-        var arcTween = function (newAngle) {
+    upgradeMachine = function (newVal, context) {
+        var exploitSvgGroup = d3.select("#exploitcirclegroup" + context),
+            arcTween = function (newAngle) {
             return function(d) {
                 var interpolate = d3.interpolate(d.endAngle, newAngle);
                 return function(t) {
@@ -556,13 +562,9 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         $("#" + choiceId).addClass("clicked");
         $("#machinescreen").html("processing...");
         if (choiceId === "exploit") {
-            d3.select("#context" + context + " .contextcard")
-                .style("stroke-width", 4);
             contextObj.nextChoice = "exploit";
             contextObj.nextValue = contextObj.value;
         } else {
-            d3.select("#context" + context + " .mysterycard")
-                .style("stroke-width", 4);
             contextObj.nextChoice = "explore";
             if (Math.random() > .333) {
                 contextObj.nextValue = .333 + .667 * Math.random();
@@ -587,26 +589,12 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                                  nextValue: contextObj.nextValue,
                                  outcome: contextObj.outcome
                                 });
-        setTimeout(
-            function () {
-                if (advanced) {
-                    d3.select("#context" + context + " .contextbox")
-                        .style("fill", "#2222BB");
-                }
-                functionList.pop()();
-            }, 1000);
+        setTimeout(functionList.pop(), 1000);
     };
 
     enterContext = function (context) {
         var contextObj = contexts[context];
         $("#exploreexploitdiv").hide();
-        if(context === (trial + 4) % 6 || condition === 0) {
-            d3.select("#context" + context + " .contextbox")
-                .style("fill", "#444444");
-        } else {
-            d3.select("#context" + context + " .contextbox")
-                .style("fill", "#22BB22");
-        }
         $("#alternativecontents").show();
         $("#alternativecontents").html("Click circled machine");
         if(trial < 6) {
@@ -618,18 +606,14 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                 return "translate(" + locations[d.loc][0] +
                     "," + locations[d.loc][1] + ")";
             });
-        playerMarker.transition()
+        contextMarker.transition()
             .duration(1500)
-            .attr("transform", "translate(" + (35 + locations[contextObj.loc][0]) +
-                  "," + (-35 + locations[contextObj.loc][1] ) + ")");
-        contextMarker.style("opacity", 1);
-        contextMarker.attr("cx", locations[contextObj.loc][0])
+            .attr("cx", locations[contextObj.loc][0])
             .attr("cy", locations[contextObj.loc][1]);
         $("#contextmarker, #context" + context).click(function () {
             $("#contextmarker, #context" + context).off("click");
             $("#alternativecontents").hide();
             $("#exploreexploitdiv").show();
-            contextMarker.style("opacity", 0);
             functionList.pop()();
         });
     };
@@ -640,7 +624,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         $("#start").prop("disabled", true);
         $("#machinescreen").html("Select setting.");
         $("#machineid").html(context + 1);
-        updateMachine(contexts[context].value, "?");
+        updateMachine(contexts[context].value, "?", context);
         $("#exploreexploit").show();
         timeStamp = new Date().getTime();
         choiceNumber++;
@@ -649,7 +633,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
 
     showOutcome = function (context) {
         var contextObj = contexts[context];
-        updateMachine(contextObj.value, "?");
+        updateMachine(contextObj.value, "?", context);
         $("#machineid").html(context + 1);
         $(".choicebutton").removeClass("clicked");
         $("#" + contextObj.nextChoice).addClass("clicked");
@@ -660,18 +644,18 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             var extraTime = 0;
             if (contextObj.nextChoice === "explore") {
                 extraTime = 1500;
-                updateMachine(contextObj.value, contextObj.nextValue);
+                updateMachine(contextObj.value, contextObj.nextValue, context);
                 if (contextObj.nextValue > contextObj.value) {
                     $("#machinescreen").html("new setting saved!");
                     contextObj.value = contextObj.nextValue;
-                    upgradeMachine(contextObj.value);
+                    upgradeMachine(contextObj.value, context);
                 } else {
                     $("#machinescreen").html("new setting not saved");
                 }
             }
             setTimeout(function () {
                 $("#machinescreen").html("running...");
-                spinMachine(contextObj.nextChoice, contextObj.nextValue, contextObj.outcome);
+                spinMachine(contextObj.nextChoice, contextObj.nextValue, contextObj.outcome, context);
             }, extraTime);
             setTimeout(function () {
                 if (contextObj.outcome) {
@@ -683,15 +667,10 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                 $("#start").click(function () {
                     $("#start").off("click");
                     $("#exploreexploitdiv").hide();
-                    d3.select("#context" + context + " .contextcard")
-                        .style("fill", "white");
-                    d3.select("#context" + context + " .contextbox")
-                        .style("fill", "#BB2222");
+                    updateMachine(contextObj.value, "?", context);
                     callback(contextObj.nextValue, contextObj.outcome, trial);
                 });
             }, 2000 + extraTime);
-            d3.select("#context" + context + " .contextvalue")
-                .text(contextObj.value.toFixed(2));
         }, 500);
     };
 
@@ -699,9 +678,9 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         var contextObj = contexts[context];
         contextObj.value = .333 + .333 * Math.random();
         $("#machinescreen").html("Machine<br/>RESET");
-        updateMachine(0, "?");
+        updateMachine(0, "?", context);
         setTimeout(function () {
-            upgradeMachine(contextObj.value);
+            upgradeMachine(contextObj.value, context);
         }, 1000);
         $("#exploreexploitdiv").show();
         setTimeout(functionList.pop(), 4000);
@@ -771,7 +750,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         }
     })();
     locations = _.range(6).map(function (i) {
-        return [170 * ((2.5-Math.abs(i - 2.5)) % 3), 150 * Math.floor(i/3)];
+        return [90 + 180 * ((2.5-Math.abs(i - 2.5)) % 3), 75 + 150 * Math.floor(i/3)];
     });
     contexts = [{}, {}, {}, {}, {}, {}];
     contexts = _.shuffle(contexts);
@@ -780,75 +759,6 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         obj.nextValue = 0;
         obj.loc = (i + 2 * condition ) % 6;
         return obj;
-    });
-
-    maze.attr("transform", "translate(80, 80)");
-    contextMarker = maze.append("circle")
-        .attr("id", "contextmarker")
-        .attr("r", "50")
-        .style("fill", "gainsboro")
-        .style("opacity", 0)
-        .style("stroke", "black")
-        .style("stroke-width", 1);
-    contextGroups = maze.selectAll(".context")
-        .data(contexts)
-        .enter()
-        .append("g")
-        .attr("class", "context")
-        .attr("transform", function(d) {
-            return "translate(" + locations[d.loc][0] +
-                "," + locations[d.loc][1] + ")";
-        })
-        .attr("id", function (d, idx) {
-            return "context" + idx;
-        })
-        .style("opacity", 0);
-    contextGroups.append("rect")
-        .attr("class", "contextbox")
-        .attr("width", 84)
-        .attr("height", 44)
-        .attr("x", -42)
-        .attr("y", -22)
-        .style("fill", "#444444")
-        .style("stroke", "black")
-        .style("stroke-width", 1);
-    contextGroups.append("rect")
-        .attr("class", "contextcard")
-        .attr("width", 30)
-        .attr("height", 30)
-        .attr("x", -35)
-        .attr("y", -15)
-        .style("fill", "white")
-        .style("stroke", "black")
-        .style("stroke-width", 1);
-    contextGroups.append("rect")
-        .attr("class", "mysterycard")
-        .attr("width", 30)
-        .attr("height", 30)
-        .attr("x", 5)
-        .attr("y", -15)
-        .style("fill", "white")
-        .style("stroke", "black")
-        .style("stroke-width", 1);
-    contextGroups.append("text")
-        .attr("class", "contextvalue")
-        .attr("x", -20)
-        .attr("y", 6)
-        .attr("text-anchor", "middle")
-        .text(function (d) {return d.value.toFixed(2); });
-    contextGroups.append("text")
-        .attr("class", "mysteryvalue")
-        .attr("x", 20)
-        .attr("y", 6)
-        .attr("text-anchor", "middle")
-        .text("?");
-    playerMarker = maze.append("g")
-        .attr("id", "marker")
-        .attr("transform", "translate(" + (35 + locations[0][0]) +
-              "," + (-35 + locations[0][1] ) + ")");
-    d3.xml("/static/images/player.svg", function(xml) {
-        var importedNode = document.importNode(xml.documentElement, true);
-        document.getElementById("marker").appendChild(importedNode.cloneNode(true));
     });
 
     function arcTween (newAngle) {
@@ -860,50 +770,182 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
             };
         };
     }
-    exploitSvgGroup = d3.select("#exploitsvg")
-            .append("g")
-            .attr("transform", "translate(75, 75)");
-    exploitSvgGroup.append("path")
-        .datum({endAngle: tau})
-        .style("fill", "#222222")
-        .attr("d", arc);
-    exploitSvgGroup.append("path")
-        .datum({endAngle: 0.127 * tau})
-        .attr("class", "winningArc")
-        .style("fill", "orange")
-        .attr("d", arc);
-    exploreSvgGroup = d3.select("#exploresvg")
-        .append("g")
-        .attr("transform", "translate(75, 75)");
-    exploreSvgGroup.append("path")
-        .datum({endAngle: tau})
-        .style("fill", "#222222")
-        .attr("d", arc);
-    exploreSvgGroup.append("path")
-        .datum({endAngle: 0})
-        .attr("class", "winningArc")
-        .style("fill", "orange")
-        .attr("d", arc);
-    exploreSvgGroup.append("line")
-        .attr("id", "losingLine")
-        .attr("y2", -70)
-        .style("stroke-width", 1)
-        .style("stroke", "gold");
-    exploreSvgGroup.append("text")
-        .attr("id", "questionMark")
-        .text("?")
-        .attr("text-anchor", "middle")
-        .attr("y", "10px")
-        .style("font-family", "sans-serif")
-        .style("font-size", "30px")
-        .style("fill", "lightgray");
-    d3.selectAll(".machinesvg")
-        .append("polygon")
-        .attr("points", "65 0, 85 0, 75 20")
-        .style("fill", "black")
-        .style("stroke", "gray")
-        .style("stroke-width", 2);
 
+    _.range(contexts.length).map(function (x) {
+        var entiregroup,
+            circlegroup;
+        entiregroup = d3.select("#exploitsvg")
+            .append("g")
+            .attr("class", "exploitgroupouter")
+            .attr("id", "exploitgroupouter" + x)
+            .append("g")
+            .attr("class", "exploitgroupinner")
+            .attr("id", "exploitgroupinner" + x);
+        circlegroup = entiregroup.append("g")
+            .attr("class", "exploitcirclegroup")
+            .attr("id", "exploitcirclegroup" + x)
+            .attr("transform", "translate(75, 75)");
+        circlegroup.append("path")
+            .datum({endAngle: tau})
+            .style("fill", "#222222")
+            .attr("d", arc);
+        circlegroup.append("path")
+            .datum({endAngle: 0.127 * tau})
+            .attr("class", "winningArc")
+            .style("fill", "orange")
+            .attr("d", arc);
+        entiregroup.append("polygon")
+            .attr("points", "65 0, 85 0, 75 20")
+            .style("fill", "black")
+            .style("stroke", "gray")
+            .style("stroke-width", 2);
+        entiregroup = d3.select("#exploresvg")
+            .append("g")
+            .attr("class", "exploregroupouter")
+            .attr("id", "exploregroupouter" + x)
+            .append("g")
+            .attr("class", "exploregroupinner")
+            .attr("id", "exploregroupinner" + x);
+        circlegroup = entiregroup.append("g")
+            .attr("class", "explorecirclegroup")
+            .attr("id", "explorecirclegroup" + x)
+            .attr("transform", "translate(75, 75)");
+        circlegroup.append("path")
+            .datum({endAngle: tau})
+            .style("fill", "#222222")
+            .attr("d", arc);
+        circlegroup.append("path")
+            .datum({endAngle: 0 * tau})
+            .attr("class", "winningArc")
+            .style("fill", "orange")
+            .attr("d", arc);
+        circlegroup.append("line")
+            .attr("id", "losingLine")
+            .attr("y2", -70)
+            .style("stroke-width", 1)
+            .style("stroke", "gold");
+        circlegroup.append("text")
+            .attr("id", "questionMark")
+            .text("?")
+            .attr("text-anchor", "middle")
+            .attr("y", "10px")
+            .style("font-family", "sans-serif")
+            .style("font-size", "30px")
+            .style("fill", "lightgray");
+        entiregroup.append("polygon")
+            .attr("points", "65 0, 85 0, 75 20")
+            .style("fill", "black")
+            .style("stroke", "gray")
+            .style("stroke-width", 2);
+    });
+
+    maze.append("rect")
+        .attr("x", 3)
+        .attr("y", 3)
+        .attr("width", 534)
+        .attr("height", 294)
+        .style("fill", condition ? "#CCCCFF" : "#FFCCCC")
+        .style("stroke-width", "3")
+        .style("stroke", "black");
+    maze.append("rect")
+        .attr("x", 3)
+        .attr("y", 3)
+        .attr("width", 180)
+        .attr("height", 150)
+        .style("fill", "white")
+        .style("stroke-width", "3")
+        .style("stroke", "black");
+    if (condition) {
+        maze.append("rect")
+            .attr("x", 180)
+            .attr("y", 3)
+            .attr("width", 180)
+            .attr("height", 150)
+            .style("fill", "#FFCCCC")
+            .style("stroke-width", "3")
+            .style("stroke", "black");
+        maze.append("rect")
+            .attr("x", 357)
+            .attr("y", 3)
+            .attr("width", 180)
+            .attr("height", 150)
+            .style("fill", "white")
+            .style("stroke-width", "3")
+            .style("stroke", "black");
+        maze.append("text")
+            .attr("x", 364)
+            .attr("y", 24)
+            .style("font-size", "20px")
+            .text("ready");
+        maze.append("text")
+            .attr("x", 10)
+            .attr("y", 174)
+            .style("font-size", "20px")
+            .text("processing");
+    }
+    maze.append("text")
+        .attr("x", 10)
+        .attr("y", 24)
+        .style("font-size", "20px")
+        .text("idle");
+    maze.append("text")
+        .attr("x", condition ? 187 : 10)
+        .attr("y", condition ? 24 : 174)
+        .style("font-size", "20px")
+        .text("cooling");
+    contextMarker = maze.append("circle")
+        .attr("id", "contextmarker")
+        .attr("r", "70")
+        .attr("cx", locations[0][0])
+        .attr("cy", locations[0][1])
+        .style("fill", "black")
+        .style("fill-opacity", .15)
+        .style("stroke", "black")
+        .style("stroke-width", 1);
+
+    contextGroups = maze.selectAll(".context")
+        .data(contexts)
+        .enter()
+        .append("g")
+        .attr("class", "context")
+        .attr("transform", function(d) {
+            return "translate(" + locations[d.loc][0] +
+                "," + locations[d.loc][1] + ")";
+        })
+        .attr("id", function (d, idx) {
+            return "context" + idx;
+        });
+        // .style("opacity", 0);
+    contextGroups.append("rect")
+        .attr("class", "contextbox")
+        .attr("width", 120)
+        .attr("height", 70)
+        .attr("x", -60)
+        .attr("y", -35)
+        .attr("rx", 5)
+        .attr("ry", 5)
+        .style("fill", "gray")
+        .style("stroke", "black")
+        .style("stroke-width", 1);
+    contextGroups.append("text")
+        .text(function(d, e) { return e + 1; })
+        .style("font-size", 10)
+        .style("font-family", "monospace")
+        .attr("x", 45)
+        .attr("y", -20);
+    contextGroups.append("use")
+        .attr("transform", "translate(-55, -25) scale(.35, .35)")
+        .attr("xlink:href", function (d, e) {
+            return "#exploitgroupinner" + e;
+        });
+    contextGroups.append("use")
+        .attr("transform", "translate(0, -25) scale(.35, .35)")
+        .attr("xlink:href", function (d, e) {
+            return "#exploregroupinner" + e;
+        });
+    _.range(contexts.length).map(function (x) {
+        updateMachine(contexts[x].value, "?", x);
+    });
 }
 
 function ConsumptionRewards(psiTurk, callback) {
