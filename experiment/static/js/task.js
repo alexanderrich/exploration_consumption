@@ -461,15 +461,16 @@ function SliderTask() {
     };
 }
 
-function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
+function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callback) {
     "use strict";
     var responseFn,
         contexts,
         locations,
         resetArray,
         i,
-        // trial = -10,
         trial = -1,
+        firstMachineTrial = nPreWorkPeriods,
+        nTrials = nChoices + nPreWorkPeriods,
         choiceNumber = -1,
         functionList = [],
         runChoice,
@@ -481,6 +482,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         updateMachine,
         spinMachine,
         upgradeMachine,
+        preMachineWork,
         enterContext,
         resetContext,
         incrementContexts,
@@ -606,9 +608,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         $("#exploreexploitdiv").hide();
         $("#alternativecontents").show();
         $("#alternativecontents").html("Click circled machine");
-        if(trial < 6) {
-            $("#context" + context).css("opacity", 1);
-        }
+        $("#context" + context).css("opacity", 1);
         contextGroups.transition()
             .duration(1500)
             .attr("transform", function(d) {
@@ -705,17 +705,34 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         functionList.pop()();
     };
 
+    preMachineWork = function () {
+        $("#exploreexploitdiv").hide();
+        $("#alternativecontents").show();
+        $("#alternativecontents").html("Press START to begin task.<br/><button id=\"alternativestart\" class=\"machinebutton\"> START </button>");
+        $("#alternativestart").click(function () {$("#alternativecontents").hide();
+                                                  $("#mazediv").hide();
+                                                  $("#bottominfodiv").hide();
+                                                  callback(0, 0, trial); });
+    };
+
     this.run = function() {
         trial++;
-        if (trial < 0 && condition === 1 && trial + 4 >= 0) {
-            functionList = [function () {$("#exploreexploitdiv").hide();
-                                         callback(0, 0, trial); },
+        $("#mazediv").show();
+        $("#bottominfodiv").show();
+
+        if (trial + 4 * condition < firstMachineTrial) {
+            $("#trialsuntilmachines").html(firstMachineTrial - 4*condition - trial);
+        } else if (trial + 4 * condition === firstMachineTrial) {
+            $("#mazeblocker").hide();
+        }
+
+        if (trial < firstMachineTrial && condition === 1 && trial + 4 >= firstMachineTrial) {
+            functionList = [function () {preMachineWork(); },
                             function () {incrementContexts(); },
                             function () {runChoice((trial + 4) % 6); },
                             function () {enterContext((trial + 4) % 6); }];
-        } else if (trial < 0) {
-            functionList = [function () {$("#exploreexploitdiv").hide();
-                                         callback(0, 0, trial);}];
+        } else if (trial < firstMachineTrial) {
+            functionList = [function () {preMachineWork(); }];
         } else if (condition === 0) {
             functionList = [
                 function () {showOutcome(trial % 6); },
@@ -738,7 +755,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                 function () {enterContext(trial % 6); },
             ];
         }
-        if (trial > 0 && resetArray[trial - 1]) {
+        if (trial > firstMachineTrial && resetArray[trial - 1]) {
             functionList.push(function () {resetContext((trial - 1) % 6); });
         }
 
@@ -768,7 +785,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     contexts = contexts.map(function (obj, i) {
         obj.value = .333 + .333 * Math.random();
         obj.nextValue = 0;
-        obj.loc = (i + 2 * condition ) % 6;
+        obj.loc = (i + 6 - firstMachineTrial % 6) % 6;
         return obj;
     });
 
@@ -1108,11 +1125,12 @@ function TransitionScreen(page, psiTurk, callback) {
     $("#continue").click(callback);
 }
 
-function phaseDriver(nTrials, ExploreFn, RewardFn, taskType, psiTurk, callback) {
+function phaseDriver(nChoices, nPreWorkPeriods, ExploreFn, RewardFn, taskType, psiTurk, callback) {
     "use strict";
     var exploreExploit,
         rewards,
         nextChoice,
+        nTrials = nChoices + nPreWorkPeriods,
         trial = 0;
 
     nextChoice = function () {
@@ -1133,7 +1151,7 @@ function phaseDriver(nTrials, ExploreFn, RewardFn, taskType, psiTurk, callback) 
     $("#sliders").hide();
 
     rewards = new RewardFn(psiTurk, nextChoice);
-    exploreExploit = new ExploreFn(nTrials, taskType, psiTurk, rewards.setReward);
+    exploreExploit = new ExploreFn(nChoices, nPreWorkPeriods, taskType, psiTurk, rewards.setReward);
     nextChoice();
 }
 
@@ -1279,7 +1297,8 @@ function experimentDriver() {
     "use strict";
     var psiTurk = new PsiTurk(uniqueId, adServerLoc, mode),
         next,
-        nTrials = [18, 66],
+        nChoices = [18, 60],
+        nPreWorkPeriods = [4 * condition, 10],
         // nTrials = [3, 3, 3],
         functionList = [];
 
@@ -1325,7 +1344,7 @@ function experimentDriver() {
             TransitionScreen("transition_practicedecision.html", psiTurk, next);
         },
         function () {
-            phaseDriver(nTrials[0], ExploreExploitTask, PracticeRewards, "practice", psiTurk, next); },
+            phaseDriver(nChoices[0], nPreWorkPeriods[0], ExploreExploitTask, PracticeRewards, "practice", psiTurk, next); },
         function () {
             TransitionScreen("transition_practiceconsumption.html", psiTurk, next);
         },
@@ -1335,7 +1354,7 @@ function experimentDriver() {
             TransitionScreen("transition_fulltask.html", psiTurk, next);
         },
         function () {
-            phaseDriver(nTrials[1], ExploreExploitTask, ConsumptionRewards, "consumption", psiTurk, next); },
+            phaseDriver(nChoices[1], nPreWorkPeriods[1], ExploreExploitTask, ConsumptionRewards, "consumption", psiTurk, next); },
         function () {
             endingQuestions(psiTurk, next); },
         function () {

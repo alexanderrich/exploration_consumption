@@ -244,6 +244,11 @@ strong {
     color: #888888;
     border-color: #888888;
 }
+
+#alternativestart {
+    width: 200px;
+}
+
 #inforeminderbutton {
     text-align: center;
     width: 60px;
@@ -342,4 +347,17 @@ input.slider[type="range"] {
     position: relative;
     width: 600px;
     height: 310px;
+}
+
+#mazeblocker {
+    text-align: center;
+    font-size: 30px;
+    padding-top: 80px;
+    position: absolute;
+    left: 15px;
+    top: 15px;
+    width: 570px;
+    height: 270px;
+    background: white;
+    border: 2px solid black;
 }
