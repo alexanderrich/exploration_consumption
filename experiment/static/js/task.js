@@ -37,36 +37,38 @@ function Game() {
         points = 0,
         speed = 4,
         cursors,
-        multiplierTimeout,
-        multiplierText,
+        messageTimeout,
+        messageText,
+        pointsText,
         lastRunPoints = 0,
         lastRunBricks = 0,
         lastRunDeaths = 0;
 
     preload = function () {
         var graphicBase;
+        game.load.image('starfield', 'static/images/starfield.jpg');
         graphicBase = game.add.graphics(0, 0);
         graphicBase.beginFill(0xff0000);
         graphicBase.lineStyle(1, 0x000000, 1);
-        graphicBase.drawRect(0, 0, 50, 20);
+        graphicBase.drawRect(0, 0, 40, 16);
         graphicBase.endFill();
         brickTexture = graphicBase.generateTexture();
         graphicBase.destroy();
         graphicBase = game.add.graphics(0, 0);
         graphicBase.beginFill(0x00bb00);
         graphicBase.lineStyle(1, 0x000000, 1);
-        graphicBase.drawRect(0, 0, 49, 19);
+        graphicBase.drawRect(0, 0, 40, 16);
         graphicBase.endFill();
         bonusTexture = graphicBase.generateTexture();
         graphicBase.destroy();
         graphicBase = game.add.graphics(0, 0);
-        graphicBase.beginFill(0x444444);
+        graphicBase.beginFill(0x0058ff);
         graphicBase.drawRect(0, 0, 60, 10);
         graphicBase.endFill();
         paddleTexture = graphicBase.generateTexture();
         graphicBase.destroy();
         graphicBase = game.add.graphics(0, 0);
-        graphicBase.beginFill(0x000000);
+        graphicBase.beginFill(0xffa500);
         graphicBase.drawCircle(0, 0, 20);
         graphicBase.endFill();
         ballTexture = graphicBase.generateTexture();
@@ -78,7 +80,7 @@ function Game() {
         game.physics.startSystem(Phaser.Physics.ARCADE);
         //  We check bounds collisions against all walls other than the bottom one
         game.physics.arcade.checkCollision.down = false;
-        game.stage.backgroundColor = "#00c5cf";
+        game.add.tileSprite(0, 0, 800, 600, 'starfield');
         bricks = game.add.group();
         bricks.enableBody = true;
         bricks.physicsBodyType = Phaser.Physics.ARCADE;
@@ -94,7 +96,7 @@ function Game() {
         bonuses = game.add.group();
         bonuses.enableBody = true;
         bonuses.physicsBodyType = Phaser.Physics.ARCADE;
-        paddle = game.add.sprite(game.world.centerX, 475, paddleTexture);
+        paddle = game.add.sprite(game.world.centerX, game.world.height - 25, paddleTexture);
         paddle.anchor.setTo(0.5, 0.5);
         game.physics.enable(paddle, Phaser.Physics.ARCADE);
         paddle.body.collideWorldBounds = true;
@@ -108,8 +110,9 @@ function Game() {
         ball.body.bounce.set(1);
         ball.events.onOutOfBounds.add(ballLost, this);
         game.time.events.add(1000, releaseBall, this);
-        multiplierText = game.add.text(275, 180, speed.toString() + "x points", {font: "30px Arial"});
-        multiplierText.alpha = 0;
+        messageText = game.add.text(275, 180, "", {font: "30px Arial", fill: "white"});
+        pointsText = game.add.text(15, 15, "Points: 0", {font: "20px Arial", fill: "white"});
+        messageText.alpha = 0;
         cursors = game.input.keyboard.createCursorKeys();
         cursors.up.onDown.add(function () {
             if (!game.paused) {
@@ -120,10 +123,10 @@ function Game() {
                 }
                 $("#multiplierbar :first-child").css("width", (speed/8*100).toFixed() + "%");
                 $("#multiplierbar :first-child").html(speed.toString() +  "x");
-                clearTimeout(multiplierTimeout);
-                multiplierText.alpha = 1;
-                multiplierText.text = speed.toString() + "x points";
-                multiplierTimeout = setTimeout(function () {multiplierText.alpha = 0; }, 1000);
+                clearTimeout(messageTimeout);
+                messageText.alpha = 1;
+                messageText.text = speed.toString() + "x points";
+                messageTimeout = setTimeout(function () {messageText.alpha = 0; }, 1000);
             }
         });
         cursors.down.onDown.add(function () {
@@ -135,15 +138,14 @@ function Game() {
                 }
                 $("#multiplierbar :first-child").css("width", (speed/8*100).toFixed() + "%");
                 $("#multiplierbar :first-child").html(speed.toString() +  "x");
-                clearTimeout(multiplierTimeout);
-                multiplierText.alpha = 1;
-                multiplierText.text = speed.toString() + "x points";
-                multiplierTimeout = setTimeout(function () {multiplierText.alpha = 0; }, 1000);
+                clearTimeout(messageTimeout);
+                messageText.alpha = 1;
+                messageText.text = speed.toString() + "x points";
+                messageTimeout = setTimeout(function () {messageText.alpha = 0; }, 1000);
             }
         });
         $("#multiplierbar :first-child").css("width", (speed/8*100).toFixed() + "%");
         $("#multiplierbar :first-child").html(speed.toString() +  "x");
-        startLevel();
         update();
         game.paused = true;
     };
@@ -191,11 +193,15 @@ function Game() {
         game.time.events.add(1000, releaseBall, this);
         ball.x = paddle.x + 16;
         ball.y = paddle.y - 16;
+        clearTimeout(messageTimeout);
+        messageText.alpha = 1;
+        messageText.text = "Level " + (level + 1);
+        messageTimeout = setTimeout(function () {messageText.alpha = 0; }, 1000);
         switch (level % 10) {
         case 0:
             for (y = 0; y < 10; y++) {
                 for (x = 0; x < 14; x++) {
-                    if (y > 3 && y < 8) {
+                    if (y % 2 && y < 8 && x > 0 && x < 13) {
                         bricks.getChildAt(y * 14 + x).revive();
                     }
                 }
@@ -204,7 +210,7 @@ function Game() {
         case 1:
             for (y = 0; y < 10; y++) {
                 for (x = 0; x < 14; x++) {
-                    if (y < 3 || y > 6) {
+                    if (y < 2 || y > 7) {
                         bricks.getChildAt(y * 14 + x).revive();
                     }
                 }
@@ -304,7 +310,7 @@ function Game() {
         points += speed;
         lastRunPoints += speed;
         lastRunBricks++;
-        $("#points").html(points);
+        pointsText.text = "Points: " + points;
         //  Are they any bricks left?
         if (bricks.countLiving() === 0) {
             startLevel();
@@ -313,7 +319,7 @@ function Game() {
             bonus.body.velocity.y = 150;
             bonus.checkWorldBounds = true;
             bonus.outOfBoundsKill = true;
-            bonus.addChild(game.add.text(10, 0, "+15", {font: "15px Arial", fill: "#000000"}));
+            bonus.addChild(game.add.text(7, 0, "+15", {font: "15px Arial", fill: "#000000"}));
         }
     };
 
@@ -343,10 +349,13 @@ function Game() {
         _bonus.kill();
         points += 15;
         lastRunPoints += 15;
-        $("#points").html(points);
+        pointsText.text = "Points: " + points;
     };
 
     this.run = function () {
+        if (bricks.countLiving() === 0) {
+            startLevel();
+        }
         $("#rewards").show();
         lastRunPoints = 0;
         lastRunBricks = 0;
@@ -667,6 +676,8 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
                 $("#start").click(function () {
                     $("#start").off("click");
                     $("#exploreexploitdiv").hide();
+                    $("#mazediv").hide();
+                    $("#bottominfodiv").hide();
                     updateMachine(contextObj.value, "?", context);
                     callback(contextObj.nextValue, contextObj.outcome, trial);
                 });
@@ -750,7 +761,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         }
     })();
     locations = _.range(6).map(function (i) {
-        return [90 + 180 * ((2.5-Math.abs(i - 2.5)) % 3), 75 + 150 * Math.floor(i/3)];
+        return [100 + 200 * ((2.5-Math.abs(i - 2.5)) % 3), 75 + 150 * Math.floor(i/3)];
     });
     contexts = [{}, {}, {}, {}, {}, {}];
     contexts = _.shuffle(contexts);
@@ -842,7 +853,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     maze.append("rect")
         .attr("x", 3)
         .attr("y", 3)
-        .attr("width", 534)
+        .attr("width", 594)
         .attr("height", 294)
         .style("fill", condition ? "#CCCCFF" : "#FFCCCC")
         .style("stroke-width", "3")
@@ -850,30 +861,30 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
     maze.append("rect")
         .attr("x", 3)
         .attr("y", 3)
-        .attr("width", 180)
+        .attr("width", 200)
         .attr("height", 150)
         .style("fill", "white")
         .style("stroke-width", "3")
         .style("stroke", "black");
     if (condition) {
         maze.append("rect")
-            .attr("x", 180)
+            .attr("x", 200)
             .attr("y", 3)
-            .attr("width", 180)
+            .attr("width", 200)
             .attr("height", 150)
             .style("fill", "#FFCCCC")
             .style("stroke-width", "3")
             .style("stroke", "black");
         maze.append("rect")
-            .attr("x", 357)
+            .attr("x", 397)
             .attr("y", 3)
-            .attr("width", 180)
+            .attr("width", 200)
             .attr("height", 150)
             .style("fill", "white")
             .style("stroke-width", "3")
             .style("stroke", "black");
         maze.append("text")
-            .attr("x", 364)
+            .attr("x", 404)
             .attr("y", 24)
             .style("font-size", "20px")
             .text("ready");
@@ -889,7 +900,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         .style("font-size", "20px")
         .text("idle");
     maze.append("text")
-        .attr("x", condition ? 187 : 10)
+        .attr("x", condition ? 207 : 10)
         .attr("y", condition ? 24 : 174)
         .style("font-size", "20px")
         .text("cooling");
@@ -914,8 +925,8 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         })
         .attr("id", function (d, idx) {
             return "context" + idx;
-        });
-        // .style("opacity", 0);
+        })
+        .style("opacity", 0);
     contextGroups.append("rect")
         .attr("class", "contextbox")
         .attr("width", 120)
@@ -929,7 +940,7 @@ function ExploreExploitTask(nTrials, taskType, psiTurk, callback) {
         .style("stroke-width", 1);
     contextGroups.append("text")
         .text(function(d, e) { return e + 1; })
-        .style("font-size", 10)
+        .style("font-size", "16px")
         .style("font-family", "monospace")
         .attr("x", 45)
         .attr("y", -20);
@@ -1046,7 +1057,6 @@ function ConsumptionRewards(psiTurk, callback) {
 
     sliderTask = new SliderTask();
     game = new Game();
-    $("#points").html("0");
     $("#time").html("0");
     $("#sliderpct").html("0");
 }

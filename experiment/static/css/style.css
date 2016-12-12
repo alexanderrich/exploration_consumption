@@ -111,7 +111,7 @@ strong {
     margin-left: auto;
     margin-right: auto;
     width: 700px;
-    height: 450px;
+    height: 550px;
 }
 
 .standardRewards {
@@ -146,28 +146,25 @@ strong {
 }
 
 #timediv {
-    float: right;
-    width: 120px;
-}
-
-#pointsdiv {
     float: left;
-    width: 150px;
+    width: 100px;
 }
 
 #trialsdiv {
     float: left;
-    width: 150px;
+    width: 250px;
 }
 
 #sliderpctdiv {
     float: left;
-    width: 180px;
+    width: 250px;
 }
 
 /* card task */
 
 #alternativecontents {
+    margin-left: auto;
+    margin-right: auto;
     position: relative;
     text-align: center;
     padding-top: 100px;
@@ -184,6 +181,8 @@ strong {
 }
 
 #exploreexploitdiv {
+    margin-left: auto;
+    margin-right: auto;
     margin-bottom: 10px;
     position: relative;
     padding-top: 15px;
@@ -302,9 +301,18 @@ strong {
     width: 300px;
 }
 
+#sliders {
+    margin-bottom: 10px;
+    width: 700px;
+    height: 450px;
+    overflow: auto;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .sliderdiv {
     width: 100%;
-    height: 50px;
+    height: 60px;
     margin-top: 10px;
     margin-bottom: 10px;
 }
@@ -320,7 +328,17 @@ input.slider[type="range"] {
     margin: 10px;
 }
 
-#bottomdiv {
+#mazediv {
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    width: 600px;
+    height: 310px;
+}
+
+#bottominfodiv {
+    margin-left: auto;
+    margin-right: auto;
     position: relative;
     width: 600px;
     height: 310px;
