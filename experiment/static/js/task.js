@@ -689,10 +689,12 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         var contextObj = contexts[context];
         contextObj.value = .333 + .333 * Math.random();
         $("#machinescreen").html("Machine<br/>RESET");
+        $("#start").prop("disabled", true);
         updateMachine(0, "?", context);
         setTimeout(function () {
             upgradeMachine(contextObj.value, context);
         }, 1000);
+        $("#alternativecontents").hide();
         $("#exploreexploitdiv").show();
         setTimeout(functionList.pop(), 4000);
     };
@@ -1082,7 +1084,14 @@ function PracticeRewards (psiTurk, callback) {
     "use strict";
 
     this.setReward = function (rewardProb, reward, trial) {
-        callback();
+        $("#alternativecontents").show();
+        if (reward) {
+            $("#alternativecontents").html("<span style=\"background:gold;padding:10px;\">(Brickbreak game)</span>");
+        } else {
+            $("#alternativecontents").html("<span style=\"background:gray;padding:10px;\">(Slider task)</span>");
+        }
+        setTimeout(callback, 2000);
+        // callback();
     };
 
     this.recordFinal = function(taskType) {
@@ -1092,7 +1101,7 @@ function PracticeRewards (psiTurk, callback) {
 
 function practiceConsumption(psiTurk, callback) {
     "use strict";
-    var examples = [24, 12, 0, 36],
+    var examples = [0, 0, 1, 1],
         trials = [-4, -3, -2, -1],
         rewards,
         next;
@@ -1102,13 +1111,19 @@ function practiceConsumption(psiTurk, callback) {
             callback();
         } else {
             var reward = examples.shift();
+            $("#rewards").hide();
+            $("#sliders").hide();
             $("#rewardintro").show();
-            $("#rewardintrotext").html("Example outcome: " + reward);
+            if (reward) {
+                $("#rewardintrotext").html("Example outcome: Brickbreak game");
+            } else {
+                $("#rewardintrotext").html("Example outcome: Slider task");
+            }
             $("#continue").off("click");
             $("#continue").click(
                 function () {
                     $("#rewardintro").hide();
-                    rewards.setReward(reward, trials.shift());
+                    rewards.setReward(.5, reward, trials.shift());
                 }
             );
         }
@@ -1116,6 +1131,7 @@ function practiceConsumption(psiTurk, callback) {
 
     psiTurk.showPage("practice.html");
     $("#rewards").hide();
+    $("#sliders").hide();
     rewards = new ConsumptionRewards(psiTurk, next);
     next();
 }
@@ -1297,9 +1313,8 @@ function experimentDriver() {
     "use strict";
     var psiTurk = new PsiTurk(uniqueId, adServerLoc, mode),
         next,
-        nChoices = [18, 60],
-        nPreWorkPeriods = [4 * condition, 10],
-        // nTrials = [3, 3, 3],
+        nChoices = [12, 60],
+        nPreWorkPeriods = [2 + 4 * condition, 10],
         functionList = [];
 
     next = function () {

@@ -333,6 +333,11 @@ input.slider[type="range"] {
     margin: 10px;
 }
 
+#sliderinstructions {
+    text-align: center;
+    font-size: 28px;
+}
+
 #mazediv {
     margin-left: auto;
     margin-right: auto;
