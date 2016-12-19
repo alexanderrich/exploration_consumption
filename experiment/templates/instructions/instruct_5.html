@@ -1,29 +1,44 @@
 <div id="container-instructions">
 
-	  <h1>Instructions&mdash;decision-making task</h1>
+	  <h1>Instructions</h1>
 
 	  <hr>
 
 	  <div class="instructions well">
 
         <p>
-            <strong>Room resets:</strong> After each visit to a room, there is a 1 in
-            6 (17%) chance that the dealer will reset the room, meaning that the best-yet
-            card will be set back to a random value between 12 and 18.
+            <span id="processcoolinstr"></span>
+            There is also a one in six (17%) chance that after the machine runs it will reset itself. That means the current setting will be set
+            back to a random wedge size between one third and two thirds of the spinner.
         </p>
-
-        <div class="instrimages">
-            <img width="350px" src="/static/images/instruct_5_img.png">
-        </div>
 
         <p>
-            <strong>"info" button:</strong> In the lower-right corner of the
-            room map is a button labeled "info". If you forget the rules of the
-            game, click this button to toggle a set of reminders.
+            Below the display of the six machines is a button labeled "info". If you forget
+            how the machines function, click this button to toggle a set of reminders.
         </p>
+
+        <p>
+            You will receive a <strong>bonus of $3.00</strong> simply for accurately
+            completing the slider work periods. If you occasionally do not accurately set a
+            slider to 50, you will not be penalized and will receive your complete bonus
+            However, <strong>you will be penalized 10 cents from your bonus for each
+            percentage of sliders over 10% that you miss</strong>. (For example, if you miss
+            23% of the sliders throughout the entire task, you will lose $1.30 and your
+            final bonus will be $1.70.) The percentage of sliders missed will be displayed
+            at the top of the screen.
+        </p>
+
 	  </div>
 
 	  <hr>
+
+    <script>
+     if (condition === 0) {
+         $("#processcoolinstr").html("After the machine runs and you complete the following work period, the machine will have to cool down for the next five work periods before becoming \"idle\" and ready for you to make another choice.");
+     } else {
+         $("#processcoolinstr").html("Each machine takes four work periods to process after you choose the current setting or a new setting. After it is done processing it will become \"ready\" and can be run. It will then have to cool down for one additional work period before becoming \"idle\" and ready for you to make another choice.");
+     }
+    </script>
 
     <div class="instructionsnav">
         <div class="row">

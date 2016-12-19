@@ -1249,7 +1249,7 @@ function endingQuestions(psiTurk, callback) {
         bonus;
 
     recordResponses = function () {
-        if ($("#popupenjoyment").val() === "noresp" || $("#brickbreakenjoyment").val() === "noresp") {
+        if ($("#sliderenjoyment").val() === "noresp" || $("#brickbreakenjoyment").val() === "noresp") {
             $("#blankmessage").html("<strong>Please answer all questions before continuing.</strong>");
         } else {
             $("select").each(function () {
@@ -1355,8 +1355,6 @@ function experimentDriver() {
                           "instructions/instruct_4.html",
                           "instructions/instruct_5.html",
                           "instructions/instruct_6.html",
-                          "instructions/instruct_7.html",
-                          "instructions/instruct_8.html",
                           "instructions/quiz.html",
                           "transition_practicedecision.html",
                           "transition_practiceconsumption.html",
@@ -1370,9 +1368,7 @@ function experimentDriver() {
                                "instructions/instruct_3.html",
                                "instructions/instruct_4.html",
                                "instructions/instruct_5.html",
-                               "instructions/instruct_6.html",
-                               "instructions/instruct_7.html",
-                               "instructions/instruct_8.html"],
+                               "instructions/instruct_6.html"],
                               "instructions/quiz.html",
                               {mystery0: "third",
                                range: "12_36",
