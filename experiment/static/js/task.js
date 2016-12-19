@@ -572,10 +572,16 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             advanced = condition === 1;
         $("#" + choiceId).addClass("clicked");
         $("#machinescreen").html("processing...");
+        if (condition) {
+            $("#idlerect").css("fill", "#CCCCFF");
+            $("#idletext").html("processing");
+        }
         if (choiceId === "exploit") {
             contextObj.nextChoice = "exploit";
             contextObj.nextValue = contextObj.value;
+            $("#exploitgroupinner" + context + " .spinnerbacking").css("opacity", 1);
         } else {
+            $("#exploregroupinner" + context + " .spinnerbacking").css("opacity", 1);
             contextObj.nextChoice = "explore";
             if (Math.random() > .333) {
                 contextObj.nextValue = .333 + .667 * Math.random();
@@ -678,6 +684,9 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
                     $("#exploreexploitdiv").hide();
                     $("#mazediv").hide();
                     $("#bottominfodiv").hide();
+                    $(".choicebutton").removeClass("clicked");
+                    $("#exploitgroupinner" + context + " .spinnerbacking").css("opacity", 0);
+                    $("#exploregroupinner" + context + " .spinnerbacking").css("opacity", 0);
                     updateMachine(contextObj.value, "?", context);
                     callback(contextObj.nextValue, contextObj.outcome, trial);
                 });
@@ -719,6 +728,8 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
 
     this.run = function() {
         trial++;
+        $("#idlerect").css("fill", "white");
+        $("#idletext").html("idle");
         $("#mazediv").show();
         $("#bottominfodiv").show();
 
@@ -811,6 +822,12 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             .append("g")
             .attr("class", "exploitgroupinner")
             .attr("id", "exploitgroupinner" + x);
+        entiregroup.append("rect")
+            .attr("class", "spinnerbacking")
+            .attr("width",  150)
+            .attr("height", 150)
+            .style("opacity", 0)
+            .style("fill", "#444444");
         circlegroup = entiregroup.append("g")
             .attr("class", "exploitcirclegroup")
             .attr("id", "exploitcirclegroup" + x)
@@ -836,6 +853,12 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             .append("g")
             .attr("class", "exploregroupinner")
             .attr("id", "exploregroupinner" + x);
+        entiregroup.append("rect")
+            .attr("class", "spinnerbacking")
+            .attr("width",  150)
+            .attr("height", 150)
+            .style("opacity", 0)
+            .style("fill", "#444444");
         circlegroup = entiregroup.append("g")
             .attr("class", "explorecirclegroup")
             .attr("id", "explorecirclegroup" + x)
@@ -878,6 +901,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         .style("stroke-width", "3")
         .style("stroke", "black");
     maze.append("rect")
+        .attr("id", "idlerect")
         .attr("x", 3)
         .attr("y", 3)
         .attr("width", 200)
@@ -914,6 +938,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             .text("processing");
     }
     maze.append("text")
+        .attr("id", "idletext")
         .attr("x", 10)
         .attr("y", 24)
         .style("font-size", "20px")
@@ -957,12 +982,6 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         .style("fill", "gray")
         .style("stroke", "black")
         .style("stroke-width", 1);
-    contextGroups.append("text")
-        .text(function(d, e) { return e + 1; })
-        .style("font-size", "16px")
-        .style("font-family", "monospace")
-        .attr("x", 45)
-        .attr("y", -20);
     contextGroups.append("use")
         .attr("transform", "translate(-55, -25) scale(.35, .35)")
         .attr("xlink:href", function (d, e) {
@@ -973,6 +992,12 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         .attr("xlink:href", function (d, e) {
             return "#exploregroupinner" + e;
         });
+    contextGroups.append("text")
+        .text(function(d, e) { return e + 1; })
+        .style("font-size", "16px")
+        .style("font-family", "monospace")
+        .attr("x", 45)
+        .attr("y", -20);
     _.range(contexts.length).map(function (x) {
         updateMachine(contexts[x].value, "?", x);
     });
@@ -1101,7 +1126,7 @@ function PracticeRewards (psiTurk, callback) {
 
 function practiceConsumption(psiTurk, callback) {
     "use strict";
-    var examples = [0, 0, 1, 1],
+    var examples = [0, 0, 0, 1],
         trials = [-4, -3, -2, -1],
         rewards,
         next;
