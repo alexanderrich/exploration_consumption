@@ -7,38 +7,40 @@
 	  <div class="instructions well">
 
         <p>
-            <span id="processcoolinstr"></span>
-            There is also a one in six (17%) chance that after the machine runs it will reset itself. That means the current setting will be set
-            back to a random wedge size between one third and two thirds of the spinner.
+            If you try a new setting, a random wedge will be created in the new
+            setting spinner. One third (33%) of the time, the attempt to create a new
+            setting will fail and the wedge will take up 0% of the spinner, meaning the
+            machine will not work. The other two thirds (67%) of the time, a new gold wedge
+            will be created that takes up between one third (33%) of the spinner and the
+            entire spinner (100%). The value of each new setting is totally
+            random and doesn't depend on the value of past spinners. Below are
+            some examples of randomly generated new settings
         </p>
 
-        <p>
-            Below the display of the six machines is a button labeled "info". If you forget
-            how the machines function, click this button to toggle a set of reminders.
-        </p>
+        <div class="instrimages">
+            <img width="700px" src="/static/images/instruct_5_img_example_spinners.png">
+        </div>
 
         <p>
-            You will receive a <strong>bonus of $3.00</strong> simply for accurately
-            completing the slider work periods. If you occasionally do not accurately set a
-            slider to 50, you will not be penalized and will receive your complete bonus
-            However, <strong>you will be penalized 10 cents from your bonus for each
-            percentage of sliders over 10% that you miss</strong>. (For example, if you miss
-            23% of the sliders throughout the entire task, you will lose $1.30 and your
-            final bonus will be $1.70.) The percentage of sliders missed will be displayed
-            at the top of the screen.
+            After the new setting is created, the machine will run the new
+            setting. If the new setting is worse than the current setting, the
+            machine will simply "forget" the new setting and remain on its
+            current setting for future uses. But if the new setting is better
+            than the current setting, it will be <strong>saved</strong> and will become the current setting
+            the next time you use the machine. This means that while running a new setting
+            can be risky, it can also allow you to improve the machines so they are more
+            likely to work in the future.
         </p>
+
+        <div class="instrimages">
+            <img width="700px" src="/static/images/instruct_5_img.png">
+        </div>
+
+
 
 	  </div>
 
 	  <hr>
-
-    <script>
-     if (condition === 0) {
-         $("#processcoolinstr").html("After the machine runs and you complete the following work period, the machine will have to cool down for the next five work periods before becoming \"idle\" and ready for you to make another choice.");
-     } else {
-         $("#processcoolinstr").html("Each machine takes four work periods to process after you choose the current setting or a new setting. After it is done processing it will become \"ready\" and can be run. It will then have to cool down for one additional work period before becoming \"idle\" and ready for you to make another choice.");
-     }
-    </script>
 
     <div class="instructionsnav">
         <div class="row">

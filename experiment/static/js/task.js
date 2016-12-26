@@ -876,7 +876,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             .attr("id", "losingLine")
             .attr("y2", -70)
             .style("stroke-width", 1)
-            .style("stroke", "gold");
+            .style("stroke", "orange");
         circlegroup.append("text")
             .attr("id", "questionMark")
             .text("?")
@@ -1355,6 +1355,7 @@ function experimentDriver() {
                           "instructions/instruct_4.html",
                           "instructions/instruct_5.html",
                           "instructions/instruct_6.html",
+                          "instructions/instruct_7.html",
                           "instructions/quiz.html",
                           "transition_practicedecision.html",
                           "transition_practiceconsumption.html",
@@ -1368,7 +1369,8 @@ function experimentDriver() {
                                "instructions/instruct_3.html",
                                "instructions/instruct_4.html",
                                "instructions/instruct_5.html",
-                               "instructions/instruct_6.html"],
+                               "instructions/instruct_6.html",
+                               "instructions/instruct_7.html"],
                               "instructions/quiz.html",
                               {mystery0: "third",
                                range: "12_36",

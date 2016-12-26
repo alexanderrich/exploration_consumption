@@ -9,21 +9,33 @@
         <p>
             Once the six machines are available, they will be displayed at the
             bottom of the screen before each work period, with the currently
-            ready-to-use machine circled. Each machine has a "current setting"
-            button and spinner, a "new setting" button and spinner, and a screen
-            on the right that displays useful information and instructions.
+            idle machine circled.
         </p>
 
+
+        <p id="processcoolinstr">
+        </p>
+
+        <div class="instrimages">
+            <img width="700px">
+        </div>
+
         <p>
-            To use the machine, you can choose to run the current setting or to try a new
-            setting. The gold wedge in the current setting spinner represents the chance of
-            the machine working and completing the sliders for you. If you select the
-            current setting spinner, it will spin and the machine will work if the arrow
-            lands on the gold wedge. The current setting wedge on each machine starts as a
-            random proportion between one third (33%) and two thirds (67%) of the spinner.
+            As you make use of the six machines and they change state, for
+            example from "cooling" to "idle", they will rotate counterclockwise
+            around the machine display like a conveyor belt.
         </p>
 
 	  </div>
+    <script>
+     if (condition === 0) {
+         $("#processcoolinstr").html("When a machine is idle, you will have to pick between the machine's current setting and a new setting, and then run the machine. After the machine runs and you complete the following work period, the machine will have to cool down for the next five work periods before becoming \"idle\" again and ready for you to make another choice.");
+         $("img").attr("src", "/static/images/instruct_3_img_cond0.png");
+     } else {
+         $("#processcoolinstr").html("When a machine is idle, you will have to pick between the machine's current setting and a new setting. Each machine then takes four work periods to process. After it is done processing it will become \"ready\" and can be run. It will then have to cool down for one additional work period before becoming \"idle\" again and ready for you to make another choice.");
+         $("img").attr("src", "/static/images/instruct_3_img_cond1.png");
+     }
+    </script>
 
 	  <hr>
 
