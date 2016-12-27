@@ -1372,10 +1372,10 @@ function experimentDriver() {
                                "instructions/instruct_6.html",
                                "instructions/instruct_7.html"],
                               "instructions/quiz.html",
-                              {mystery0: "third",
-                               range: "12_36",
+                              {new0: "third",
+                               range: "onethird_all",
                                reset: "1_6",
-                               advancednum: "4",
+                               processnum: "4",
                                penalty: "10percentage"},
                               psiTurk, next); },
         function () {

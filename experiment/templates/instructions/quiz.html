@@ -16,62 +16,76 @@
         <form id="prequiz" action="debrief" method="post">
             <div class="question">
                 <p class="questiontext">
-                    What proportion of cards in the deck have a value of <strong>0</strong>?
-                    <select id="mystery0" name="mystery0" class="form-control">
+                    What proportion of the time will the machine fail to create
+                    a new setting, and make a wedge that covers 0% of the
+                    spinner?
+                    <select id="new0" name="new0" class="form-control">
                         <option value="noresp" SELECTED></option>
-	                      <option value="none">none of the cards</option>
-	                      <option value="third">1/3 of cards</option>
-	                      <option value="twothird">2/3 of cards</option>
-	                      <option value="all">all of the cards</option>
+	                      <option value="none">never</option>
+	                      <option value="third">1/3 of the time</option>
+	                      <option value="twothird">2/3 of the time</option>
+	                      <option value="all">every time</option>
                     </select>
                 </p>
             </div>
             <div class="question">
                 <p class="questiontext">
-                    For cards with a value <strong>higher than</strong> 0, what range of values is possible?
+                    When the machine creates a new setting, what range of wedge sizes are possible?
                     <select id="range" name="range" class="form-control">
                         <option value="noresp" SELECTED></option>
-	                      <option value="12_18">12 to 18</option>
-	                      <option value="12_36">12 to 36</option>
-	                      <option value="24_36">24 to 36</option>
+	                      <option value="onethird_twothird">1/3 (33%) of the spinner to 2/3 (67%) of the spinner </option>
+	                      <option value="onethird_all">1/3 (33%) of the spinner to all (100%) of the spinner</option>
+	                      <option value="twothird_all">2/3 (67%) of the spinner to all (100%) of the spinner</option>
                     </select>
                 </p>
             </div>
             <div class="question">
                 <p class="questiontext">
-                    What are the chances of the best-yet card being <strong>reset</strong> to a value between 12 and 18 after a visit to a room?
+                    What are the chances of a machine's current setting being
+                    <strong>reset</strong> back to a wedge between 1/3 (33%) and 2/3
+                    (67%) after it is used?
                     <select id="reset" name="reset" class="form-control">
                         <option value="noresp" SELECTED></option>
 	                      <option value="never">It is never reset</option>
-	                      <option value="1_6">It is reset randomly after 1 in 6 visits</option>
-	                      <option value="1_2">It is reset randomly after half of visits</option>
+	                      <option value="1_6">It has a 1 in 6 change of being reset after every use</option>
+	                      <option value="1_2">It has a 1 in 2 chance of being reset after every use</option>
 	                      <option value="always">It is reset after every visit</option>
                     </select>
                 </p>
             </div>
-            <div class="question">
-                <p class="questiontext">
-                    When you make an <strong>call-ahead choice</strong>, how far ahead of its room will it be?
-                    <select id="advancednum" name="advancednum" class="form-control">
-                        <option value="noresp" SELECTED></option>
-	                      <option value="1">1 room ahead</option>
-	                      <option value="4">4 rooms ahead</option>
-	                      <option value="10">10 rooms ahead</option>
-                    </select>
-                </p>
+            <div id="cond1question" style="display:none" >
+                <div class="question">
+                    <p class="questiontext">
+                        How many work periods does a machine have to process after you choose a setting before it can be used?
+                        <select id="processnum" name="processnum" class="form-control">
+                            <option value="noresp"></option>
+	                          <option value="1">1 work period</option>
+	                          <option value="4">4 work periods</option>
+	                          <option value="10">10 work periods</option>
+                        </select>
+                    </p>
+                </div>
             </div>
             <div class="question">
                 <p class="questiontext">
-                    What is the penalty for <strong>failing to click</strong> the popups?
+                    What is the penalty for <strong>failing to adjust</strong> the sliders to 50?
                     <select id="penalty" name="penalty" class="form-control">
                         <option value="noresp" SELECTED></option>
 	                      <option value="none">There is no penalty</option>
-	                      <option value="10each">10 cents for every popup missed</option>
-	                      <option value="10percentage">10 cents for every percentage over 10% of total popups missed</option>
+	                      <option value="10each">10 cents for every slider missed</option>
+	                      <option value="10percentage">10 cents for every percentage over 10% of total sliders missed</option>
                     </select>
                 </p>
             </div>
         </form>
+        <script>
+         if (condition === 0) {
+             $("#processnum").val("4").change();
+         } else {
+             $("#cond1question").show();
+             $("#processnum").val("noresp").change();
+         }
+        </script>
 
     </div>
 
