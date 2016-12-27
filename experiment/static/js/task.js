@@ -352,6 +352,15 @@ function Game() {
         pointsText.text = "Points: " + points;
     };
 
+    this.practiceRun = function () {
+        if (bricks.countLiving() === 0) {
+            startLevel();
+        }
+        ballOnPaddle = true;
+        ball.reset(paddle.body.x + 26, paddle.y - 16);
+        $("#rewards").show();
+    };
+
     this.run = function () {
         if (bricks.countLiving() === 0) {
             startLevel();
@@ -405,6 +414,24 @@ function SliderTask() {
             }
         });
     });
+
+    this.practiceRun = function () {
+        $("#sliders").show();
+        $(".sliderdiv").each(function () {
+            var div = $(this),
+                initial = Math.floor(Math.random() * 101);
+            if(initial === 50) {
+                initial++;
+            }
+            div.css("padding-left", (200*Math.random()).toString() + "px");
+            div.children(".slider").val(initial);
+        });
+        $(".slider").trigger("input");
+        $(".sliderdiv").css("background-color", "gray");
+        $(".slider").prop("disabled", true);
+        // $("#slider1").prop("disabled", false);
+        $("#sliderdiv1").css("background-color", "");
+    };
 
     this.run = function () {
         $("#sliders").show();
@@ -1107,21 +1134,37 @@ function ConsumptionRewards(psiTurk, callback) {
 
 function PracticeRewards (psiTurk, callback) {
     "use strict";
+    var sliderTask,
+        currentTask,
+        game;
 
     this.setReward = function (rewardProb, reward, trial) {
-        $("#alternativecontents").show();
+        // $("#alternativecontents").show();
+        $("#consumptionblocker").show();
         if (reward) {
-            $("#alternativecontents").html("<span style=\"background:gold;padding:10px;\">(Brickbreak game)</span>");
+            currentTask = game;
+            $("#consumptionblocker").html("Brickbreak game");
         } else {
-            $("#alternativecontents").html("<span style=\"background:gray;padding:10px;\">(Slider task)</span>");
+            currentTask = sliderTask;
+            $("#consumptionblocker").html("Slider task");
         }
-        setTimeout(callback, 2000);
-        // callback();
+
+        currentTask.practiceRun();
+        setTimeout(function () {
+            currentTask.stop();
+            $("#consumptionblocker").hide();
+            callback();
+        }, 2000);
     };
 
     this.recordFinal = function(taskType) {
         return;
     };
+
+    sliderTask = new SliderTask();
+    game = new Game();
+    $("#time").html("0");
+    $("#sliderpct").html("0");
 }
 
 function practiceConsumption(psiTurk, callback) {

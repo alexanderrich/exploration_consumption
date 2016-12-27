@@ -99,6 +99,7 @@ strong {
 }
 
 #expdiv {
+    position: relative;
     font-family: sans-serif;
     width: 700px;
     margin-left: auto;
@@ -280,6 +281,21 @@ strong {
     margin-left: auto;
     margin-right: auto;
     width: 450px;
+}
+
+#consumptionblocker {
+    font-size: 30px;
+    text-align: center;
+    padding-top: 75px;
+    display: none;
+    position: absolute;
+    width: 300px;
+    height: 200px;
+    left: 200px;
+    top: 120px;
+    border: 5px solid black;
+    border-radius: 10px;
+    background: gray;
 }
 
 /* game */
