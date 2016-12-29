@@ -87,7 +87,7 @@ function Game() {
         var brick;
         for (var y = 0; y < 10; y++) {
             for (var x = 0; x < 14; x++) {
-                brick = bricks.create(x * 50, 60 + (y * 20), brickTexture);
+                brick = bricks.create(5 + x * 50, 60 + (y * 20), brickTexture);
                 brick.body.bounce.set(1);
                 brick.body.immovable = true;
             }
@@ -217,7 +217,7 @@ function Game() {
             }
             break;
         case 2:
-            for (y = 0; y < 9; y++) {
+            for (y = 3; y < 9; y++) {
                 for (x = 0; x < 14; x++) {
                     if (y > x * .65) {
                         bricks.getChildAt(y * 14 + x).revive();
@@ -259,16 +259,18 @@ function Game() {
         case 6:
             for (y = 0; y < 10; y++) {
                 for (x = 0; x < 14; x++) {
-                    if (y < 1 || y > 8) {
-                        bricks.getChildAt(y * 14 + x).revive();
-                    } else if ((y === 1 || y === 8) && (x < 5 || x > 8)) {
-                        bricks.getChildAt(y * 14 + x).revive();
-                    } else if ((y === 2 || y === 7) && (x < 4 || x > 9)) {
-                        bricks.getChildAt(y * 14 + x).revive();
-                    } else if ((y === 3 || y === 6) && (x < 3 || x > 10)) {
-                        bricks.getChildAt(y * 14 + x).revive();
-                    } else if ((y === 4 || y === 5) && (x < 2 || x > 11)) {
-                        bricks.getChildAt(y * 14 + x).revive();
+                    if (x > 0 && x < 13) {
+                        if (y < 1 || y > 8) {
+                            bricks.getChildAt(y * 14 + x).revive();
+                        } else if ((y === 1 || y === 8) && (x < 5 || x > 8)) {
+                            bricks.getChildAt(y * 14 + x).revive();
+                        } else if ((y === 2 || y === 7) && (x < 4 || x > 9)) {
+                            bricks.getChildAt(y * 14 + x).revive();
+                        } else if ((y === 3 || y === 6) && (x < 3 || x > 10)) {
+                            bricks.getChildAt(y * 14 + x).revive();
+                        } else if ((y === 4 || y === 5) && (x < 2 || x > 11)) {
+                            bricks.getChildAt(y * 14 + x).revive();
+                        }
                     }
                 }
             }
@@ -1381,8 +1383,9 @@ function experimentDriver() {
     "use strict";
     var psiTurk = new PsiTurk(uniqueId, adServerLoc, mode),
         next,
-        nChoices = [12, 60],
-        nPreWorkPeriods = [2 + 4 * condition, 10],
+        nChoices = [18, 60],
+        nPreWorkPeriods = [6, 10],
+        // nPreWorkPeriods = [0, 0],
         functionList = [];
 
     next = function () {
