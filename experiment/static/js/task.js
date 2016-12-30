@@ -500,7 +500,6 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         trial = -1,
         firstMachineTrial = nPreWorkPeriods,
         nTrials = nChoices + nPreWorkPeriods,
-        choiceNumber = -1,
         functionList = [],
         runChoice,
         maze = d3.select("#maze").append("g"),
@@ -597,8 +596,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
     };
 
     responseFn = function (choiceId, context) {
-        var contextObj = contexts[context],
-            advanced = condition === 1;
+        var contextObj = contexts[context];
         $("#" + choiceId).addClass("clicked");
         $("#machinescreen").html("processing...");
         if (condition) {
@@ -623,17 +621,17 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         psiTurk.recordTrialData({phase: "EXPERIMENT",
                                  trialType: "exploreexploit",
                                  taskType: taskType,
-                                 trialChoice: trial + 4 * advanced,
-                                 trialOutcome: choiceNumber,
+                                 trialChoice: trial + 4 * condition,
+                                 trialOutcome: trial,
                                  uniqueid: uniqueId,
                                  condition: condition,
                                  context: context,
                                  response: choiceId === "explore" ? 1 : 0,
-                                 advanced: advanced,
                                  rt: new Date().getTime() - timeStamp,
                                  currentValue: contextObj.value,
                                  nextValue: contextObj.nextValue,
-                                 outcome: contextObj.outcome
+                                 outcome: contextObj.outcome,
+                                 reset: resetArray[trial + 4 * condition - firstMachineTrial]
                                 });
         setTimeout(functionList.pop(), 1000);
     };
@@ -671,7 +669,6 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         updateMachine(contexts[context].value, "?", context);
         $("#exploreexploit").show();
         timeStamp = new Date().getTime();
-        choiceNumber++;
         $(".choicebutton").click(function () {responseFn(this.id, context); });
     };
 
@@ -797,7 +794,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
                 function () {enterContext(trial % 6); },
             ];
         }
-        if (trial > firstMachineTrial && resetArray[trial - 1]) {
+        if (trial > firstMachineTrial && resetArray[trial - firstMachineTrial - 1]) {
             functionList.push(function () {resetContext((trial - 1) % 6); });
         }
 
@@ -810,7 +807,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         var lastchosen = -1,
             chosen = -1;
         resetArray = [];
-        for (i = 0; i < nTrials / 6; i++) {
+        for (i = 0; i < nChoices / 6; i++) {
             while(chosen === lastchosen) {
                 chosen = Math.floor(Math.random() * 6);
             }
