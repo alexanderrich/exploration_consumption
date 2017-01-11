@@ -7,393 +7,441 @@
  */
 
 /*jslint browser: true*/
-/*global condition, uniqueId, adServerLoc, mode, document, PsiTurk, $, _, d3, Phaser, window, setTimeout, clearTimeout, setInterval, clearInterval*/
+/*global condition, uniqueId, adServerLoc, mode, document, PsiTurk, YT, $, _, d3, Phaser, window, setTimeout, clearTimeout, setInterval, clearInterval*/
 
 condition = parseInt(condition);
+condition = 0;
+
+var tag = document.createElement('script');
+var firstScriptTag = document.getElementsByTagName('script')[0];
+tag.src = "https://www.youtube.com/iframe_api";
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
 function Game() {
     "use strict";
-    var game,
-        preload,
-        create,
-        update,
-        ballLost,
-        releaseBall,
-        startLevel,
-        ballHitBrick,
-        ballHitPaddle,
-        bonusHitPaddle,
-        brickTexture,
-        bonusTexture,
-        paddleTexture,
-        ballTexture,
-        ball,
-        paddle,
-        bricks,
-        bonuses,
-        stopBonuses = false,
-        ballOnPaddle = true,
-        level = 0,
-        points = 0,
-        speed = 4,
-        cursors,
-        messageTimeout,
-        messageText,
-        pointsText,
-        lastRunPoints = 0,
-        lastRunBricks = 0,
-        lastRunDeaths = 0;
+    var run;
+    var player;
+    player = new YT.Player('player', {
+        height: '390',
+        width: '640',
+        playerVars: {'controls': 0 },
+        videoId: 'EqxaanDEAHw',
+        start: 25
+        // events: {
+        //     'onReady': run
+        //     // 'onStateChange': onPlayerStateChange
+        // }
+    });
 
-    preload = function () {
-        var graphicBase;
-        game.load.image('starfield', 'static/images/starfield.jpg');
-        graphicBase = game.add.graphics(0, 0);
-        graphicBase.beginFill(0xff0000);
-        graphicBase.lineStyle(1, 0x000000, 1);
-        graphicBase.drawRect(0, 0, 40, 16);
-        graphicBase.endFill();
-        brickTexture = graphicBase.generateTexture();
-        graphicBase.destroy();
-        graphicBase = game.add.graphics(0, 0);
-        graphicBase.beginFill(0x00bb00);
-        graphicBase.lineStyle(1, 0x000000, 1);
-        graphicBase.drawRect(0, 0, 40, 16);
-        graphicBase.endFill();
-        bonusTexture = graphicBase.generateTexture();
-        graphicBase.destroy();
-        graphicBase = game.add.graphics(0, 0);
-        graphicBase.beginFill(0x0058ff);
-        graphicBase.drawRect(0, 0, 60, 10);
-        graphicBase.endFill();
-        paddleTexture = graphicBase.generateTexture();
-        graphicBase.destroy();
-        graphicBase = game.add.graphics(0, 0);
-        graphicBase.beginFill(0xffa500);
-        graphicBase.drawCircle(0, 0, 20);
-        graphicBase.endFill();
-        ballTexture = graphicBase.generateTexture();
-        graphicBase.destroy();
-    };
-
-    create = function () {
-        game.stage.disableVisibilityChange = true;
-        game.physics.startSystem(Phaser.Physics.ARCADE);
-        //  We check bounds collisions against all walls other than the bottom one
-        game.physics.arcade.checkCollision.down = false;
-        game.add.tileSprite(0, 0, 800, 600, 'starfield');
-        bricks = game.add.group();
-        bricks.enableBody = true;
-        bricks.physicsBodyType = Phaser.Physics.ARCADE;
-        var brick;
-        for (var y = 0; y < 10; y++) {
-            for (var x = 0; x < 14; x++) {
-                brick = bricks.create(5 + x * 50, 60 + (y * 20), brickTexture);
-                brick.body.bounce.set(1);
-                brick.body.immovable = true;
-            }
-        }
-        bricks.callAll("kill");
-        bonuses = game.add.group();
-        bonuses.enableBody = true;
-        bonuses.physicsBodyType = Phaser.Physics.ARCADE;
-        paddle = game.add.sprite(game.world.centerX, game.world.height - 25, paddleTexture);
-        paddle.anchor.setTo(0.5, 0.5);
-        game.physics.enable(paddle, Phaser.Physics.ARCADE);
-        paddle.body.collideWorldBounds = true;
-        paddle.body.bounce.set(1);
-        paddle.body.immovable = true;
-        ball = game.add.sprite(game.world.centerX, paddle.y - 16, ballTexture);
-        ball.anchor.set(0.5);
-        ball.checkWorldBounds = true;
-        game.physics.enable(ball, Phaser.Physics.ARCADE);
-        ball.body.collideWorldBounds = true;
-        ball.body.bounce.set(1);
-        ball.events.onOutOfBounds.add(ballLost, this);
-        game.time.events.add(1000, releaseBall, this);
-        messageText = game.add.text(275, 180, "", {font: "30px Arial", fill: "white"});
-        pointsText = game.add.text(15, 15, "Points: 0", {font: "20px Arial", fill: "white"});
-        messageText.alpha = 0;
-        cursors = game.input.keyboard.createCursorKeys();
-        cursors.up.onDown.add(function () {
-            if (!game.paused) {
-                if (speed < 8) {
-                    speed++;
-                    ball.body.velocity.x = ball.body.velocity.x * speed / (speed - 1);
-                    ball.body.velocity.y = ball.body.velocity.y * speed / (speed - 1);
-                }
-                $("#multiplierbar :first-child").css("width", (speed/8*100).toFixed() + "%");
-                $("#multiplierbar :first-child").html(speed.toString() +  "x");
-                clearTimeout(messageTimeout);
-                messageText.alpha = 1;
-                messageText.text = speed.toString() + "x points";
-                messageTimeout = setTimeout(function () {messageText.alpha = 0; }, 1000);
-            }
-        });
-        cursors.down.onDown.add(function () {
-            if (!game.paused) {
-                if (speed > 1) {
-                    speed--;
-                    ball.body.velocity.x = ball.body.velocity.x * speed / (speed + 1);
-                    ball.body.velocity.y = ball.body.velocity.y * speed / (speed + 1);
-                }
-                $("#multiplierbar :first-child").css("width", (speed/8*100).toFixed() + "%");
-                $("#multiplierbar :first-child").html(speed.toString() +  "x");
-                clearTimeout(messageTimeout);
-                messageText.alpha = 1;
-                messageText.text = speed.toString() + "x points";
-                messageTimeout = setTimeout(function () {messageText.alpha = 0; }, 1000);
-            }
-        });
-        $("#multiplierbar :first-child").css("width", (speed/8*100).toFixed() + "%");
-        $("#multiplierbar :first-child").html(speed.toString() +  "x");
-        update();
-        game.paused = true;
-    };
-
-    update = function () {
-        paddle.x = game.input.x;
-        if (paddle.x < 30) {
-            paddle.x = 30;
-        } else if (paddle.x > game.width - 30) {
-            paddle.x = game.width - 30;
-        }
-        if (ballOnPaddle) {
-            ball.body.x = paddle.x - 10;
-            game.physics.arcade.collide(bonuses, paddle, bonusHitPaddle, null, this);
-        } else {
-            game.physics.arcade.collide(ball, paddle, ballHitPaddle, null, this);
-            game.physics.arcade.collide(ball, bricks, ballHitBrick, null, this);
-            game.physics.arcade.collide(bonuses, paddle, bonusHitPaddle, null, this);
-        }
-    };
-
-    releaseBall = function () {
-        if (ballOnPaddle)
-        {
-            ballOnPaddle = false;
-            ball.body.velocity.y = speed * -75;
-            ball.body.velocity.x = speed * (-20 + 40 * Math.random());
-        }
-    };
-
-    ballLost = function () {
-        lastRunDeaths++;
-        setTimeout(function () {
-            ballOnPaddle = true;
-            ball.reset(paddle.body.x + 20, paddle.y - 16);
-            game.time.events.add(1000, releaseBall, this);
-        }, 1000);
-    };
-
-    startLevel = function () {
-        var x, y;
-        //  Let's move the ball back to the paddle
-        ballOnPaddle = true;
-        ball.body.velocity.set(0);
-        game.time.events.add(1000, releaseBall, this);
-        ball.x = paddle.x + 16;
-        ball.y = paddle.y - 16;
-        clearTimeout(messageTimeout);
-        messageText.alpha = 1;
-        messageText.text = "Level " + (level + 1);
-        messageTimeout = setTimeout(function () {messageText.alpha = 0; }, 1000);
-        switch (level % 10) {
-        case 0:
-            for (y = 0; y < 10; y++) {
-                for (x = 0; x < 14; x++) {
-                    if (y % 2 && y < 8 && x > 0 && x < 13) {
-                        bricks.getChildAt(y * 14 + x).revive();
-                    }
-                }
-            }
-            break;
-        case 1:
-            for (y = 0; y < 10; y++) {
-                for (x = 0; x < 14; x++) {
-                    if (y < 2 || y > 7) {
-                        bricks.getChildAt(y * 14 + x).revive();
-                    }
-                }
-            }
-            break;
-        case 2:
-            for (y = 3; y < 9; y++) {
-                for (x = 0; x < 14; x++) {
-                    if (y > x * .65) {
-                        bricks.getChildAt(y * 14 + x).revive();
-                    }
-                }
-            }
-            break;
-        case 3:
-            for (y = 0; y < 10; y++) {
-                for (x = 0; x < 14; x++) {
-                    if (y < 2 || y > 7) {
-                        bricks.getChildAt(y * 14 + x).revive();
-                    } else if (_.contains([2, 3, 6, 7], y) && (x < 2 || x > 11)) {
-                        bricks.getChildAt(y * 14 + x).revive();
-                    } else if (_.contains([4, 5], y) && _.contains([0, 1, 4, 5, 6, 7, 8, 9, 12, 13], x)) {
-                        bricks.getChildAt(y * 14 + x).revive();
-                    }
-                }
-            }
-            break;
-        case 4:
-            for (y = 0; y < 10; y++) {
-                for (x = 0; x < 14; x++) {
-                    if (!_.contains([2, 3, 6, 7, 10, 11], x) && y > 1) {
-                        bricks.getChildAt(y * 14 + x).revive();
-                    }
-                }
-            }
-            break;
-        case 5:
-            for (y = 0; y < 10; y++) {
-                for (x = 0; x < 14; x++) {
-                    if (y % 2 === 0) {
-                        bricks.getChildAt(y * 14 + x).revive();
-                    }
-                }
-            }
-            break;
-        case 6:
-            for (y = 0; y < 10; y++) {
-                for (x = 0; x < 14; x++) {
-                    if (x > 0 && x < 13) {
-                        if (y < 1 || y > 8) {
-                            bricks.getChildAt(y * 14 + x).revive();
-                        } else if ((y === 1 || y === 8) && (x < 5 || x > 8)) {
-                            bricks.getChildAt(y * 14 + x).revive();
-                        } else if ((y === 2 || y === 7) && (x < 4 || x > 9)) {
-                            bricks.getChildAt(y * 14 + x).revive();
-                        } else if ((y === 3 || y === 6) && (x < 3 || x > 10)) {
-                            bricks.getChildAt(y * 14 + x).revive();
-                        } else if ((y === 4 || y === 5) && (x < 2 || x > 11)) {
-                            bricks.getChildAt(y * 14 + x).revive();
-                        }
-                    }
-                }
-            }
-            break;
-        case 7:
-            for (y = 0; y < 10; y++) {
-                for (x = 0; x < 14; x++) {
-                    if ((y < x * .7 - 2) || (y > x * .7 + 2) ) {
-                        bricks.getChildAt(y * 14 + x).revive();
-                    }
-                }
-            }
-            break;
-        case 8:
-            for (y = 0; y < 10; y++) {
-                for (x = 0; x < 14; x++) {
-                    if ((y === 0 || y === 1 || y === 8 || y === 9) || (x === 6 || x === 7)) {
-                        bricks.getChildAt(y * 14 + x).revive();
-                    }
-                }
-            }
-            break;
-        case 9:
-            for (y = 0; y < 10; y++) {
-                for (x = 0; x < 14; x++) {
-                    if ("toqwiusdkjfetiufknskdfjetqoewtopsdiufaspqweioidsuflkjxvnmvksjdfhqwiyoerrsflkmmjbkhdfqietasdfqewrwertasdfasdwertdsadfewrtdsytouooojknvlkjfhtieorewoijflk".charCodeAt(y*14 + x) > 109) {
-                        bricks.getChildAt(y * 14 + x).revive();
-                    }
-                }
-            }
-            break;
-        }
-        level++;
-    };
-
-    ballHitBrick = function (_ball, _brick) {
-        var bonus;
-        _brick.kill();
-        points += speed;
-        lastRunPoints += speed;
-        lastRunBricks++;
-        pointsText.text = "Points: " + points;
-        //  Are they any bricks left?
-        if (bricks.countLiving() === 0) {
-            startLevel();
-        } else if (!stopBonuses && Math.random() > .9) {
-            bonus = bonuses.create(_brick.x, _brick.y, bonusTexture);
-            bonus.body.velocity.y = 150;
-            bonus.checkWorldBounds = true;
-            bonus.outOfBoundsKill = true;
-            bonus.addChild(game.add.text(7, 0, "+15", {font: "15px Arial", fill: "#000000"}));
-        }
-    };
-
-    ballHitPaddle = function (_ball, _paddle) {
-        var diff = 0;
-        if (_ball.x < _paddle.x)
-        {
-            //  Ball is on the left-hand side of the paddle
-            diff = _paddle.x - _ball.x;
-            _ball.body.velocity.x = speed * (-2.5 * diff);
-        }
-        else if (_ball.x > _paddle.x)
-        {
-            //  Ball is on the right-hand side of the paddle
-            diff = _ball.x - _paddle.x;
-            _ball.body.velocity.x = speed * (2.5 * diff);
-        }
-        else
-        {
-            //  Ball is perfectly in the middle
-            //  Add a little random X to stop it bouncing straight up!
-            _ball.body.velocity.x = speed * (-1 + Math.random() * 2);
-        }
-    };
-
-    bonusHitPaddle = function (_paddle, _bonus) {
-        _bonus.kill();
-        points += 15;
-        lastRunPoints += 15;
-        pointsText.text = "Points: " + points;
-    };
-
-    this.practiceRun = function () {
-        if (bricks.countLiving() === 0) {
-            startLevel();
-        }
-        ballOnPaddle = true;
-        ball.reset(paddle.body.x + 26, paddle.y - 16);
-        $("#rewards").show();
-    };
-
+    // 4. The API will call this function when the video player is ready.
+    // function onPlayerReady(event) {
+    //     event.target.playVideo();
+    // }
     this.run = function () {
-        if (bricks.countLiving() === 0) {
-            startLevel();
-        }
         $("#rewards").show();
-        lastRunPoints = 0;
-        lastRunBricks = 0;
-        lastRunDeaths = 0;
-        stopBonuses = false;
-        game.paused = false;
-        ballOnPaddle = true;
-        ball.reset(paddle.body.x + 26, paddle.y - 16);
-        game.time.events.add(1000, releaseBall, this);
+        player.playVideo();
     };
 
     this.stop = function () {
         $("#rewards").hide();
-        game.paused = true;
+        player.pauseVideo();
     };
+
+    // 5. The API calls this function when the player's state changes.
+    //    The function indicates that when playing a video (state=1),
+    //    the player should play for six seconds and then stop.
+    // var done = false;
+    // function onPlayerStateChange(event) {
+    //     if (event.data == YT.PlayerState.PLAYING && !done) {
+    //         setTimeout(stopVideo, 6000);
+    //         done = true;
+    //     }
+    // }
+    // function stopVideo() {
+    //     player.stopVideo();
+    // }
+
+    // var game,
+    //     preload,
+    //     create,
+    //     update,
+    //     ballLost,
+    //     releaseBall,
+    //     startLevel,
+    //     ballHitBrick,
+    //     ballHitPaddle,
+    //     bonusHitPaddle,
+    //     brickTexture,
+    //     bonusTexture,
+    //     paddleTexture,
+    //     ballTexture,
+    //     ball,
+    //     paddle,
+    //     bricks,
+    //     bonuses,
+    //     stopBonuses = false,
+    //     ballOnPaddle = true,
+    //     level = 0,
+    //     points = 0,
+    //     speed = 4,
+    //     cursors,
+    //     messageTimeout,
+    //     messageText,
+    //     pointsText,
+    //     lastRunPoints = 0,
+    //     lastRunBricks = 0,
+    //     lastRunDeaths = 0;
+
+    // preload = function () {
+    //     var graphicBase;
+    //     game.load.image('starfield', 'static/images/starfield.jpg');
+    //     graphicBase = game.add.graphics(0, 0);
+    //     graphicBase.beginFill(0xff0000);
+    //     graphicBase.lineStyle(1, 0x000000, 1);
+    //     graphicBase.drawRect(0, 0, 40, 16);
+    //     graphicBase.endFill();
+    //     brickTexture = graphicBase.generateTexture();
+    //     graphicBase.destroy();
+    //     graphicBase = game.add.graphics(0, 0);
+    //     graphicBase.beginFill(0x00bb00);
+    //     graphicBase.lineStyle(1, 0x000000, 1);
+    //     graphicBase.drawRect(0, 0, 40, 16);
+    //     graphicBase.endFill();
+    //     bonusTexture = graphicBase.generateTexture();
+    //     graphicBase.destroy();
+    //     graphicBase = game.add.graphics(0, 0);
+    //     graphicBase.beginFill(0x0058ff);
+    //     graphicBase.drawRect(0, 0, 60, 10);
+    //     graphicBase.endFill();
+    //     paddleTexture = graphicBase.generateTexture();
+    //     graphicBase.destroy();
+    //     graphicBase = game.add.graphics(0, 0);
+    //     graphicBase.beginFill(0xffa500);
+    //     graphicBase.drawCircle(0, 0, 20);
+    //     graphicBase.endFill();
+    //     ballTexture = graphicBase.generateTexture();
+    //     graphicBase.destroy();
+    // };
+
+    // create = function () {
+    //     game.stage.disableVisibilityChange = true;
+    //     game.physics.startSystem(Phaser.Physics.ARCADE);
+    //     //  We check bounds collisions against all walls other than the bottom one
+    //     game.physics.arcade.checkCollision.down = false;
+    //     game.add.tileSprite(0, 0, 800, 600, 'starfield');
+    //     bricks = game.add.group();
+    //     bricks.enableBody = true;
+    //     bricks.physicsBodyType = Phaser.Physics.ARCADE;
+    //     var brick;
+    //     for (var y = 0; y < 10; y++) {
+    //         for (var x = 0; x < 14; x++) {
+    //             brick = bricks.create(5 + x * 50, 60 + (y * 20), brickTexture);
+    //             brick.body.bounce.set(1);
+    //             brick.body.immovable = true;
+    //         }
+    //     }
+    //     bricks.callAll("kill");
+    //     bonuses = game.add.group();
+    //     bonuses.enableBody = true;
+    //     bonuses.physicsBodyType = Phaser.Physics.ARCADE;
+    //     paddle = game.add.sprite(game.world.centerX, game.world.height - 25, paddleTexture);
+    //     paddle.anchor.setTo(0.5, 0.5);
+    //     game.physics.enable(paddle, Phaser.Physics.ARCADE);
+    //     paddle.body.collideWorldBounds = true;
+    //     paddle.body.bounce.set(1);
+    //     paddle.body.immovable = true;
+    //     ball = game.add.sprite(game.world.centerX, paddle.y - 16, ballTexture);
+    //     ball.anchor.set(0.5);
+    //     ball.checkWorldBounds = true;
+    //     game.physics.enable(ball, Phaser.Physics.ARCADE);
+    //     ball.body.collideWorldBounds = true;
+    //     ball.body.bounce.set(1);
+    //     ball.events.onOutOfBounds.add(ballLost, this);
+    //     game.time.events.add(1000, releaseBall, this);
+    //     messageText = game.add.text(275, 180, "", {font: "30px Arial", fill: "white"});
+    //     pointsText = game.add.text(15, 15, "Points: 0", {font: "20px Arial", fill: "white"});
+    //     messageText.alpha = 0;
+    //     cursors = game.input.keyboard.createCursorKeys();
+    //     cursors.up.onDown.add(function () {
+    //         if (!game.paused) {
+    //             if (speed < 8) {
+    //                 speed++;
+    //                 ball.body.velocity.x = ball.body.velocity.x * speed / (speed - 1);
+    //                 ball.body.velocity.y = ball.body.velocity.y * speed / (speed - 1);
+    //             }
+    //             $("#multiplierbar :first-child").css("width", (speed/8*100).toFixed() + "%");
+    //             $("#multiplierbar :first-child").html(speed.toString() +  "x");
+    //             clearTimeout(messageTimeout);
+    //             messageText.alpha = 1;
+    //             messageText.text = speed.toString() + "x points";
+    //             messageTimeout = setTimeout(function () {messageText.alpha = 0; }, 1000);
+    //         }
+    //     });
+    //     cursors.down.onDown.add(function () {
+    //         if (!game.paused) {
+    //             if (speed > 1) {
+    //                 speed--;
+    //                 ball.body.velocity.x = ball.body.velocity.x * speed / (speed + 1);
+    //                 ball.body.velocity.y = ball.body.velocity.y * speed / (speed + 1);
+    //             }
+    //             $("#multiplierbar :first-child").css("width", (speed/8*100).toFixed() + "%");
+    //             $("#multiplierbar :first-child").html(speed.toString() +  "x");
+    //             clearTimeout(messageTimeout);
+    //             messageText.alpha = 1;
+    //             messageText.text = speed.toString() + "x points";
+    //             messageTimeout = setTimeout(function () {messageText.alpha = 0; }, 1000);
+    //         }
+    //     });
+    //     $("#multiplierbar :first-child").css("width", (speed/8*100).toFixed() + "%");
+    //     $("#multiplierbar :first-child").html(speed.toString() +  "x");
+    //     update();
+    //     game.paused = true;
+    // };
+
+    // update = function () {
+    //     paddle.x = game.input.x;
+    //     if (paddle.x < 30) {
+    //         paddle.x = 30;
+    //     } else if (paddle.x > game.width - 30) {
+    //         paddle.x = game.width - 30;
+    //     }
+    //     if (ballOnPaddle) {
+    //         ball.body.x = paddle.x - 10;
+    //         game.physics.arcade.collide(bonuses, paddle, bonusHitPaddle, null, this);
+    //     } else {
+    //         game.physics.arcade.collide(ball, paddle, ballHitPaddle, null, this);
+    //         game.physics.arcade.collide(ball, bricks, ballHitBrick, null, this);
+    //         game.physics.arcade.collide(bonuses, paddle, bonusHitPaddle, null, this);
+    //     }
+    // };
+
+    // releaseBall = function () {
+    //     if (ballOnPaddle)
+    //     {
+    //         ballOnPaddle = false;
+    //         ball.body.velocity.y = speed * -75;
+    //         ball.body.velocity.x = speed * (-20 + 40 * Math.random());
+    //     }
+    // };
+
+    // ballLost = function () {
+    //     lastRunDeaths++;
+    //     setTimeout(function () {
+    //         ballOnPaddle = true;
+    //         ball.reset(paddle.body.x + 20, paddle.y - 16);
+    //         game.time.events.add(1000, releaseBall, this);
+    //     }, 1000);
+    // };
+
+    // startLevel = function () {
+    //     var x, y;
+    //     //  Let's move the ball back to the paddle
+    //     ballOnPaddle = true;
+    //     ball.body.velocity.set(0);
+    //     game.time.events.add(1000, releaseBall, this);
+    //     ball.x = paddle.x + 16;
+    //     ball.y = paddle.y - 16;
+    //     clearTimeout(messageTimeout);
+    //     messageText.alpha = 1;
+    //     messageText.text = "Level " + (level + 1);
+    //     messageTimeout = setTimeout(function () {messageText.alpha = 0; }, 1000);
+    //     switch (level % 10) {
+    //     case 0:
+    //         for (y = 0; y < 10; y++) {
+    //             for (x = 0; x < 14; x++) {
+    //                 if (y % 2 && y < 8 && x > 0 && x < 13) {
+    //                     bricks.getChildAt(y * 14 + x).revive();
+    //                 }
+    //             }
+    //         }
+    //         break;
+    //     case 1:
+    //         for (y = 0; y < 10; y++) {
+    //             for (x = 0; x < 14; x++) {
+    //                 if (y < 2 || y > 7) {
+    //                     bricks.getChildAt(y * 14 + x).revive();
+    //                 }
+    //             }
+    //         }
+    //         break;
+    //     case 2:
+    //         for (y = 3; y < 9; y++) {
+    //             for (x = 0; x < 14; x++) {
+    //                 if (y > x * .65) {
+    //                     bricks.getChildAt(y * 14 + x).revive();
+    //                 }
+    //             }
+    //         }
+    //         break;
+    //     case 3:
+    //         for (y = 0; y < 10; y++) {
+    //             for (x = 0; x < 14; x++) {
+    //                 if (y < 2 || y > 7) {
+    //                     bricks.getChildAt(y * 14 + x).revive();
+    //                 } else if (_.contains([2, 3, 6, 7], y) && (x < 2 || x > 11)) {
+    //                     bricks.getChildAt(y * 14 + x).revive();
+    //                 } else if (_.contains([4, 5], y) && _.contains([0, 1, 4, 5, 6, 7, 8, 9, 12, 13], x)) {
+    //                     bricks.getChildAt(y * 14 + x).revive();
+    //                 }
+    //             }
+    //         }
+    //         break;
+    //     case 4:
+    //         for (y = 0; y < 10; y++) {
+    //             for (x = 0; x < 14; x++) {
+    //                 if (!_.contains([2, 3, 6, 7, 10, 11], x) && y > 1) {
+    //                     bricks.getChildAt(y * 14 + x).revive();
+    //                 }
+    //             }
+    //         }
+    //         break;
+    //     case 5:
+    //         for (y = 0; y < 10; y++) {
+    //             for (x = 0; x < 14; x++) {
+    //                 if (y % 2 === 0) {
+    //                     bricks.getChildAt(y * 14 + x).revive();
+    //                 }
+    //             }
+    //         }
+    //         break;
+    //     case 6:
+    //         for (y = 0; y < 10; y++) {
+    //             for (x = 0; x < 14; x++) {
+    //                 if (x > 0 && x < 13) {
+    //                     if (y < 1 || y > 8) {
+    //                         bricks.getChildAt(y * 14 + x).revive();
+    //                     } else if ((y === 1 || y === 8) && (x < 5 || x > 8)) {
+    //                         bricks.getChildAt(y * 14 + x).revive();
+    //                     } else if ((y === 2 || y === 7) && (x < 4 || x > 9)) {
+    //                         bricks.getChildAt(y * 14 + x).revive();
+    //                     } else if ((y === 3 || y === 6) && (x < 3 || x > 10)) {
+    //                         bricks.getChildAt(y * 14 + x).revive();
+    //                     } else if ((y === 4 || y === 5) && (x < 2 || x > 11)) {
+    //                         bricks.getChildAt(y * 14 + x).revive();
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //         break;
+    //     case 7:
+    //         for (y = 0; y < 10; y++) {
+    //             for (x = 0; x < 14; x++) {
+    //                 if ((y < x * .7 - 2) || (y > x * .7 + 2) ) {
+    //                     bricks.getChildAt(y * 14 + x).revive();
+    //                 }
+    //             }
+    //         }
+    //         break;
+    //     case 8:
+    //         for (y = 0; y < 10; y++) {
+    //             for (x = 0; x < 14; x++) {
+    //                 if ((y === 0 || y === 1 || y === 8 || y === 9) || (x === 6 || x === 7)) {
+    //                     bricks.getChildAt(y * 14 + x).revive();
+    //                 }
+    //             }
+    //         }
+    //         break;
+    //     case 9:
+    //         for (y = 0; y < 10; y++) {
+    //             for (x = 0; x < 14; x++) {
+    //                 if ("toqwiusdkjfetiufknskdfjetqoewtopsdiufaspqweioidsuflkjxvnmvksjdfhqwiyoerrsflkmmjbkhdfqietasdfqewrwertasdfasdwertdsadfewrtdsytouooojknvlkjfhtieorewoijflk".charCodeAt(y*14 + x) > 109) {
+    //                     bricks.getChildAt(y * 14 + x).revive();
+    //                 }
+    //             }
+    //         }
+    //         break;
+    //     }
+    //     level++;
+    // };
+
+    // ballHitBrick = function (_ball, _brick) {
+    //     var bonus;
+    //     _brick.kill();
+    //     points += speed;
+    //     lastRunPoints += speed;
+    //     lastRunBricks++;
+    //     pointsText.text = "Points: " + points;
+    //     //  Are they any bricks left?
+    //     if (bricks.countLiving() === 0) {
+    //         startLevel();
+    //     } else if (!stopBonuses && Math.random() > .9) {
+    //         bonus = bonuses.create(_brick.x, _brick.y, bonusTexture);
+    //         bonus.body.velocity.y = 150;
+    //         bonus.checkWorldBounds = true;
+    //         bonus.outOfBoundsKill = true;
+    //         bonus.addChild(game.add.text(7, 0, "+15", {font: "15px Arial", fill: "#000000"}));
+    //     }
+    // };
+
+    // ballHitPaddle = function (_ball, _paddle) {
+    //     var diff = 0;
+    //     if (_ball.x < _paddle.x)
+    //     {
+    //         //  Ball is on the left-hand side of the paddle
+    //         diff = _paddle.x - _ball.x;
+    //         _ball.body.velocity.x = speed * (-2.5 * diff);
+    //     }
+    //     else if (_ball.x > _paddle.x)
+    //     {
+    //         //  Ball is on the right-hand side of the paddle
+    //         diff = _ball.x - _paddle.x;
+    //         _ball.body.velocity.x = speed * (2.5 * diff);
+    //     }
+    //     else
+    //     {
+    //         //  Ball is perfectly in the middle
+    //         //  Add a little random X to stop it bouncing straight up!
+    //         _ball.body.velocity.x = speed * (-1 + Math.random() * 2);
+    //     }
+    // };
+
+    // bonusHitPaddle = function (_paddle, _bonus) {
+    //     _bonus.kill();
+    //     points += 15;
+    //     lastRunPoints += 15;
+    //     pointsText.text = "Points: " + points;
+    // };
+
+    // this.practiceRun = function () {
+    //     if (bricks.countLiving() === 0) {
+    //         startLevel();
+    //     }
+    //     ballOnPaddle = true;
+    //     ball.reset(paddle.body.x + 26, paddle.y - 16);
+    //     $("#rewards").show();
+    // };
+
+    // this.run = function () {
+    //     if (bricks.countLiving() === 0) {
+    //         startLevel();
+    //     }
+    //     $("#rewards").show();
+    //     lastRunPoints = 0;
+    //     lastRunBricks = 0;
+    //     lastRunDeaths = 0;
+    //     stopBonuses = false;
+    //     game.paused = false;
+    //     ballOnPaddle = true;
+    //     ball.reset(paddle.body.x + 26, paddle.y - 16);
+    //     game.time.events.add(1000, releaseBall, this);
+    // };
+
+    // this.stop = function () {
+    //     $("#rewards").hide();
+    //     game.paused = true;
+    // };
 
     this.getStats = function () {
-        return {points: points,
-                lastRunPoints: lastRunPoints,
-                lastRunBricks: lastRunBricks,
-                endingSpeed: speed,
-                level: level,
-                bricksLeft: bricks.countLiving(),
-                deaths: lastRunDeaths};
+        return {points: 0,
+                lastRunPoints: 0,
+                lastRunBricks: 0,
+                endingSpeed: 0,
+                level: 0,
+                bricksLeft: 0,
+                deaths: 0};
     };
 
-    game = new Phaser.Game(700, 500, Phaser.AUTO, "gamediv", {preload: preload, create: create, update: update});
+    // game = new Phaser.Game(700, 500, Phaser.AUTO, "gamediv", {preload: preload, create: create, update: update});
 }
 
 function SliderTask() {
@@ -1381,8 +1429,8 @@ function experimentDriver() {
     var psiTurk = new PsiTurk(uniqueId, adServerLoc, mode),
         next,
         nChoices = [18, 60],
-        nPreWorkPeriods = [6, 10],
-        // nPreWorkPeriods = [0, 0],
+        // nPreWorkPeriods = [6, 10],
+        nPreWorkPeriods = [0, 0],
         functionList = [];
 
     next = function () {
@@ -1406,34 +1454,34 @@ function experimentDriver() {
                           "endingquestions.html",
                           "postquestionnaire.html"]);
     functionList = [
-        function () {
-            instructionDriver(["instructions/instruct_1.html",
-                               "instructions/instruct_2.html",
-                               "instructions/instruct_3.html",
-                               "instructions/instruct_4.html",
-                               "instructions/instruct_5.html",
-                               "instructions/instruct_6.html",
-                               "instructions/instruct_7.html"],
-                              "instructions/quiz.html",
-                              {new0: "third",
-                               range: "onethird_all",
-                               reset: "1_6",
-                               processnum: "4",
-                               penalty: "10percentage"},
-                              psiTurk, next); },
-        function () {
-            TransitionScreen("transition_practicedecision.html", psiTurk, next);
-        },
-        function () {
-            phaseDriver(nChoices[0], nPreWorkPeriods[0], ExploreExploitTask, PracticeRewards, "practice", psiTurk, next); },
-        function () {
-            TransitionScreen("transition_practiceconsumption.html", psiTurk, next);
-        },
-        function () {
-            practiceConsumption(psiTurk, next); },
-        function () {
-            TransitionScreen("transition_fulltask.html", psiTurk, next);
-        },
+        // function () {
+        //     instructionDriver(["instructions/instruct_1.html",
+        //                        "instructions/instruct_2.html",
+        //                        "instructions/instruct_3.html",
+        //                        "instructions/instruct_4.html",
+        //                        "instructions/instruct_5.html",
+        //                        "instructions/instruct_6.html",
+        //                        "instructions/instruct_7.html"],
+        //                       "instructions/quiz.html",
+        //                       {new0: "third",
+        //                        range: "onethird_all",
+        //                        reset: "1_6",
+        //                        processnum: "4",
+        //                        penalty: "10percentage"},
+        //                       psiTurk, next); },
+        // function () {
+        //     TransitionScreen("transition_practicedecision.html", psiTurk, next);
+        // },
+        // function () {
+        //     phaseDriver(nChoices[0], nPreWorkPeriods[0], ExploreExploitTask, PracticeRewards, "practice", psiTurk, next); },
+        // function () {
+        //     TransitionScreen("transition_practiceconsumption.html", psiTurk, next);
+        // },
+        // function () {
+        //     practiceConsumption(psiTurk, next); },
+        // function () {
+        //     TransitionScreen("transition_fulltask.html", psiTurk, next);
+        // },
         function () {
             phaseDriver(nChoices[1], nPreWorkPeriods[1], ExploreExploitTask, ConsumptionRewards, "consumption", psiTurk, next); },
         function () {
@@ -1443,7 +1491,10 @@ function experimentDriver() {
     next();
 }
 
-$(window).load(function () {
-    "use strict";
-    experimentDriver();
-});
+
+function onYouTubeIframeAPIReady() {
+    $(window).load(function () {
+        "use strict";
+        experimentDriver();
+    });
+}
