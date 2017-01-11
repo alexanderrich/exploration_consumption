@@ -8,11 +8,9 @@
 
     <div class="instructions well">
         <p>
-            Well done! You scored <strong><span id="pointsscored"></span></strong> points in Brickbreak!
-        </p>
-        <p>
             You missed <strong><span id="misspct"></span>%</strong>
-            of sliders, subtracting <strong>$<span id="missloss"></span></strong>
+            of sliders and left the video paused for <strong><span id="pausepct"></span>%</strong>
+            of the time, subtracting <strong>$<span id="losses"></span></strong>
             from your bonus.
         </p>
         <p>Your total bonus is <strong>$<span id="totalbonus"></span></strong>.</p>
@@ -41,9 +39,9 @@
             <div class="question">
                 <p class="questiontext">
                     On a scale from 1 to 7, where 1 is very un-enjoyable
-                    and 7 is very enjoyable, how enjoyable did you find the
-                    <strong>Brickbreak</strong> game?
-                    <select id="brickbreakenjoyment" name="brickbreakenjoyment">
+                    and 7 is very enjoyable, how enjoyable did you find watching
+                    the <strong>Youtube video</strong>?
+                    <select id="videoenjoyment" name="videoenjoyment">
                         <option value="noresp" SELECTED></option>
                         <option value="1">1 - very un-enjoyable</option>
                         <option value="2">2</option>
@@ -52,6 +50,18 @@
                         <option value="5">5 </option>
                         <option value="6">6</option>
                         <option value="7">7 - very enjoyable</option>
+                    </select>
+                </p>
+            </div>
+            <div class="question">
+                <p class="questiontext">
+                    Did you have any technical issues, such as the video not loading fast enough, while watching the Youtube video?
+                    <select id="technicalissues" name="technicalissues">
+                        <option value="noresp" SELECTED></option>
+                        <option value="no">There were no technical issues</option>
+                        <option value="alittle">There were minor technical issues that didn't greatly affect my enjoyment</option>
+                        <option value="alot">There were major technical issues that greatly affected my enjoyment</option>
+                        <option value="unplayable">The video failed to play at all.</option>
                     </select>
                 </p>
             </div>

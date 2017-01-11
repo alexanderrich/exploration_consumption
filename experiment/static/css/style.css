@@ -108,11 +108,17 @@ strong {
 }
 
 #rewards {
+    pointer-events: none;
     position: relative;
     margin-left: auto;
     margin-right: auto;
     width: 700px;
     height: 550px;
+}
+
+#holdspace {
+    text-align: center;
+    font-size: 30px;
 }
 
 .standardRewards {
@@ -140,7 +146,7 @@ strong {
 #topinfo {
     margin-left: auto;
     margin-right: auto;
-    width: 600px;
+    width: 700px;
     height: 30px;
     font-size: 25px;
     font-family: sans-serif;
@@ -153,12 +159,17 @@ strong {
 
 #trialsdiv {
     float: left;
-    width: 250px;
+    width: 200px;
 }
 
 #sliderpctdiv {
     float: left;
-    width: 250px;
+    width: 200px;
+}
+
+#pausepctdiv {
+    float: left;
+    width: 200px;
 }
 
 /* card task */

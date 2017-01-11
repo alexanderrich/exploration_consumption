@@ -10,438 +10,88 @@
 /*global condition, uniqueId, adServerLoc, mode, document, PsiTurk, YT, $, _, d3, Phaser, window, setTimeout, clearTimeout, setInterval, clearInterval*/
 
 condition = parseInt(condition);
-condition = 0;
 
-var tag = document.createElement('script');
-var firstScriptTag = document.getElementsByTagName('script')[0];
+var tag = document.createElement('script'),
+    firstScriptTag = document.getElementsByTagName('script')[0],
+    videoChoice;
 tag.src = "https://www.youtube.com/iframe_api";
 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-function Game() {
+function VideoPlayer() {
     "use strict";
-    var run;
-    var player;
+    var player,
+        startPlaying,
+        stopPlaying,
+        onVideo = false,
+        playing = false,
+        timeStamp,
+        playTime,
+        totalPlayTime = 0,
+        totalPlayTimePossible = 0;
     player = new YT.Player('player', {
-        height: '390',
-        width: '640',
-        playerVars: {'controls': 0 },
-        videoId: 'EqxaanDEAHw',
-        start: 25
-        // events: {
-        //     'onReady': run
-        //     // 'onStateChange': onPlayerStateChange
-        // }
+        height: '430',
+        width: '700',
+        playerVars: {'controls': 0,
+                     'disablekb': 1,
+                     'start': videoChoice.start},
+        videoId: videoChoice.videoId
     });
 
-    // 4. The API will call this function when the video player is ready.
-    // function onPlayerReady(event) {
-    //     event.target.playVideo();
-    // }
+    $(window).blur(function () {
+        console.log("testing");
+        if (onVideo && playing) {
+            player.pauseVideo();
+            playTime += (new Date().getTime()) - timeStamp;
+            playing = false;
+        }
+    });
+
+    $("body").keydown(function (e) {
+        console.log("keyup");
+        if(e.keyCode === 32 && onVideo && !playing) {
+            player.playVideo();
+            timeStamp = new Date().getTime()
+            playing = true;
+        } else if (e.keyCode === 32){
+            return false;
+        }
+    });
+
+    $("body").keyup(function (e) {
+        if(e.keyCode === 32 && onVideo && playing) {
+            player.pauseVideo();
+            playTime += (new Date().getTime()) - timeStamp;
+            playing = false;
+        }
+    });
+
     this.run = function () {
         $("#rewards").show();
-        player.playVideo();
+        onVideo = true;
+        playTime = 0;
+        totalPlayTimePossible += 30000;
     };
 
     this.stop = function () {
         $("#rewards").hide();
+        onVideo = false;
         player.pauseVideo();
+        playTime += (new Date().getTime()) - timeStamp;
+        totalPlayTime += playTime;
+        playing = false;
     };
 
-    // 5. The API calls this function when the player's state changes.
-    //    The function indicates that when playing a video (state=1),
-    //    the player should play for six seconds and then stop.
-    // var done = false;
-    // function onPlayerStateChange(event) {
-    //     if (event.data == YT.PlayerState.PLAYING && !done) {
-    //         setTimeout(stopVideo, 6000);
-    //         done = true;
-    //     }
-    // }
-    // function stopVideo() {
-    //     player.stopVideo();
-    // }
-
-    // var game,
-    //     preload,
-    //     create,
-    //     update,
-    //     ballLost,
-    //     releaseBall,
-    //     startLevel,
-    //     ballHitBrick,
-    //     ballHitPaddle,
-    //     bonusHitPaddle,
-    //     brickTexture,
-    //     bonusTexture,
-    //     paddleTexture,
-    //     ballTexture,
-    //     ball,
-    //     paddle,
-    //     bricks,
-    //     bonuses,
-    //     stopBonuses = false,
-    //     ballOnPaddle = true,
-    //     level = 0,
-    //     points = 0,
-    //     speed = 4,
-    //     cursors,
-    //     messageTimeout,
-    //     messageText,
-    //     pointsText,
-    //     lastRunPoints = 0,
-    //     lastRunBricks = 0,
-    //     lastRunDeaths = 0;
-
-    // preload = function () {
-    //     var graphicBase;
-    //     game.load.image('starfield', 'static/images/starfield.jpg');
-    //     graphicBase = game.add.graphics(0, 0);
-    //     graphicBase.beginFill(0xff0000);
-    //     graphicBase.lineStyle(1, 0x000000, 1);
-    //     graphicBase.drawRect(0, 0, 40, 16);
-    //     graphicBase.endFill();
-    //     brickTexture = graphicBase.generateTexture();
-    //     graphicBase.destroy();
-    //     graphicBase = game.add.graphics(0, 0);
-    //     graphicBase.beginFill(0x00bb00);
-    //     graphicBase.lineStyle(1, 0x000000, 1);
-    //     graphicBase.drawRect(0, 0, 40, 16);
-    //     graphicBase.endFill();
-    //     bonusTexture = graphicBase.generateTexture();
-    //     graphicBase.destroy();
-    //     graphicBase = game.add.graphics(0, 0);
-    //     graphicBase.beginFill(0x0058ff);
-    //     graphicBase.drawRect(0, 0, 60, 10);
-    //     graphicBase.endFill();
-    //     paddleTexture = graphicBase.generateTexture();
-    //     graphicBase.destroy();
-    //     graphicBase = game.add.graphics(0, 0);
-    //     graphicBase.beginFill(0xffa500);
-    //     graphicBase.drawCircle(0, 0, 20);
-    //     graphicBase.endFill();
-    //     ballTexture = graphicBase.generateTexture();
-    //     graphicBase.destroy();
-    // };
-
-    // create = function () {
-    //     game.stage.disableVisibilityChange = true;
-    //     game.physics.startSystem(Phaser.Physics.ARCADE);
-    //     //  We check bounds collisions against all walls other than the bottom one
-    //     game.physics.arcade.checkCollision.down = false;
-    //     game.add.tileSprite(0, 0, 800, 600, 'starfield');
-    //     bricks = game.add.group();
-    //     bricks.enableBody = true;
-    //     bricks.physicsBodyType = Phaser.Physics.ARCADE;
-    //     var brick;
-    //     for (var y = 0; y < 10; y++) {
-    //         for (var x = 0; x < 14; x++) {
-    //             brick = bricks.create(5 + x * 50, 60 + (y * 20), brickTexture);
-    //             brick.body.bounce.set(1);
-    //             brick.body.immovable = true;
-    //         }
-    //     }
-    //     bricks.callAll("kill");
-    //     bonuses = game.add.group();
-    //     bonuses.enableBody = true;
-    //     bonuses.physicsBodyType = Phaser.Physics.ARCADE;
-    //     paddle = game.add.sprite(game.world.centerX, game.world.height - 25, paddleTexture);
-    //     paddle.anchor.setTo(0.5, 0.5);
-    //     game.physics.enable(paddle, Phaser.Physics.ARCADE);
-    //     paddle.body.collideWorldBounds = true;
-    //     paddle.body.bounce.set(1);
-    //     paddle.body.immovable = true;
-    //     ball = game.add.sprite(game.world.centerX, paddle.y - 16, ballTexture);
-    //     ball.anchor.set(0.5);
-    //     ball.checkWorldBounds = true;
-    //     game.physics.enable(ball, Phaser.Physics.ARCADE);
-    //     ball.body.collideWorldBounds = true;
-    //     ball.body.bounce.set(1);
-    //     ball.events.onOutOfBounds.add(ballLost, this);
-    //     game.time.events.add(1000, releaseBall, this);
-    //     messageText = game.add.text(275, 180, "", {font: "30px Arial", fill: "white"});
-    //     pointsText = game.add.text(15, 15, "Points: 0", {font: "20px Arial", fill: "white"});
-    //     messageText.alpha = 0;
-    //     cursors = game.input.keyboard.createCursorKeys();
-    //     cursors.up.onDown.add(function () {
-    //         if (!game.paused) {
-    //             if (speed < 8) {
-    //                 speed++;
-    //                 ball.body.velocity.x = ball.body.velocity.x * speed / (speed - 1);
-    //                 ball.body.velocity.y = ball.body.velocity.y * speed / (speed - 1);
-    //             }
-    //             $("#multiplierbar :first-child").css("width", (speed/8*100).toFixed() + "%");
-    //             $("#multiplierbar :first-child").html(speed.toString() +  "x");
-    //             clearTimeout(messageTimeout);
-    //             messageText.alpha = 1;
-    //             messageText.text = speed.toString() + "x points";
-    //             messageTimeout = setTimeout(function () {messageText.alpha = 0; }, 1000);
-    //         }
-    //     });
-    //     cursors.down.onDown.add(function () {
-    //         if (!game.paused) {
-    //             if (speed > 1) {
-    //                 speed--;
-    //                 ball.body.velocity.x = ball.body.velocity.x * speed / (speed + 1);
-    //                 ball.body.velocity.y = ball.body.velocity.y * speed / (speed + 1);
-    //             }
-    //             $("#multiplierbar :first-child").css("width", (speed/8*100).toFixed() + "%");
-    //             $("#multiplierbar :first-child").html(speed.toString() +  "x");
-    //             clearTimeout(messageTimeout);
-    //             messageText.alpha = 1;
-    //             messageText.text = speed.toString() + "x points";
-    //             messageTimeout = setTimeout(function () {messageText.alpha = 0; }, 1000);
-    //         }
-    //     });
-    //     $("#multiplierbar :first-child").css("width", (speed/8*100).toFixed() + "%");
-    //     $("#multiplierbar :first-child").html(speed.toString() +  "x");
-    //     update();
-    //     game.paused = true;
-    // };
-
-    // update = function () {
-    //     paddle.x = game.input.x;
-    //     if (paddle.x < 30) {
-    //         paddle.x = 30;
-    //     } else if (paddle.x > game.width - 30) {
-    //         paddle.x = game.width - 30;
-    //     }
-    //     if (ballOnPaddle) {
-    //         ball.body.x = paddle.x - 10;
-    //         game.physics.arcade.collide(bonuses, paddle, bonusHitPaddle, null, this);
-    //     } else {
-    //         game.physics.arcade.collide(ball, paddle, ballHitPaddle, null, this);
-    //         game.physics.arcade.collide(ball, bricks, ballHitBrick, null, this);
-    //         game.physics.arcade.collide(bonuses, paddle, bonusHitPaddle, null, this);
-    //     }
-    // };
-
-    // releaseBall = function () {
-    //     if (ballOnPaddle)
-    //     {
-    //         ballOnPaddle = false;
-    //         ball.body.velocity.y = speed * -75;
-    //         ball.body.velocity.x = speed * (-20 + 40 * Math.random());
-    //     }
-    // };
-
-    // ballLost = function () {
-    //     lastRunDeaths++;
-    //     setTimeout(function () {
-    //         ballOnPaddle = true;
-    //         ball.reset(paddle.body.x + 20, paddle.y - 16);
-    //         game.time.events.add(1000, releaseBall, this);
-    //     }, 1000);
-    // };
-
-    // startLevel = function () {
-    //     var x, y;
-    //     //  Let's move the ball back to the paddle
-    //     ballOnPaddle = true;
-    //     ball.body.velocity.set(0);
-    //     game.time.events.add(1000, releaseBall, this);
-    //     ball.x = paddle.x + 16;
-    //     ball.y = paddle.y - 16;
-    //     clearTimeout(messageTimeout);
-    //     messageText.alpha = 1;
-    //     messageText.text = "Level " + (level + 1);
-    //     messageTimeout = setTimeout(function () {messageText.alpha = 0; }, 1000);
-    //     switch (level % 10) {
-    //     case 0:
-    //         for (y = 0; y < 10; y++) {
-    //             for (x = 0; x < 14; x++) {
-    //                 if (y % 2 && y < 8 && x > 0 && x < 13) {
-    //                     bricks.getChildAt(y * 14 + x).revive();
-    //                 }
-    //             }
-    //         }
-    //         break;
-    //     case 1:
-    //         for (y = 0; y < 10; y++) {
-    //             for (x = 0; x < 14; x++) {
-    //                 if (y < 2 || y > 7) {
-    //                     bricks.getChildAt(y * 14 + x).revive();
-    //                 }
-    //             }
-    //         }
-    //         break;
-    //     case 2:
-    //         for (y = 3; y < 9; y++) {
-    //             for (x = 0; x < 14; x++) {
-    //                 if (y > x * .65) {
-    //                     bricks.getChildAt(y * 14 + x).revive();
-    //                 }
-    //             }
-    //         }
-    //         break;
-    //     case 3:
-    //         for (y = 0; y < 10; y++) {
-    //             for (x = 0; x < 14; x++) {
-    //                 if (y < 2 || y > 7) {
-    //                     bricks.getChildAt(y * 14 + x).revive();
-    //                 } else if (_.contains([2, 3, 6, 7], y) && (x < 2 || x > 11)) {
-    //                     bricks.getChildAt(y * 14 + x).revive();
-    //                 } else if (_.contains([4, 5], y) && _.contains([0, 1, 4, 5, 6, 7, 8, 9, 12, 13], x)) {
-    //                     bricks.getChildAt(y * 14 + x).revive();
-    //                 }
-    //             }
-    //         }
-    //         break;
-    //     case 4:
-    //         for (y = 0; y < 10; y++) {
-    //             for (x = 0; x < 14; x++) {
-    //                 if (!_.contains([2, 3, 6, 7, 10, 11], x) && y > 1) {
-    //                     bricks.getChildAt(y * 14 + x).revive();
-    //                 }
-    //             }
-    //         }
-    //         break;
-    //     case 5:
-    //         for (y = 0; y < 10; y++) {
-    //             for (x = 0; x < 14; x++) {
-    //                 if (y % 2 === 0) {
-    //                     bricks.getChildAt(y * 14 + x).revive();
-    //                 }
-    //             }
-    //         }
-    //         break;
-    //     case 6:
-    //         for (y = 0; y < 10; y++) {
-    //             for (x = 0; x < 14; x++) {
-    //                 if (x > 0 && x < 13) {
-    //                     if (y < 1 || y > 8) {
-    //                         bricks.getChildAt(y * 14 + x).revive();
-    //                     } else if ((y === 1 || y === 8) && (x < 5 || x > 8)) {
-    //                         bricks.getChildAt(y * 14 + x).revive();
-    //                     } else if ((y === 2 || y === 7) && (x < 4 || x > 9)) {
-    //                         bricks.getChildAt(y * 14 + x).revive();
-    //                     } else if ((y === 3 || y === 6) && (x < 3 || x > 10)) {
-    //                         bricks.getChildAt(y * 14 + x).revive();
-    //                     } else if ((y === 4 || y === 5) && (x < 2 || x > 11)) {
-    //                         bricks.getChildAt(y * 14 + x).revive();
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //         break;
-    //     case 7:
-    //         for (y = 0; y < 10; y++) {
-    //             for (x = 0; x < 14; x++) {
-    //                 if ((y < x * .7 - 2) || (y > x * .7 + 2) ) {
-    //                     bricks.getChildAt(y * 14 + x).revive();
-    //                 }
-    //             }
-    //         }
-    //         break;
-    //     case 8:
-    //         for (y = 0; y < 10; y++) {
-    //             for (x = 0; x < 14; x++) {
-    //                 if ((y === 0 || y === 1 || y === 8 || y === 9) || (x === 6 || x === 7)) {
-    //                     bricks.getChildAt(y * 14 + x).revive();
-    //                 }
-    //             }
-    //         }
-    //         break;
-    //     case 9:
-    //         for (y = 0; y < 10; y++) {
-    //             for (x = 0; x < 14; x++) {
-    //                 if ("toqwiusdkjfetiufknskdfjetqoewtopsdiufaspqweioidsuflkjxvnmvksjdfhqwiyoerrsflkmmjbkhdfqietasdfqewrwertasdfasdwertdsadfewrtdsytouooojknvlkjfhtieorewoijflk".charCodeAt(y*14 + x) > 109) {
-    //                     bricks.getChildAt(y * 14 + x).revive();
-    //                 }
-    //             }
-    //         }
-    //         break;
-    //     }
-    //     level++;
-    // };
-
-    // ballHitBrick = function (_ball, _brick) {
-    //     var bonus;
-    //     _brick.kill();
-    //     points += speed;
-    //     lastRunPoints += speed;
-    //     lastRunBricks++;
-    //     pointsText.text = "Points: " + points;
-    //     //  Are they any bricks left?
-    //     if (bricks.countLiving() === 0) {
-    //         startLevel();
-    //     } else if (!stopBonuses && Math.random() > .9) {
-    //         bonus = bonuses.create(_brick.x, _brick.y, bonusTexture);
-    //         bonus.body.velocity.y = 150;
-    //         bonus.checkWorldBounds = true;
-    //         bonus.outOfBoundsKill = true;
-    //         bonus.addChild(game.add.text(7, 0, "+15", {font: "15px Arial", fill: "#000000"}));
-    //     }
-    // };
-
-    // ballHitPaddle = function (_ball, _paddle) {
-    //     var diff = 0;
-    //     if (_ball.x < _paddle.x)
-    //     {
-    //         //  Ball is on the left-hand side of the paddle
-    //         diff = _paddle.x - _ball.x;
-    //         _ball.body.velocity.x = speed * (-2.5 * diff);
-    //     }
-    //     else if (_ball.x > _paddle.x)
-    //     {
-    //         //  Ball is on the right-hand side of the paddle
-    //         diff = _ball.x - _paddle.x;
-    //         _ball.body.velocity.x = speed * (2.5 * diff);
-    //     }
-    //     else
-    //     {
-    //         //  Ball is perfectly in the middle
-    //         //  Add a little random X to stop it bouncing straight up!
-    //         _ball.body.velocity.x = speed * (-1 + Math.random() * 2);
-    //     }
-    // };
-
-    // bonusHitPaddle = function (_paddle, _bonus) {
-    //     _bonus.kill();
-    //     points += 15;
-    //     lastRunPoints += 15;
-    //     pointsText.text = "Points: " + points;
-    // };
-
-    // this.practiceRun = function () {
-    //     if (bricks.countLiving() === 0) {
-    //         startLevel();
-    //     }
-    //     ballOnPaddle = true;
-    //     ball.reset(paddle.body.x + 26, paddle.y - 16);
-    //     $("#rewards").show();
-    // };
-
-    // this.run = function () {
-    //     if (bricks.countLiving() === 0) {
-    //         startLevel();
-    //     }
-    //     $("#rewards").show();
-    //     lastRunPoints = 0;
-    //     lastRunBricks = 0;
-    //     lastRunDeaths = 0;
-    //     stopBonuses = false;
-    //     game.paused = false;
-    //     ballOnPaddle = true;
-    //     ball.reset(paddle.body.x + 26, paddle.y - 16);
-    //     game.time.events.add(1000, releaseBall, this);
-    // };
-
-    // this.stop = function () {
-    //     $("#rewards").hide();
-    //     game.paused = true;
-    // };
-
-    this.getStats = function () {
-        return {points: 0,
-                lastRunPoints: 0,
-                lastRunBricks: 0,
-                endingSpeed: 0,
-                level: 0,
-                bricksLeft: 0,
-                deaths: 0};
+    this.getPlayTime = function () {
+        return playTime;
     };
 
-    // game = new Phaser.Game(700, 500, Phaser.AUTO, "gamediv", {preload: preload, create: create, update: update});
+    this.pausePct = function () {
+        return ((1 - (totalPlayTime / totalPlayTimePossible)) * 100) || 0;
+    };
+
+    this.practiceRun = function () {
+        $("#rewards").show();
+    };
 }
 
 function SliderTask() {
@@ -517,9 +167,9 @@ function SliderTask() {
         }, 20000);
     };
 
-    this.getStats = function () {
+    this.getMisses = function () {
         //return number of sliders missed (out of 5)
-        return { slidersMissed: misses };
+        return misses;
     };
 
     this.missPct = function () {
@@ -748,7 +398,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             }, extraTime);
             setTimeout(function () {
                 if (contextObj.outcome) {
-                    $("#machinescreen").html("Machine succeeded!<br/>Press START to begin game.");
+                    $("#machinescreen").html("Machine succeeded!<br/>Press START to begin video.");
                 } else {
                     $("#machinescreen").html("Machine failed.<br/>Press START to begin task.");
                 }
@@ -1079,7 +729,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
 
 function ConsumptionRewards(psiTurk, callback) {
     "use strict";
-    var game,
+    var video,
         trialNum,
         rewardProb,
         reward,
@@ -1092,10 +742,11 @@ function ConsumptionRewards(psiTurk, callback) {
         timeInterval;
 
     recordData = function () {
-        var data,
-            missPct;
+        var stat,
+            missPct,
+            pausePct;
         if (reward) {
-            data = game.getStats();
+            stat = video.getPlayTime();
             psiTurk.recordTrialData({phase: "EXPERIMENT",
                                      trialType: "consumption",
                                      trial: trialNum,
@@ -1103,17 +754,11 @@ function ConsumptionRewards(psiTurk, callback) {
                                      condition: condition,
                                      outcome: reward,
                                      rewardProb: rewardProb,
-                                     points: data.points,
-                                     lastRunPoints: data.lastRunPoints,
-                                     lastRunBricks: data.lastRunBricks,
-                                     endingSpeed: data.endingSpeed,
-                                     level: data.level,
-                                     bricksLeft: data.bricksLeft,
-                                     deaths: data.deaths,
-                                     slidersMissed: -1
+                                     slidersMissed: -1,
+                                     playTime: stat
                                     });
         } else {
-            data = sliderTask.getStats();
+            stat = sliderTask.getMisses();
             psiTurk.recordTrialData({phase: "EXPERIMENT",
                                      trialType: "consumption",
                                      trial: trialNum,
@@ -1121,22 +766,23 @@ function ConsumptionRewards(psiTurk, callback) {
                                      condition: condition,
                                      outcome: reward,
                                      rewardProb: rewardProb,
-                                     points: -1,
-                                     lastRunPoints: -1,
-                                     lastRunBricks: -1,
-                                     endingSpeed: -1,
-                                     level: -1,
-                                     bricksLeft: -1,
-                                     deaths: -1,
-                                     slidersMissed: data.slidersMissed
+                                     slidersMissed: stat,
+                                     playTime: -1
                                     });
         }
         missPct = sliderTask.missPct();
+        pausePct = video.pausePct();
         $("#sliderpct").html(missPct.toFixed());
+        $("#pausepct").html(pausePct.toFixed());
         if (missPct > 10) {
             $("#sliderpctdiv").css("color", "red");
         } else {
             $("#sliderpctdiv").css("color", "black");
+        }
+        if (pausePct > 20) {
+            $("#pausepctdiv").css("color", "red");
+        } else {
+            $("#pausepctdiv").css("color", "black");
         }
         callback();
     };
@@ -1149,7 +795,7 @@ function ConsumptionRewards(psiTurk, callback) {
         timeLeft = 30;
         timeInterval = setInterval(decrementTime, 1000);
         if (reward) {
-            currentTask = game;
+            currentTask = video;
         } else {
             currentTask = sliderTask;
         }
@@ -1157,8 +803,8 @@ function ConsumptionRewards(psiTurk, callback) {
     };
 
     this.recordFinal = function(taskType) {
-        psiTurk.recordUnstructuredData("points_" + taskType, game.getStats().points.toString());
         psiTurk.recordUnstructuredData("misses_" + taskType, sliderTask.missPct().toString());
+        psiTurk.recordUnstructuredData("pauses_" + taskType, video.pausePct().toString());
     };
 
     decrementTime = function () {
@@ -1174,23 +820,24 @@ function ConsumptionRewards(psiTurk, callback) {
     };
 
     sliderTask = new SliderTask();
-    game = new Game();
+    video = new VideoPlayer();
     $("#time").html("0");
     $("#sliderpct").html("0");
+    $("#pausepct").html("0");
 }
 
 function PracticeRewards (psiTurk, callback) {
     "use strict";
     var sliderTask,
         currentTask,
-        game;
+        video;
 
     this.setReward = function (rewardProb, reward, trial) {
         // $("#alternativecontents").show();
         $("#consumptionblocker").show();
         if (reward) {
-            currentTask = game;
-            $("#consumptionblocker").html("Brickbreak game");
+            currentTask = video;
+            $("#consumptionblocker").html("Youtube video");
         } else {
             currentTask = sliderTask;
             $("#consumptionblocker").html("Slider task");
@@ -1209,15 +856,16 @@ function PracticeRewards (psiTurk, callback) {
     };
 
     sliderTask = new SliderTask();
-    game = new Game();
+    video = new VideoPlayer();
     $("#time").html("0");
     $("#sliderpct").html("0");
+    $("#pausepct").html("0");
 }
 
 function practiceConsumption(psiTurk, callback) {
     "use strict";
-    var examples = [0, 0, 0, 1],
-        trials = [-4, -3, -2, -1],
+    var examples = [0, 0, 0],
+        trials = [-3, -2, -1],
         rewards,
         next;
 
@@ -1229,11 +877,7 @@ function practiceConsumption(psiTurk, callback) {
             $("#rewards").hide();
             $("#sliders").hide();
             $("#rewardintro").show();
-            if (reward) {
-                $("#rewardintrotext").html("Example outcome: Brickbreak game");
-            } else {
-                $("#rewardintrotext").html("Example outcome: Slider task");
-            }
+            $("#rewardintrotext").html("Example outcome: Slider task");
             $("#continue").off("click");
             $("#continue").click(
                 function () {
@@ -1251,7 +895,28 @@ function practiceConsumption(psiTurk, callback) {
     next();
 }
 
-function TransitionScreen(page, psiTurk, callback) {
+function videoChoice(psiTurk, callback) {
+    psiTurk.showPage("videopicker.html");
+    $("#continue").click(function () {
+        var choice = $("#videochoice").val();
+        if (choice !== "noresp") {
+            if (choice === "planetearth") {
+                videoChoice = {videoId: "EqxaanDEAHw", start: 25};
+            } else if (choice === "bakeoff") {
+                videoChoice = {videoId: "TOKv4dG8nQs", start: 230};
+            } else if (choice === "mythbusters"){
+                videoChoice = {videoId: "0zTtuuNK2N4", start: 118};
+            } else {
+                videoChoice = {videoId: "_W9JZkHdCdA", start: 95};
+            }
+            psiTurk.recordUnstructuredData("videoChoice", choice);
+
+            callback();
+        }
+    });
+}
+
+function transitionScreen(page, psiTurk, callback) {
     psiTurk.showPage(page);
     $("#continue").click(callback);
 }
@@ -1285,6 +950,7 @@ function phaseDriver(nChoices, nPreWorkPeriods, ExploreFn, RewardFn, taskType, p
     exploreExploit = new ExploreFn(nChoices, nPreWorkPeriods, taskType, psiTurk, rewards.setReward);
     nextChoice();
 }
+
 
 function instructionDriver(instructionPages, quizPage, answerKey, psiTurk, callback) {
     "use strict";
@@ -1335,11 +1001,12 @@ function endingQuestions(psiTurk, callback) {
     var recordResponses,
         points = psiTurk.getQuestionData().points_consumption,
         misspct = Math.floor(psiTurk.getQuestionData().misses_consumption),
-        missloss = 0,
+        pausepct = Math.floor(psiTurk.getQuestionData().pauses_consumption),
+        losses = 0,
         bonus;
 
     recordResponses = function () {
-        if ($("#sliderenjoyment").val() === "noresp" || $("#brickbreakenjoyment").val() === "noresp") {
+        if ($("#sliderenjoyment").val() === "noresp" || $("#videoenjoyment").val() === "noresp" || $("technicalissues").val() === "noresp") {
             $("#blankmessage").html("<strong>Please answer all questions before continuing.</strong>");
         } else {
             $("select").each(function () {
@@ -1353,13 +1020,16 @@ function endingQuestions(psiTurk, callback) {
     psiTurk.showPage("endingquestions.html");
     $("#pointsscored").html(points);
     $("#misspct").html(misspct);
+    $("#pausepct").html(pausepct);
     if (misspct > 10) {
-        missloss = Math.min((misspct - 10) * .1, 3);
-        bonus = 3 - missloss;
-    } else {
-        bonus = 3;
+        losses += (misspct - 10) * .1;
     }
-    $("#missloss").html(missloss.toFixed(2));
+    if (pausepct > 20) {
+        losses += (pausepct - 20) * .1;
+    }
+    losses = Math.min(losses, 3);
+    bonus = 3 - losses;
+    $("#losses").html(losses.toFixed(2));
     psiTurk.recordUnstructuredData("bonus", bonus);
     psiTurk.recordUnstructuredData("uniqueid", uniqueId);
     psiTurk.recordUnstructuredData("condition", condition);
@@ -1429,8 +1099,8 @@ function experimentDriver() {
     var psiTurk = new PsiTurk(uniqueId, adServerLoc, mode),
         next,
         nChoices = [18, 60],
-        // nPreWorkPeriods = [6, 10],
-        nPreWorkPeriods = [0, 0],
+        nPreWorkPeriods = [6, 10],
+        // nPreWorkPeriods = [0, 0],
         functionList = [];
 
     next = function () {
@@ -1451,37 +1121,41 @@ function experimentDriver() {
                           "transition_practicedecision.html",
                           "transition_practiceconsumption.html",
                           "transition_fulltask.html",
+                          "videopicker.html",
                           "endingquestions.html",
                           "postquestionnaire.html"]);
     functionList = [
-        // function () {
-        //     instructionDriver(["instructions/instruct_1.html",
-        //                        "instructions/instruct_2.html",
-        //                        "instructions/instruct_3.html",
-        //                        "instructions/instruct_4.html",
-        //                        "instructions/instruct_5.html",
-        //                        "instructions/instruct_6.html",
-        //                        "instructions/instruct_7.html"],
-        //                       "instructions/quiz.html",
-        //                       {new0: "third",
-        //                        range: "onethird_all",
-        //                        reset: "1_6",
-        //                        processnum: "4",
-        //                        penalty: "10percentage"},
-        //                       psiTurk, next); },
-        // function () {
-        //     TransitionScreen("transition_practicedecision.html", psiTurk, next);
-        // },
-        // function () {
-        //     phaseDriver(nChoices[0], nPreWorkPeriods[0], ExploreExploitTask, PracticeRewards, "practice", psiTurk, next); },
-        // function () {
-        //     TransitionScreen("transition_practiceconsumption.html", psiTurk, next);
-        // },
-        // function () {
-        //     practiceConsumption(psiTurk, next); },
-        // function () {
-        //     TransitionScreen("transition_fulltask.html", psiTurk, next);
-        // },
+        function () {
+            instructionDriver(["instructions/instruct_1.html",
+                               "instructions/instruct_2.html",
+                               "instructions/instruct_3.html",
+                               "instructions/instruct_4.html",
+                               "instructions/instruct_5.html",
+                               "instructions/instruct_6.html",
+                               "instructions/instruct_7.html"],
+                              "instructions/quiz.html",
+                              {new0: "third",
+                               range: "onethird_all",
+                               reset: "1_6",
+                               processnum: "4",
+                               penalty: "10percentage"},
+                              psiTurk, next); },
+        function () {
+            videoChoice(psiTurk, next);
+        },
+        function () {
+            transitionScreen("transition_practicedecision.html", psiTurk, next);
+        },
+        function () {
+            phaseDriver(nChoices[0], nPreWorkPeriods[0], ExploreExploitTask, PracticeRewards, "practice", psiTurk, next); },
+        function () {
+            transitionScreen("transition_practiceconsumption.html", psiTurk, next);
+        },
+        function () {
+            practiceConsumption(psiTurk, next); },
+        function () {
+            transitionScreen("transition_fulltask.html", psiTurk, next);
+        },
         function () {
             phaseDriver(nChoices[1], nPreWorkPeriods[1], ExploreExploitTask, ConsumptionRewards, "consumption", psiTurk, next); },
         function () {
