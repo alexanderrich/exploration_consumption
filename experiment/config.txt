@@ -1,6 +1,6 @@
 [HIT Configuration]
 title = Decision making game
-description = Easy $3.00 bonus, takes about 60 minutes. Make choices to gain time playing an arcade game.
+description = Easy $3.00 bonus, takes about 60 minutes. Make choices to gain time watching Youtube.
 amt_keywords = Decision making, Psychology
 lifetime = 24
 us_only = true
@@ -27,7 +27,7 @@ login_pw = examplepassword
 threads = auto
 
 [Task Parameters]
-experiment_code_version = 2.0
+experiment_code_version = 2.1
 num_conds = 2
 num_counters = 1
 

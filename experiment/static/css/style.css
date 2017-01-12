@@ -311,9 +311,6 @@ strong {
 
 /* game */
 
-#arrowinstructions {
-    text-align: center;
-}
 
 .progress {
     margin-left: auto;
@@ -327,10 +324,6 @@ strong {
     -ms-transition: none;
     -o-transition: none;
     transition: none;
-}
-
-#multiplierbar {
-    width: 300px;
 }
 
 #sliders {

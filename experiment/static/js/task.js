@@ -807,6 +807,10 @@ function ConsumptionRewards(psiTurk, callback) {
         psiTurk.recordUnstructuredData("pauses_" + taskType, video.pausePct().toString());
     };
 
+    this.getPlayTime = function() {
+        return video.getPlayTime();
+    };
+
     decrementTime = function () {
         timeLeft--;
         if (timeLeft >= 0) {
@@ -864,20 +868,26 @@ function PracticeRewards (psiTurk, callback) {
 
 function practiceConsumption(psiTurk, callback) {
     "use strict";
-    var examples = [0, 0, 0],
+    var examples = [0, 0, 1],
         trials = [-3, -2, -1],
         rewards,
         next;
 
     next = function () {
         if (examples.length === 0) {
+            // get play time of video to start for real task
+            videoChoice.start += Math.floor(rewards.getPlayTime() / 1000);
             callback();
         } else {
             var reward = examples.shift();
             $("#rewards").hide();
             $("#sliders").hide();
             $("#rewardintro").show();
-            $("#rewardintrotext").html("Example outcome: Slider task");
+            if (reward === 0) {
+                $("#rewardintrotext").html("Example outcome: Slider task");
+            } else {
+                $("#rewardintrotext").html("Example outcome: Youtube video");
+            }
             $("#continue").off("click");
             $("#continue").click(
                 function () {
@@ -891,11 +901,11 @@ function practiceConsumption(psiTurk, callback) {
     psiTurk.showPage("practice.html");
     $("#rewards").hide();
     $("#sliders").hide();
-    rewards = new ConsumptionRewards(psiTurk, next);
+    rewards = new ConsumptionRewards(psiTurk, next, true);
     next();
 }
 
-function videoChoice(psiTurk, callback) {
+function videoPicker(psiTurk, callback) {
     psiTurk.showPage("videopicker.html");
     $("#continue").click(function () {
         var choice = $("#videochoice").val();
@@ -1141,7 +1151,7 @@ function experimentDriver() {
                                penalty: "10percentage"},
                               psiTurk, next); },
         function () {
-            videoChoice(psiTurk, next);
+            videoPicker(psiTurk, next);
         },
         function () {
             transitionScreen("transition_practicedecision.html", psiTurk, next);
