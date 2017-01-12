@@ -1046,6 +1046,8 @@ function endingQuestions(psiTurk, callback) {
 
 
     psiTurk.showPage("endingquestions.html");
+    $("body").off("keydown");
+    $("body").off("keyup");
     $("#pointsscored").html(points);
     $("#misspct").html(misspct);
     $("#pausepct").html(pausepct);
