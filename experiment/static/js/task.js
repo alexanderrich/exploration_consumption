@@ -1159,11 +1159,11 @@ function experimentDriver() {
                                "instructions/instruct_6.html",
                                "instructions/instruct_7.html"],
                               "instructions/quiz.html",
-                              {new0: "third",
-                               range: "onethird_all",
+                              {range: "none_all",
                                reset: "1_6",
                                processnum: "4",
-                               penalty: "10percentage"},
+                               misspenalty: "10percentage",
+                               pausepenalty: "10percentage"},
                               psiTurk, next); },
         function () {
             videoPicker(psiTurk, next);

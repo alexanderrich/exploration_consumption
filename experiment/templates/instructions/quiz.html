@@ -16,25 +16,12 @@
         <form id="prequiz" action="debrief" method="post">
             <div class="question">
                 <p class="questiontext">
-                    What proportion of the time will the machine <strong>fail to create</strong>
-                    a new setting?
-                    <select id="new0" name="new0" class="form-control">
-                        <option value="noresp" SELECTED></option>
-	                      <option value="none">never</option>
-	                      <option value="third">1/3 of the time</option>
-	                      <option value="twothird">2/3 of the time</option>
-	                      <option value="all">every time</option>
-                    </select>
-                </p>
-            </div>
-            <div class="question">
-                <p class="questiontext">
                     When the machine <strong>creates a new setting</strong>, what range of wedge sizes are possible?
                     <select id="range" name="range" class="form-control">
                         <option value="noresp" SELECTED></option>
 	                      <option value="onethird_twothird">1/3 of the spinner to 2/3 of the spinner </option>
-	                      <option value="onethird_all">1/3 of the spinner to all of the spinner</option>
-	                      <option value="twothird_all">2/3 of the spinner to all of the spinner</option>
+	                      <option value="onethird_all">1/3 of the spinner to 100% of the spinner</option>
+	                      <option value="none_all">0% of the spinner to 100% of the spinner</option>
                     </select>
                 </p>
             </div>
@@ -68,11 +55,22 @@
             <div class="question">
                 <p class="questiontext">
                     What is the penalty for <strong>failing to adjust</strong> the sliders to 50?
-                    <select id="penalty" name="penalty" class="form-control">
+                    <select id="misspenalty" name="misspenalty" class="form-control">
                         <option value="noresp" SELECTED></option>
 	                      <option value="none">There is no penalty</option>
 	                      <option value="10each">10 cents for every slider missed</option>
 	                      <option value="10percentage">10 cents for every percentage over 10% of total sliders missed</option>
+                    </select>
+                </p>
+            </div>
+            <div class="question">
+                <p class="questiontext">
+                    What is the penalty for <strong>leaving the video paused</strong>?
+                    <select id="pausepenalty" name="pausepenalty" class="form-control">
+                        <option value="noresp" SELECTED></option>
+	                      <option value="none">There is no penalty</option>
+	                      <option value="10each">10 cents for every second paused</option>
+	                      <option value="10percentage">10 cents for every percentage of pause time over 20%</option>
                     </select>
                 </p>
             </div>
