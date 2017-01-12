@@ -902,9 +902,9 @@ function practiceConsumption(psiTurk, callback) {
             $("#sliders").hide();
             $("#rewardintro").show();
             if (reward === 0) {
-                $("#rewardintrotext").html("Example outcome: Slider task");
+                $("#rewardintrotext").html("Example outcome: <br/> Slider task");
             } else {
-                $("#rewardintrotext").html("Example outcome: Youtube video");
+                $("#rewardintrotext").html("Example outcome: <br/> Youtube video");
             }
             $("#continue").off("click");
             $("#continue").click(
@@ -1126,7 +1126,7 @@ function experimentDriver() {
     "use strict";
     var psiTurk = new PsiTurk(uniqueId, adServerLoc, mode),
         next,
-        nChoices = [18, 60],
+        nChoices = [12, 60],
         nPreWorkPeriods = [6, 10],
         // nPreWorkPeriods = [0, 0],
         functionList = [];
