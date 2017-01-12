@@ -196,6 +196,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         resetArray,
         i,
         trial = -1,
+        choiceTrial = -1,
         firstMachineTrial = nPreWorkPeriods,
         nTrials = nChoices + nPreWorkPeriods,
         functionList = [],
@@ -287,6 +288,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
     };
 
     responseFn = function (choiceId, context) {
+        choiceTrial++;
         var contextObj = contexts[context];
         $("#" + choiceId).addClass("clicked");
         $("#machinescreen").html("processing...");
@@ -308,8 +310,9 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         psiTurk.recordTrialData({phase: "EXPERIMENT",
                                  trialType: "exploreexploit",
                                  taskType: taskType,
-                                 trialChoice: trial + 4 * condition,
-                                 trialOutcome: trial,
+                                 outcomeNumFromChoice: trial + 4 * condition,
+                                 outcomeNumImmediate: trial,
+                                 choiceTrial: choiceTrial,
                                  uniqueid: uniqueId,
                                  condition: condition,
                                  context: context,
