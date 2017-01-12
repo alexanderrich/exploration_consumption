@@ -233,21 +233,14 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
                 .style("opacity", 1);
             exploreSvgGroup.select(".winningArc")
                 .style("opacity", 0);
-            exploreSvgGroup.select("#losingLine")
-                .style("opacity", 0);
         } else {
             exploreSvgGroup.select("#questionMark")
                 .style("opacity", 0);
-            if (exploreVal > 0) {
-                exploreSvgGroup.select(".winningArc")
-                    .style("opacity", 1);
-                exploreSvgGroup.select(".winningArc")
-                    .datum({endAngle: exploreVal * tau})
-                    .attr("d", arc);
-            } else {
-                exploreSvgGroup.select("#losingLine")
-                    .style("opacity", 1);
-            }
+            exploreSvgGroup.select(".winningArc")
+                .style("opacity", 1);
+            exploreSvgGroup.select(".winningArc")
+                .datum({endAngle: exploreVal * tau})
+                .attr("d", arc);
         }
     };
 
@@ -308,11 +301,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         } else {
             $("#exploregroupinner" + context + " .spinnerbacking").css("opacity", 1);
             contextObj.nextChoice = "explore";
-            if (Math.random() > .333) {
-                contextObj.nextValue = .333 + .667 * Math.random();
-            } else {
-                contextObj.nextValue = 0;
-            }
+            contextObj.nextValue = Math.random();
         }
         contextObj.outcome = Math.random() < contextObj.nextValue;
         $(".choicebutton").off("click");
@@ -388,6 +377,11 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
                     $("#machinescreen").html("new setting saved!");
                     contextObj.value = contextObj.nextValue;
                     upgradeMachine(contextObj.value, context);
+                    $("#savedrect").css("fill", "gold");
+                    $("#savedrect").css("opacity", 1);
+                    setTimeout(function () {
+                        $("#savedrect").css("opacity", 0);
+                    }, 1000);
                 } else {
                     $("#machinescreen").html("new setting not saved");
                 }
@@ -424,6 +418,11 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         $("#machinescreen").html("Machine<br/>RESET");
         $("#start").prop("disabled", true);
         updateMachine(0, "?", context);
+        $("#savedrect").css("fill", "gray");
+        $("#savedrect").css("opacity", 1);
+        setTimeout(function () {
+            $("#savedrect").css("opacity", 0);
+        }, 1000);
         setTimeout(function () {
             upgradeMachine(contextObj.value, context);
         }, 1000);
@@ -596,11 +595,6 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             .attr("class", "winningArc")
             .style("fill", "orange")
             .attr("d", arc);
-        circlegroup.append("line")
-            .attr("id", "losingLine")
-            .attr("y2", -70)
-            .style("stroke-width", 1)
-            .style("stroke", "orange");
         circlegroup.append("text")
             .attr("id", "questionMark")
             .text("?")
@@ -650,6 +644,16 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             .style("fill", "white")
             .style("stroke-width", "3")
             .style("stroke", "black");
+        maze.append("rect")
+            .attr("id", "savedrect")
+            .attr("x", 397)
+            .attr("y", 3)
+            .attr("width", 200)
+            .attr("height", 150)
+            .style("fill", "gold")
+            .style("opacity", "0")
+            .style("stroke-width", "3")
+            .style("stroke", "black");
         maze.append("text")
             .attr("x", 404)
             .attr("y", 24)
@@ -660,6 +664,17 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             .attr("y", 174)
             .style("font-size", "20px")
             .text("processing");
+    } else {
+        maze.append("rect")
+            .attr("id", "savedrect")
+            .attr("x", 3)
+            .attr("y", 3)
+            .attr("width", 200)
+            .attr("height", 150)
+            .style("fill", "gold")
+            .style("opacity", "0")
+            .style("stroke-width", "3")
+            .style("stroke", "black");
     }
     maze.append("text")
         .attr("id", "idletext")
