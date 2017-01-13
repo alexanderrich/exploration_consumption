@@ -214,6 +214,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         resetContext,
         incrementContexts,
         timeStamp,
+        wedges = 5,
         showOutcome;
 
     updateMachine = function (exploitVal, exploreVal, context) {
@@ -226,21 +227,21 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         d3.select("#exploregroupouter" + context).style("opacity", 1);
         exploitSvgGroup.attr("transform", "translate(75, 75)");
         exploreSvgGroup.attr("transform", "translate(75, 75)");
-        exploitSvgGroup.select(".winningArc")
-            .datum({endAngle: exploitVal * tau})
+        exploitSvgGroup.selectAll(".winningArc")
+            .datum({endAngle: exploitVal * tau / wedges})
             .attr("d", arc);
         if (exploreVal === "?") {
             exploreSvgGroup.select("#questionMark")
                 .style("opacity", 1);
-            exploreSvgGroup.select(".winningArc")
+            exploreSvgGroup.selectAll(".winningArc")
                 .style("opacity", 0);
         } else {
             exploreSvgGroup.select("#questionMark")
                 .style("opacity", 0);
-            exploreSvgGroup.select(".winningArc")
+            exploreSvgGroup.selectAll(".winningArc")
                 .style("opacity", 1);
-            exploreSvgGroup.select(".winningArc")
-                .datum({endAngle: exploreVal * tau})
+            exploreSvgGroup.selectAll(".winningArc")
+                .datum({endAngle: exploreVal * tau / wedges})
                 .attr("d", arc);
         }
     };
@@ -256,9 +257,9 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             group = exploitSvgGroup;
         }
         if (outcome) {
-            r = 1440 - 360 * choiceVal * (.02 + .98 * Math.random());
+            r = 720 - 360 / wedges * choiceVal * Math.random();
         } else {
-            r = 1440 - 360 * (choiceVal + (1 - choiceVal) * (.02 + .98 * Math.random()));
+            r = 720 - 360 / wedges * (choiceVal + (1 - choiceVal) * Math.random());
         }
         group.transition()
             .duration(2000)
@@ -281,10 +282,10 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
                 };
             };
         };
-        exploitSvgGroup.select(".winningArc")
+        exploitSvgGroup.selectAll(".winningArc")
             .transition()
             .duration(1000)
-            .attrTween("d", arcTween(newVal * tau));
+            .attrTween("d", arcTween(newVal * tau / wedges));
     };
 
     responseFn = function (choiceId, context) {
@@ -562,11 +563,15 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             .datum({endAngle: tau})
             .style("fill", "#222222")
             .attr("d", arc);
-        circlegroup.append("path")
-            .datum({endAngle: 0.127 * tau})
-            .attr("class", "winningArc")
-            .style("fill", "orange")
-            .attr("d", arc);
+        _.range(wedges).map(function (x) {
+            circlegroup.append("g")
+                .attr("transform", "rotate(" + x / wedges * 360 + ")")
+                .append("path")
+                .datum({endAngle: 0})
+                .attr("class", "winningArc")
+                .style("fill", "orange")
+                .attr("d", arc);
+        });
         entiregroup.append("polygon")
             .attr("points", "65 0, 85 0, 75 20")
             .style("fill", "black")
@@ -593,11 +598,15 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             .datum({endAngle: tau})
             .style("fill", "#222222")
             .attr("d", arc);
-        circlegroup.append("path")
-            .datum({endAngle: 0 * tau})
-            .attr("class", "winningArc")
-            .style("fill", "orange")
-            .attr("d", arc);
+        _.range(wedges).map(function (x) {
+            circlegroup.append("g")
+                .attr("transform", "rotate(" + x / wedges * 360 + ")")
+                .append("path")
+                .datum({endAngle: 0})
+                .attr("class", "winningArc")
+                .style("fill", "orange")
+                .attr("d", arc);
+        });
         circlegroup.append("text")
             .attr("id", "questionMark")
             .text("?")
