@@ -355,7 +355,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         $("#alternativecontents").hide();
         $(".machinebutton").removeClass("clicked");
         $("#start").prop("disabled", true);
-        $("#machinescreen").html("Select setting.");
+        $("#machinescreen").html("Select spinner.");
         $("#machineid").html(context + 1);
         updateMachine(contexts[context].value, "?", context);
         $("#exploreexploit").show();
@@ -378,7 +378,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
                 extraTime = 1500;
                 updateMachine(contextObj.value, contextObj.nextValue, context);
                 if (contextObj.nextValue > contextObj.value) {
-                    $("#machinescreen").html("new setting saved!");
+                    $("#machinescreen").html("new spinner saved!");
                     contextObj.value = contextObj.nextValue;
                     upgradeMachine(contextObj.value, context);
                     $("#savedrect").css("fill", "gold");
@@ -387,7 +387,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
                         $("#savedrect").css("opacity", 0);
                     }, 1000);
                 } else {
-                    $("#machinescreen").html("new setting not saved");
+                    $("#machinescreen").html("new spinner not saved");
                 }
             }
             setTimeout(function () {
