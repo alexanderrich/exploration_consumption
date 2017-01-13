@@ -38,7 +38,6 @@ function VideoPlayer() {
     });
 
     $(window).blur(function () {
-        console.log("testing");
         if (onVideo && playing) {
             player.pauseVideo();
             playTime += (new Date().getTime()) - timeStamp;
@@ -47,10 +46,9 @@ function VideoPlayer() {
     });
 
     $("body").keydown(function (e) {
-        console.log("keyup");
         if(e.keyCode === 32 && onVideo && !playing) {
             player.playVideo();
-            timeStamp = new Date().getTime()
+            timeStamp = new Date().getTime();
             playing = true;
         } else if (e.keyCode === 32){
             return false;
@@ -75,8 +73,10 @@ function VideoPlayer() {
     this.stop = function () {
         $("#rewards").hide();
         onVideo = false;
-        player.pauseVideo();
-        playTime += (new Date().getTime()) - timeStamp;
+        if (playing) {
+            player.pauseVideo();
+            playTime += (new Date().getTime()) - timeStamp;
+        }
         totalPlayTime += playTime;
         playing = false;
     };
@@ -819,8 +819,12 @@ function ConsumptionRewards(psiTurk, callback) {
         rewardProb = _rewardProb;
         trialNum = trial;
         $("#time").html(30);
-        timeLeft = 30;
+        timeLeft = totalTime;
         timeInterval = setInterval(decrementTime, 1000);
+        setTimeout(function () {
+            currentTask.stop();
+            recordData();
+        }, totalTime * 1000);
         if (reward) {
             currentTask = video;
         } else {
@@ -844,9 +848,7 @@ function ConsumptionRewards(psiTurk, callback) {
             $("#time").html(timeLeft);
         }
         if (timeLeft === 0) {
-            currentTask.stop();
             clearInterval(timeInterval);
-            recordData();
         }
     };
 
