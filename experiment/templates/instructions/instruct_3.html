@@ -33,15 +33,9 @@
 
 	  </div>
     <script>
-     if (condition === 0) {
-         $("#processcoolinstr").html("Each machine has a \"current spinner\" and a \"new spinner\". When a machine is idle, you will have to make a choice between the machine's spinners, and then run the machine. After the machine runs and you complete the following work period, the machine will have to cool down for the next five work periods before becoming \"idle\" again and ready for you to make another choice.");
-         $("#img1").attr("src", "/static/images/instruct_3_img_cond0.png");
-         $("#img2").attr("src", "/static/images/instruct_3_img2_cond0.png");
-     } else {
-         $("#processcoolinstr").html("Each machine has a \"current spinner\" and a \"new spinner\". When a machine is idle, you will have to make a choice between the machine's spinners. Each machine then takes four work periods to process, and then becomes \"ready\" and can be run. It will then have to cool down for one additional work period before becoming \"idle\" again and ready for you to make another choice.");
-         $("#img1").attr("src", "/static/images/instruct_3_img_cond1.png");
-         $("#img2").attr("src", "/static/images/instruct_3_img2_cond1.png");
-     }
+     $("#processcoolinstr").html("Each machine has a \"current spinner\" and a \"new spinner\". When a machine is idle, you will have to make a choice between the machine's spinners, and then run the machine. After the machine runs and you complete the following work period, the machine will have to cool down for the next five work periods before becoming \"idle\" again and ready for you to make another choice.");
+     $("#img1").attr("src", "/static/images/instruct_3_img_exprange.png");
+     $("#img2").attr("src", "/static/images/instruct_3_img2_exprange.png");
     </script>
 
 	  <hr>

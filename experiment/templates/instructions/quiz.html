@@ -20,8 +20,8 @@
                     <select id="range" name="range" class="form-control">
                         <option value="noresp" SELECTED></option>
 	                      <option value="onethird_twothird">1/3 of the spinner to 2/3 of the spinner </option>
-	                      <option value="onethird_all">1/3 of the spinner to 100% of the spinner</option>
-	                      <option value="none_all">0% of the spinner to 100% of the spinner</option>
+	                      <option value="onequarter_all">25% of the spinner to 100% of the spinner</option>
+	                      <option value="none_threequarter">0% of the spinner to 75% of the spinner</option>
                     </select>
                 </p>
             </div>
@@ -38,19 +38,6 @@
 	                      <option value="always">It is reset after every visit</option>
                     </select>
                 </p>
-            </div>
-            <div id="cond1question" style="display:none" >
-                <div class="question">
-                    <p class="questiontext">
-                        How many work periods does a machine have to <strong>process</strong> after you choose a spinner before it can be used?
-                        <select id="processnum" name="processnum" class="form-control">
-                            <option value="noresp"></option>
-	                          <option value="1">1 work period</option>
-	                          <option value="4">4 work periods</option>
-	                          <option value="10">10 work periods</option>
-                        </select>
-                    </p>
-                </div>
             </div>
             <div class="question">
                 <p class="questiontext">
@@ -75,14 +62,6 @@
                 </p>
             </div>
         </form>
-        <script>
-         if (condition === 0) {
-             $("#processnum").val("4").change();
-         } else {
-             $("#cond1question").show();
-             $("#processnum").val("noresp").change();
-         }
-        </script>
 
     </div>
 

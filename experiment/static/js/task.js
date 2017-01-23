@@ -293,10 +293,6 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         var contextObj = contexts[context];
         $("#" + choiceId).addClass("clicked");
         $("#machinescreen").html("processing...");
-        if (condition) {
-            $("#idlerect").css("fill", "#CCCCFF");
-            $("#idletext").html("processing");
-        }
         if (choiceId === "exploit") {
             contextObj.nextChoice = "exploit";
             contextObj.nextValue = contextObj.value;
@@ -304,14 +300,14 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         } else {
             $("#exploregroupinner" + context + " .spinnerbacking").css("opacity", 1);
             contextObj.nextChoice = "explore";
-            contextObj.nextValue = Math.random();
+            contextObj.nextValue = condition ? .25 + .75 * Math.random() : .75 * Math.random();
         }
         contextObj.outcome = Math.random() < contextObj.nextValue;
         $(".choicebutton").off("click");
         psiTurk.recordTrialData({phase: "EXPERIMENT",
                                  trialType: "exploreexploit",
                                  taskType: taskType,
-                                 outcomeNumFromChoice: trial + 4 * condition,
+                                 outcomeNumFromChoice: trial,
                                  outcomeNumImmediate: trial,
                                  choiceTrial: choiceTrial,
                                  uniqueid: uniqueId,
@@ -322,7 +318,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
                                  currentValue: contextObj.value,
                                  nextValue: contextObj.nextValue,
                                  outcome: contextObj.outcome,
-                                 reset: resetArray[trial + 4 * condition - firstMachineTrial]
+                                 reset: resetArray[trial - firstMachineTrial]
                                 });
         setTimeout(functionList.pop(), 1000);
     };
@@ -460,38 +456,19 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         $("#mazediv").show();
         $("#bottominfodiv").show();
 
-        if (trial + 4 * condition < firstMachineTrial) {
-            $("#trialsuntilmachines").html(firstMachineTrial - 4*condition - trial);
-        } else if (trial + 4 * condition === firstMachineTrial) {
+        if (trial < firstMachineTrial) {
+            $("#trialsuntilmachines").html(firstMachineTrial - trial);
+        } else if (trial  === firstMachineTrial) {
             $("#mazeblocker").hide();
         }
 
-        if (trial < firstMachineTrial && condition === 1 && trial + 4 >= firstMachineTrial) {
-            functionList = [function () {preMachineWork(); },
-                            function () {incrementContexts(); },
-                            function () {runChoice((trial + 4) % 6); },
-                            function () {enterContext((trial + 4) % 6); }];
-        } else if (trial < firstMachineTrial) {
+        if (trial < firstMachineTrial) {
             functionList = [function () {preMachineWork(); }];
-        } else if (condition === 0) {
-            functionList = [
-                function () {showOutcome(trial % 6); },
-                function () {incrementContexts(); },
-                function () {runChoice(trial % 6); },
-                function () {enterContext(trial % 6); },
-            ];
-        } else if (condition === 1 && trial < nTrials - 4){
-            functionList = [
-                function () {showOutcome(trial % 6); },
-                function () {incrementContexts(); },
-                function () {enterContext(trial % 6); },
-                function () {runChoice((trial + 4) % 6); },
-                function () {enterContext((trial + 4) % 6); },
-            ];
         } else {
             functionList = [
                 function () {showOutcome(trial % 6); },
                 function () {incrementContexts(); },
+                function () {runChoice(trial % 6); },
                 function () {enterContext(trial % 6); },
             ];
         }
@@ -627,7 +604,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         .attr("y", 3)
         .attr("width", 594)
         .attr("height", 294)
-        .style("fill", condition ? "#CCCCFF" : "#FFCCCC")
+        .style("fill", "#FFCCCC")
         .style("stroke-width", "3")
         .style("stroke", "black");
     maze.append("rect")
@@ -639,55 +616,16 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         .style("fill", "white")
         .style("stroke-width", "3")
         .style("stroke", "black");
-    if (condition) {
-        maze.append("rect")
-            .attr("x", 200)
-            .attr("y", 3)
-            .attr("width", 200)
-            .attr("height", 150)
-            .style("fill", "#FFCCCC")
-            .style("stroke-width", "3")
-            .style("stroke", "black");
-        maze.append("rect")
-            .attr("x", 397)
-            .attr("y", 3)
-            .attr("width", 200)
-            .attr("height", 150)
-            .style("fill", "white")
-            .style("stroke-width", "3")
-            .style("stroke", "black");
-        maze.append("rect")
-            .attr("id", "savedrect")
-            .attr("x", 397)
-            .attr("y", 3)
-            .attr("width", 200)
-            .attr("height", 150)
-            .style("fill", "gold")
-            .style("opacity", "0")
-            .style("stroke-width", "3")
-            .style("stroke", "black");
-        maze.append("text")
-            .attr("x", 404)
-            .attr("y", 24)
-            .style("font-size", "20px")
-            .text("ready");
-        maze.append("text")
-            .attr("x", 10)
-            .attr("y", 174)
-            .style("font-size", "20px")
-            .text("processing");
-    } else {
-        maze.append("rect")
-            .attr("id", "savedrect")
-            .attr("x", 3)
-            .attr("y", 3)
-            .attr("width", 200)
-            .attr("height", 150)
-            .style("fill", "gold")
-            .style("opacity", "0")
-            .style("stroke-width", "3")
-            .style("stroke", "black");
-    }
+    maze.append("rect")
+        .attr("id", "savedrect")
+        .attr("x", 3)
+        .attr("y", 3)
+        .attr("width", 200)
+        .attr("height", 150)
+        .style("fill", "gold")
+        .style("opacity", "0")
+        .style("stroke-width", "3")
+        .style("stroke", "black");
     maze.append("text")
         .attr("id", "idletext")
         .attr("x", 10)
@@ -695,8 +633,8 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         .style("font-size", "20px")
         .text("idle");
     maze.append("text")
-        .attr("x", condition ? 207 : 10)
-        .attr("y", condition ? 24 : 174)
+        .attr("x", 10)
+        .attr("y", 174)
         .style("font-size", "20px")
         .text("cooling");
     contextMarker = maze.append("circle")
@@ -1175,9 +1113,8 @@ function experimentDriver() {
                                "instructions/instruct_6.html",
                                "instructions/instruct_7.html"],
                               "instructions/quiz.html",
-                              {range: "none_all",
+                              {range: condition ? "onequarter_all" : "none_threequarter",
                                reset: "1_6",
-                               processnum: "4",
                                misspenalty: "10percentage",
                                pausepenalty: "10percentage"},
                               psiTurk, next); },

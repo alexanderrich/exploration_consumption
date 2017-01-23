@@ -8,7 +8,7 @@
 
         <p>
             If you choose "run new spinner", a random new spinner will be created.
-            The gold wedges on the new spinner can cover anywhere from 0% to 100% of its area.
+            The gold wedges on the new spinner can cover anywhere from <strong><span id="range"></span></strong> of its area.
             The wedge area on each new spinner is totally
             random and doesn't depend on the value of past spinners.
         </p>
@@ -32,18 +32,9 @@
             can be risky, it can also allow you to improve the machines so they are more
             likely to work in the future.</strong>
         </p>
-        <p>
-            For example, if the current-spinner gold wedges cover half of the
-            spinner, then choosing either the current spinner or a new spinner
-            will give you a 50% chance of the machine working. But, because a
-            good new spinner will be saved, choosing to try a new spinner
-            could increase the chance of the machine working in future uses as
-            well.
-        </p>
-
-
-
-
+        <script>
+         $("#range").html(condition ? "25% to 100%" : "0% to 75%");
+        </script>
 	  </div>
 
 	  <hr>
