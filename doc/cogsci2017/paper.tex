@@ -45,17 +45,42 @@
 
 \begin{abstract}
 
+  Balancing exploration and exploitation is difficult, and under-exploration
+  appears to be a particularly pressing problem. We propose that one possible cause of
+  under-exploration is present bias, in which immediate rewards (like those
+  gained from exploitation) loom larger than future rewards (like those
+  gained from exploration). This possible cause of under-exploration is not
+  addressed by past lab studies, in which choices generally yield token rewards
+  that are converted to money at the end of the experiment, removing the
+  inter-temporal aspect of the decision-making process. In this paper, we
+  develop an exploratory choice task with immediately-consumed rewards. In
+  Experiment 1, we show that people understand the task and respond as expected
+  to standard decision variables. In Experiment 2, we introduce a condition in
+  which there is a temporal delay between choices and outcomes, and test whether
+  this increases exploration by reducing present bias. While we find no effect
+  of the delay, we discuss plans for future experiments to test the validity and
+  robustness of this result.
+
   \textbf{Keywords} time preference, present bias, exploratory choice
 \end{abstract}
 
-The problem of under-exploration seems remarkably common. One of the most severe
+Balancing exploitation of known options with exploration of known options
+presents a difficult cognitive and motivational challenge. The problem of how to
+trade off between these two conflicting goals has created whole fields of study
+\citep{Mehlhorn2015, sutton1998reinforcement}, and in many cases achieving an
+optimal balance is computationally intractible \citep{Guez2013}. Given these
+facts, one might expect people to often deviate from optimal exploratory choice
+in both directions, perhaps exploring too much in some situations but too little
+in others.
+
+Notably, though, while over-exploration does occur, a bias towards under-exploration in particular seems to be
+observed across a wide range of domains. One of the most severe
 expressions of under-exploration is learned helplessness, in which an organism
 experiences the absence of contol over the environment, learns that the
 environment is uncontrollable, and thus ceases to take actions that might allow
-it to regain its sense of control. Learned helplessness has been proposed to
+it to discover that it can in fact exert control. Learned helplessness has been proposed to
 underly most notably depression \citep{Abramson1978, Abramson1989} but also
 problems ranging from difficulties in school CITE to poverty CITE.
-
 While the cognitive appraisal of experienced events affects the development of
 learned helplessness \citep{Abramson1978}, patterns of exploration clearly play
 a role as well \citep{Huys2009, Teodorescu2014a}. In the case of depression,
@@ -105,12 +130,6 @@ alternative hypothesis: that lab tests of exploratory choice have been missing a
 of real-world exploratory choice, namely, the distribution of choices and
 outcomes over time, and that this spreading of exploratory choices over time may
 account for the tendency to under-explore.
-
-% In ``observe or bet'' tasks in which people choose to either
-% obtain information or reward on each trial, people appear to collect much more
-% information than is needed \citep{tversky1966information}. But, in settings
-% where the underlying reward probabilities might change, information-seeking
-% appears close to optimal \citep{Navarro2016}.
 
 \begin{figure*}
 \centering
@@ -237,6 +256,18 @@ skipping ahead) disabled (Figure~\ref{fig:taskpictures}\emph{b}). When given acc
 browser window open and hold down the space bar for the video to play. This allowed us to ensure that
 participants maintained engagement with the content.
 
+\begin{figure*}
+\centering
+\includegraphics[width=\textwidth]{figures/machinemappictures.png}
+\caption{The machine display seen by participants to allow them to keep track of
+  the value of each of the six machines and the next time it would be ready to
+  make a choice or produce an outcome. \emph{a}: the display seen by
+  participants in Experiment 1 and the immediate condition of Experiment 2.
+  \emph{b}: the display seen by participants in teh delayed condition of
+  Experiment 2.}
+\label{fig:machinemappictures}
+\end{figure*}
+
 In the main part of the experiment, participants completed a total of 70 work
 periods. For the first 10 work periods, participants simply clicked a button to begin the
 slider task. After these initial periods, participants gained access to six
@@ -302,18 +333,6 @@ the experiment.
 Following the experiment, participants were asked to rate their enjoyment of the
 slider task and of the video-watching task on a 1 to 7 scale.
 
-\begin{figure*}
-\centering
-\includegraphics[width=\textwidth]{figures/machinemappictures.png}
-\caption{The machine display seen by participants to allow them to keep track of
-  the value of each of the six machines and the next time it would be ready to
-  make a choice or produce an outcome. \emph{a}: the display seen by
-  participants in Experiment 1 and the immediate condition of Experiment 2.
-  \emph{b}: the display seen by participants in teh delayed condition of
-  Experiment 2.}
-\label{fig:machinemappictures}
-\end{figure*}
-
 
 \section{Results}
 
@@ -361,6 +380,11 @@ effect of current-spinner value.
 
 \subsubsection{Participants.}
 
+Forty participants completed the experiment, which was conducted over
+Amazon Mechanical Turk using the psiTurk framework \citep{Gureckis2015a}.
+Participants were paid \$5.00 for their participation, with a performance-based
+bonus of up to \$3.00. All participants received the full \$3.00 bonus.
+
 \subsubsection{Design and procedure.}
 
 Experiment 2 followed the design of Experiment 1, with the following changes. In
@@ -378,19 +402,56 @@ Figure~\ref{fig:machinetimeline}\emph{b}.
 
 \section{Results}
 
-As in Experiment 1, participants rated the video as more enjoyable () than the
-slider task (), STAT.
+\begin{figure}
+\centering
+\includegraphics[width=\columnwidth]{figures/exp2results.pdf}
+\caption{Model-based estimates of participants' probability of choosing a new
+  spinner for different values of the current spinner in Experiment 2. Thick
+  lines and shaded regions indicate the mean and 95\% posterior interval for the
+  population-level parameters, while the thin lines indicate the mean posterior
+  parameters for each of the 40 individual participants. Participants in the
+  delayed-outcome condition were no more
+  likely to explore at a given current-spinner value than those in the
+  immediate-outcome condition.}
+\label{fig:exp2results}
+\end{figure}
+
+As in Experiment 1, participants rated the video as more enjoyable on average (5.65 out of 7) than the
+slider task (3.13 out of 7), $t(39)=9.26$, $p<.001$.
 
 To analyze trial-by-trial decision-making, we conducted a hierarchical Bayesian
 logistic regression identical to the one described in the results of Experiment 1.
 
-The results of the regression are shown in Figure~FIGNUM. As in Experiment 1,
-participants are less likely to choose a new spinner when the current spinner
-has a high value, $p>.999$. However, in this experiment we find no effect of
-condition---participants were no more likely to explore a new spinner when there
+The results of the regression are shown in Figure~\ref{fig:exp2results}. As in Experiment 1,
+participants were less likely to choose a new spinner when the current spinner
+has a high value, $p>.999$. However, in this experiment we found no evidence of
+an effect of condition, with a posterior probability of $p=.558$ that the effect of condition was
+greater than 0. This means that participants were no more likely to explore a new spinner when there
 was a temporal delay imposed between their choices and the received outcomes.
+However, there may be a small interaction between current spinner value and
+condition, such that participants in the delayed condition were less sensitive
+to the value of the spinner when making their choices. This might indicate that
+the delayed condition was confusing to some participants, as a few individuals
+(as seen in Figure~\ref{fig:exp2results}) changed their behavior very little
+across current-spinner values. The posterior probability that this interaction
+was above 0 is $p=.934$.
 
 \section{Discussion}
+
+In this paper we presented a novel task using immediately-consumed rewards that
+may be used to study present bias in the context of exploratory choice. In
+Experiment 1 we showed that participants appeared to understand the task and
+respond reasonably to maximize their time in the video-watching task. They are
+more likely to explore when the current exploitable option (current spinner) has
+low value, and change their degree of exploration based on the range of possible
+outcomes from choosing a new spinner. However, in Experiment 2 we found that
+participants did not explore any more when there was a temporal delay between
+choices and outcomes, even though we expected this delay to reduce the present
+bias towards the greater immediate rewards of exploitation.
+
+One explanation for our results is that people are in fact less affected by
+present bias in the realm of exploratory choice than they are in other
+inter-temporal choices.
 
 \begin{small}
   \noindent
