@@ -17,7 +17,7 @@ data = fetch(rs, n=-1)
 
 ## data <- data[data$status %in% c(4, 7),]
 data <- data[data$status %in% c(3, 4, 7),]
-data <- data[data$codeversion %in% c("2.4"),]
+data <- data[data$codeversion %in% c("2.3"),]
 
 datastrings <- data$datastring
 datastrings_json <- sapply(datastrings, fromJSON, simplify=F)
@@ -62,8 +62,8 @@ consumptiondata <- Filter(function(x)!all(is.na(x)), consumptiondata)
 exploredata <- Filter(function(x)!all(is.na(x)), exploredata)
 
 
-write.csv(exploredata, file="../data/exploration_data_v2_4.csv")
-write.csv(consumptiondata, file="../data/consumption_data_v2_4.csv")
+write.csv(exploredata, file="../data/exploration_data_v2_3.csv")
+write.csv(consumptiondata, file="../data/consumption_data_v2_3.csv")
 
 
 questiondata <- sapply(datastrings_json,
@@ -79,4 +79,4 @@ names(questiondata) <- NULL
 questiondata <- as.data.frame(do.call("rbind.data.frame", questiondata))
 rownames(questiondata) <- NULL
 
-write.csv(questiondata, file="../data/question_data_v2_4.csv")
+write.csv(questiondata, file="../data/question_data_v2_3.csv")

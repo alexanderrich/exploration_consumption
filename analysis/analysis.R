@@ -3,10 +3,10 @@ library("ggplot2")
 library("tidyr")
 library("lme4")
 
-exploredata <- read.csv('../data/exploration_data_v2_4.csv')
-consumptiondata <- read.csv('../data/consumption_data_v2_4.csv')
+exploredata <- read.csv('../data/exploration_data_v2_3.csv')
+consumptiondata <- read.csv('../data/consumption_data_v2_3.csv')
 
-questiondata <- read.csv('../data/question_data_v2_4.csv')
+questiondata <- read.csv('../data/question_data_v2_3.csv')
 
 questiondata$enjoymentdiff <- questiondata$videoenjoyment - questiondata$sliderenjoyment
 
@@ -155,14 +155,15 @@ individuals_w_predictions$condition <- factor(individuals_w_predictions$conditio
 ggplot() + geom_line(data=individuals_w_predictions, aes(x=x, y=y, group=subject, color=condition), size=.5, alpha=.5) +
   geom_line(data=params_w_predictions, aes(x=x, y=y, color=condition), size=2) +
   geom_ribbon(data=params_w_predictions, aes(x=x, y=y, ymin=lower, ymax=upper, group=condition), alpha=.3) +
-  scale_color_discrete(name="condition", labels=c("low-explore", "high-explore")) +
+  scale_color_discrete(name="condition", labels=c("immediate", "delayed")) +
   scale_x_continuous(breaks=c(0.4, 0.6, 0.8, 1), labels=c("40%", "60%", "80%", "100%")) +
   xlab("current-spinner value") +
   ylab("p(choose new spinner)") +
   theme_minimal() +
   coord_cartesian(xlim = c(.333, 1))+
   theme(legend.position="bottom")
-ggsave(filename="../doc/cogsci2017/figures/exp1results.pdf", width=5, height=3.5, useDingbats=F)
+
+ggsave(filename="../doc/cogsci2017/figures/exp2results.pdf", width=5, height=3.5, useDingbats=F)
 
 
 ## fit <- stan(file="stan_models/regression_lastoutcome.stan", data=standata, iter=1000)
