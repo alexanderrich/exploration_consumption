@@ -46,7 +46,7 @@
 \begin{abstract}
 
   Balancing exploration and exploitation is difficult, and across a wide
-  variety of situations under-exploration of new alternatives appears prevalent.
+  variety of situations under-exploration of uncertain alternatives appears prevalent.
   We propose that one possible cause of
   under-exploration is present bias, whereby immediate rewards (like those
   gained from exploitation) loom larger than future rewards (like those
@@ -58,22 +58,24 @@
   Experiment 1, we show that people understand the task and respond as expected
   to standard decision variables. In Experiment 2, we introduce a condition in
   which there is a temporal delay between choices and outcomes, and test whether
-  this increases exploration by reducing present bias. 
+  this increases exploration by reducing present bias. We find no evidence of an
+  effect of delay on exploration, and discuss possible interpretations of this result.
+
   \textbf{Keywords} time preference, present bias, exploratory choice
 \end{abstract}
 
-Balancing exploitation of known options with exploration of known options
+Balancing exploitation of known options with exploration of uncertain options
 presents a difficult cognitive and motivational challenge. The problem of how to
 trade off between these two conflicting goals has created whole fields of study
 \citep{Mehlhorn2015, sutton1998reinforcement}, and in many cases achieving an
-optimal balance is computationally intractible \citep{Guez2013}. Given these
+optimal balance is computationally intractable \citep{Guez2013}. Given these
 facts, one might expect people to often deviate from optimal exploratory choice
 in both directions, perhaps exploring too much in some situations but too little
-in others.
+in others. Notably, though, while over-exploration does occur, a bias towards under-exploration in particular seems to be
+observed across a wide range of domains.
 
-Notably, though, while over-exploration does occur, a bias towards under-exploration in particular seems to be
-observed across a wide range of domains. In learned helplessness, for example, an organism
-experiences the absence of contol over the environment, learns that the
+In learned helplessness, for example, an organism
+experiences the absence of control over the environment, learns that the
 environment is uncontrollable, and thus ceases to take actions that might allow
 it to discover that it can in fact exert control. % Learned helplessness has been proposed to
 % underly most notably depression \citep{Abramson1978, Abramson1989} but also
@@ -87,11 +89,9 @@ a role as well \citep{Huys2009, Teodorescu2014a}. % In the case of depression,
 
 Under-exploration also seems to occur in the development of complex skills, such
 as flying a plane or playing a sport \citep{Gopher1989}. In these settings, an ``emphasis
-change'' training method in which the focus of practice is repeatedly changed
-can lead to greater performance gains than unguided practice or more complex
-training methods. Emphasis change works because it encourages people to
-continually explore the performance space to find more effective cognitive and
-motor routines. Without these interventions, people often enter a ``local
+change'' training method that encourages people to continually explore the
+performance space leads to greater performance gains than unguided practice or more complex
+training methods.  Without this intervention, people often enter a ``local
 maximum'' in which exploration decreases and performance plateaus \citep{Yechiam2001}.
 
 In many other areas under-exploration is less clearly
@@ -107,7 +107,7 @@ structures that may preserve exploration \citep{Fang2010}.
 
 Given the seeming pervasiveness of under-exploration in real-world decision
 making, one might expect a clear pattern of under-exploration in lab
-experiments. Instead, however, lab results are mixed, with people sometimes
+experiments. Instead, lab results are mixed, with people sometimes
 under-exploring, sometimes over-exploring, and sometimes exploring close to an
 optimal amount. To take two illustrative examples, \citet{Zwick2003} found that
 in a sequential search task people under-searched when there were no information
@@ -116,7 +116,7 @@ costs but over-searched when there were information costs, and
 or not often enough depending on whether rare outcomes were positive or
 negative. Similar results have been obtained within and across a variety of
 other studies and paradigms
-\citep{tversky1966information, Busemeyer1988, hertwig2004decisions, Navarro2016, Juni2016, Sang2011}.
+\citep{tversky1966information, hertwig2004decisions, Navarro2016, Juni2016, Sang2011}.
 
 These experimental studies raise the question of why under-exploration appears
 more widespread than over-exploration in the field, but not in the lab. One
@@ -125,8 +125,8 @@ prevalent, though perhaps in different settings, and that the seemingly general 
 toward under-exploration is illusory. In the current paper, we propose an
 alternative hypothesis: that lab tests of exploratory choice have been missing a key component
 of real-world exploratory choice, namely, the distribution of choices and
-outcomes over time, and that this spreading of exploratory choices over time may
-account for the tendency to under-explore.
+outcomes over time, and that because of people's bias towards immediate rewards,
+this spreading of choices over time may account for the tendency to under-explore.
 
 \begin{figure*}
 \centering
@@ -145,38 +145,43 @@ account for the tendency to under-explore.
 
 Past theoretical work has proposed that under-exploration may be the result of myopia: the
 underweighting of temporally distant rewards relative to close ones \citep{March1991, Levinthal1993}. 
-% \hl{does this someone undermine the novelty of your framing/prediction?}
-While
-choosing actions that are expected to immediately maximize reward is inherently
-exploitative, exploration often requires the decision-maker to suffer short-term
-costs in search of better future options.
+In expectation, exploitation yields the greatest reward for the present choice;
+exploration yields lower expected reward for the present choice, but raises the
+expected reward for all future choices due to the possibility of discovering
+a better option. Thus, if future choices and rewards are weighted less than
+immediate ones, the value of exploration is diminished.
+
+% While
+% choosing actions that are expected to immediately maximize reward is inherently
+% exploitative, exploration often requires the decision-maker to suffer short-term
+% costs in search of better future options.
 
 \begin{figure*}
 \centering
 \includegraphics[width=\textwidth]{figures/machinetimeline.png}
 \caption{A schematic illustration of the experiment timeline. In all experiments
-  and conditions, six 30-second work periods pass between consecutive choices
+  and conditions, six 30-second work periods passed between consecutive choices
   with a given machine. \emph{a}: in Experiment 1 and the immediate condition of
-  Experiment 2, the outcome for a choice is revealed and occurs immediately
-  after the choice is made. \emph{b}: in the delayed condition of Experiment 2 (right),
-  the outcome of a choice is revealed and occurs after a delay of four work
+  Experiment 2, the outcome for a choice was revealed and occured immediately
+  after the choice was made. \emph{b}: in the delayed condition of Experiment 2 (right),
+  the outcome of a choice was revealed and occurred after a delay of four work
   periods.}
 \label{fig:machinetimeline}
 \end{figure*}
 
 
-There are two distinct possible causes of myopia \citep{Bartels2015}. The first is that the decision-maker is
+There are two distinct possible forms of myopia \citep{Bartels2015}. The first is that the decision-maker is
 unaware of or fails to consider the future. This form of myopia is likely one
 cause of under-exploration, particularly in complex environments. However,
 researchers in exploratory choice have begun to address this form of myopia, and
 have found that people change their
 patterns of exploration based on their expectations about future choices,
-showing that, at least to some degree they do consider the future \citep{Meyer1995, Wilson2014a, Rich2017}.
+showing that, at least to some degree they do consider the future \citep{Wilson2014a, Rich2017}.
 
 The second form of myopia is that the decision-maker
 is aware of the future but simply doesn't care as much about it.
 A wealth of studies have shown that this form of myopia is an important factor
-in human decision making, and that people are strongly
+in human decision making, and that people are 
 biased towards  the present. For example, people will often prefer a larger, later monetary
 reward to a smaller, sooner reward when both rewards are in the future, but will
 switch their preference when the time until both rewards is reduced so that the
@@ -188,15 +193,15 @@ when thirsty \citep{Brown2009}, a bias towards immediate rewards has been observ
 minutes or even seconds.
 
 Present bias has the clear potential to cause people to explore too little, by
-increasing the perceived immediate gains of exploiting relative to the delayed
-gains of exploring. However, there has been no experimental research
+increasing the weight of the greater expected immediate gains of exploiting relative to
+the greater expected delayed gains of exploring. However, there has been no experimental research
 examining how people's bias towards the present affects exploratory choice. In
 part, this is due to limits in experiment design. In most exploratory
 choice experiments, each choice and outcome takes fewer than 10 seconds to
 complete, making it unlikely for a large bias to develop between the current
 trial and future ones. More importantly, regardless of the length of each trial,
 rewards are generally not consumed on a trial-by-trial basis. For example, a participant
-might recieve ``points'' on each trial, which are converted to money when the
+might receive ``points'' on each trial, which are converted to money when the
 experiment ends. In this sort of paradigm, there is no reason to expect a bias
 towards the present choice's rewards over future rewards, as all rewards are
 in fact delivered at the same time.
@@ -207,8 +212,10 @@ immediately-consumed rewards and present two experiments. In the first, we vary
 the expected payoff of exploration across conditions and test whether this affects
 participant choice. The results of this experiment show that participants understand the task and respond
 as predicted to well-studied variables. In the second, we introduce a
-delayed-outcome condition, which we predicted to increase exploration
-if people are present biased. However, we find no strong evidence that delaying outcomes affects
+delayed-outcome condition. If people are present biased, we predict this to
+increase exploration by decreasing the weight of the current choice's outcomes
+relative to future choice's outcomes.
+However, we find no strong evidence that delaying outcomes affects
 the rate of exploration. While this may support the conclusion that exploratory
 choice is not susceptible to present bias, we also discuss other possible
 explanations of this null result and plans for future experiments.
@@ -218,7 +225,7 @@ explanations of this null result and plans for future experiments.
 In our experimental paradigm, participants made a series of explore--exploit
 decisions, where each decision determined whether the following 30-second
 consumption task would be unpleasant (moving sliders) or pleasant (watching a
-Youtube video). In Experiment 1, we sought to confirm that participants prefered
+YouTube video). In Experiment 1, we sought to confirm that participants preferred
 the video task to the slider task and would seek to increase video-watching
 time, and that people were sensitive to explicit, exogenous changes to the value
 of exploration. The experiment consisted of two conditions---in the high-explore
@@ -246,15 +253,15 @@ Participants were pseudo-randomly counterbalanced across two conditions.
 
 \emph{Consumption tasks.}
 Participants were informed that their job was to perform a monotonous slider task that
-would be split into 30-second ``work periods'', but that they would be able to
+would be split into 30-second ``work periods,'' but that they would be able to
 make choices throughout the experiment that would give them a chance to watch a
-Youtube video instead. The number of remaining work periods in the experiment was shown
+YouTube video instead. The number of remaining work periods in the experiment was shown
 at the top of the screen, as was the number of seconds left in the current work period.
 
 The slider task was based of a task previously used by \citet{Gill2012}. In each
 period of the slider task, five horizontal sliders appeared on the screen (Figure~\ref{fig:taskpictures}a). Each
 started at a random setting between 0 and 100, with the slider's value
-shown to its right, with a random horizontal offset so that the
+shown to its right, and with a random horizontal offset so that the
 sliders were not aligned. The participant's task was to use the mouse to move
 each slider to ``50'' before the work period ended. When a participant released
 the mouse at the correct setting, the slider turned green to show it had been
@@ -264,7 +271,7 @@ grayed out. Additional sliders were enabled at five-second intervals, such that
 all five sliders were available after 20 seconds.
 
 Before beginning the experiment, participants chose one of four videos available
-on Youtube: an episode of ``Planet Earth'', and episode of ``The Great British
+on YouTube: an episode of ``Planet Earth'', and episode of ``The Great British
 Bakeoff'', and episode of ``Mythbusters'', or an Ellen Degeneres comedy special.
 The video was embedded in the experiment with all user controls (such as
 skipping ahead) disabled (Figure~\ref{fig:taskpictures}b). When given access to the video, participants had to keep the
@@ -274,8 +281,8 @@ participants maintained engagement with the content.
 \begin{figure*}
 \centering
 \includegraphics[width=\textwidth]{figures/machinemappictures.png}
-\caption{The machine display seen by participants to allow them to keep track of
-  the value of each of the six machines and the next time it would be ready to
+\caption{The machine display seen by participants. The display allowed participants track
+  the value of each machine and the next time each machine would be ready to
   make a choice or produce an outcome. Gray arrows have been added to depict the
   counterclockwise movement of machines around the display after each work
   period.
@@ -300,13 +307,14 @@ how to set the machine before each use.
 %  allowing the participant to watch their chosen video instead.
 
 \emph{Decision-making task.}
-Following the initial 10 periods, participants were shown a machine before each work period and had to select
-between two circular spinners with arrows at the top, as shown in Figure~\ref{fig:taskpictures}c: the ``current spinner''
+Following the initial 10 periods, participants were shown a machine before each
+work period and,
+as shown in Figure~\ref{fig:taskpictures}c, had to select
+between two circular spinners with arrows at the top: the ``current spinner''
 (exploit) and the ``new spinner'' (explore).
 The current spinner was split into
 five black and five gold wedges. If a participant chose the
-current spinner, it spun (immediately or after four periods, depending
-on the condition) and, if the arrow landed on gold, the machine
+current spinner, it spun and, if the arrow landed on gold, the machine
 worked and the participant could watch the video. Initially, the
 current spinner's gold wedges were randomly set for each machine to cover between
 1/3 and 2/3 of the spinner.
@@ -332,7 +340,7 @@ Figure~\ref{fig:machinetimeline}a and Figure~\ref{fig:machinemappictures}a. It t
 following five periods, as choices were made with the other five machines.
 
 Finally, in order to induce exploration throughout the entire experiment, the
-six machines would occasionally ``reset'' after they ran. When this occured, a
+six machines would occasionally ``reset'' after they ran. When this occurred,
 the current spinner would be set to a new random value between 1/3 and 2/3 gold.
 Participants were informed that this would occur randomly on
 1/6 of trials. In fact, the procedure was designed so exactly one of the six
@@ -344,16 +352,16 @@ reset on two consecutive uses.
 \emph{Training, incentives, and post-experiment questions.}
 Before beginning the full experiment, participants completed two
 practice phases. First, they performed several trials of practice using the
-machines, with the actual work periods removed. Then, they performed three work
-periods practicing the slider task.
+machines, with the actual work periods removed. Then, they performed two work
+periods practicing the slider task and one work period practicing the video task.
 During the machine choices, participants had access to an ``info'' button at the
 bottom of the screen that provided reminders about the dynamics of the task.
 
 Participants were given a performance-based bonus of \$3.00 for completing the
-slider tasks accurately. If they missed fewer than 10\% of sliders throughout
+consumption tasks accurately. If they missed fewer than 10\% of sliders throughout
 the experiment and left the video paused less than 20\% of the time, they were
 not penalized. However, if they missed more sliders or left the video paused for
-longer, they lose 10 cents from their bonus for each additional percentage of
+longer, they lost 10 cents from their bonus for each additional percentage of
 sliders missed or time with the video paused. The running percentage of sliders
 missed and video pause time was displayed at the top of the screen throughout
 the experiment.
@@ -369,7 +377,7 @@ Participants rated their enjoyment of the video at 5.77 out of 7, on average,
 and their enjoyment of the slider task at 2.87 out of 7, on average. This
 difference in enjoyment between the tasks was significant, $t(30)=10.53$, $p<.001$.
 
-To analyze participants trial-by-trial decision-making, we conducted a hierarchical
+To analyze participants' trial-by-trial decision-making, we conducted a hierarchical
 Bayesian logistic regression using the Stan modeling language \citep{stan-software:2015}.
 This approach allowed us to estimate population-level effects of the
 current-spinner value and of condition, while also allowing for individual
@@ -381,9 +389,9 @@ The results of the regression are shown in Figure~\ref{fig:exp1results}.
 Because we observed few trials for each participant, and the current-spinner
 values observed for each participant depend on chance and the participant's
 choices, we present individual-level model fits rather than the raw choice data.
-We find that at the population level, participants are less likely to choose a
-new spinner when the value of the current spinner is higher, with posterior
-probability $p>.999$. We also find that participants in the high-explore are more likely to explore a new spinner for a
+We found that at the population level, participants were less likely to choose a
+new spinner when the value of the current spinner was higher, with posterior
+probability $p>.999$. We also found that participants in the high-explore were more likely to explore a new spinner for a
 given current spinner value than those in the low-explore condition, with
 posterior probability $p>.99$. We found no interaction between condition and the
 effect of current-spinner value.
@@ -404,13 +412,13 @@ effect of current-spinner value.
 
 These results show that participants' behavior in this task is
 similar to behavior in other exploratory choice tasks. Participants explored more
-when the current exploitative option is poor, as well as when the possible
-outcomes of exploration are good. While this experiment did not address whether the
+when the current exploitative option was poor, as well as when the possible
+payoffs of exploration were high. While this experiment did not address whether the
 consumption rewards produced a bias towards the present (a topic returned to in the
 discussion), it did showed that participants enjoyed the video more than the slider
 task, and that they made choices to obtain more video time. In the following
 experiment, we introduce a delayed-outcome version of the task and predict that, if the
-consumption rewards induce a present bias, this version will increase exploration.
+consumption rewards induce a present bias, this version of the task will increase exploration.
 
 \section{Experiment 2}
 
@@ -433,7 +441,7 @@ choice was made, as in Experiment 1. In the delayed condition, each machine was
 presented to the participant four work periods before it was schedules to run,
 and the participant made a choice at that time. The machine then had to
 ``process'' for four work periods, thus delaying
-the outcome by over 2 minutes Figure~\ref{fig:machinemappictures}b. The participant then returned to the
+the outcome by over 2 minutes (Figure~\ref{fig:machinemappictures}b). The participant then returned to the
 machine to observe its outcome and either perform the slider task or
 watch the video. The machine then cooled of for a single period before being
 ready for another choice. The timeline for the delayed condition is shown in
@@ -467,7 +475,7 @@ has a high value, $p>.999$. However, in this experiment we found no evidence of
 an effect of condition, with a posterior probability of $p=.558$ that the effect of condition was
 greater than 0. This means that participants were no more likely to explore a new spinner when there
 was a temporal delay imposed between their choices and the received outcomes.
-However, there may be a small interaction between current spinner value and
+However, there may have been a small interaction between current spinner value and
 condition, such that participants in the delayed condition were less sensitive
 to the value of the spinner when making their choices. This might indicate that
 the delayed condition was confusing to some participants, as a few individuals
@@ -477,16 +485,19 @@ was above 0 is $p=.934$.
 
 \section{Discussion}
 
-In this paper we presented a novel task using immediately-consumed rewards that
-may be used to study present bias in the context of exploratory choice. In
+In this paper we presented a novel task using immediately-consumed rewards
+to study present bias in the context of exploratory choice. We predicted that
+adding a temporal delay between choices and outcomes would increase exploration
+by reducing the weight of the current choice's outcome (which is maximized
+through exploitation) relative to future choices' outcomes (which are increased
+through exploration). In
 Experiment 1 we showed that participants appeared to understand the task and
-respond reasonably to maximize their time in the video-watching task. They are
-more likely to explore when the current exploitable option (current spinner) has
-low value, and change their degree of exploration based on the range of possible
-outcomes from choosing a new spinner. However, in Experiment 2 we found that
+respond reasonably to maximize their time in the video-watching task. They were
+more likely to explore when the current exploitable option (current spinner) had
+low value, and changed their degree of exploration based on the range of possible
+outcomes from choosing a new spinner. However, in contrast to our prediction, in Experiment 2 we found that
 participants did not explore any more when there was a temporal delay between
-choices and outcomes, even though we expected this delay to reduce the present
-bias towards the greater immediate rewards of exploitation.
+choices and outcomes.
 
 One explanation for our results is that people are in fact less affected by
 present bias in the realm of exploratory choice than they are in other
@@ -503,7 +514,7 @@ strong claims about the role of present bias in exploratory choice. First, while
 participants enjoyed the video more than the slider task, we need to perform a
 follow-up study to ensure that this difference in enjoyment was strong enough to
 create a bias towards immediate video-watching in the time scale used in our
-experiments. To test this, we might use a simple ``concurrent schedule''
+experiments. To test this, we might use a simple 
 experiment in which two buttons produce video-watching time at for different
 lengths (or with different probabilities) and at different delays. In this
 setting, we would predict a bias towards the button that produced earlier
@@ -517,14 +528,6 @@ participants may have found the delayed condition confusing, and this problem
 might be fixed through clearer instructions or interface. Additionally, the
 future encounters with each machine may not have been sufficiently salient,
 reducing the perceived need for exploration in both conditions.
-
-%%% this is a little too apologetic. who cares about our excitement! ;)
-%While introduces difficulties not found in standard decision-making tasks, we
-%remain excited about the possibility of creating a paradigm for the use of
-%immediately-consumable rewards in dynamic decision-making tasks. Such a paradigm
-%could allow not just a test of whether present bias affects exploratory choice,
-%but a greater focus on a variety of motivational factors often neglected by
-%cognitive science.
 
 \begin{small}
   \noindent
