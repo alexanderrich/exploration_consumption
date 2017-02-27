@@ -191,8 +191,6 @@ function SliderTask() {
 function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callback) {
     "use strict";
     var responseFn,
-        contexts,
-        locations,
         resetArray,
         i,
         trial = -1,
@@ -201,30 +199,22 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         nTrials = nChoices + nPreWorkPeriods,
         functionList = [],
         runChoice,
-        maze = d3.select("#maze").append("g"),
         tau = 2 * Math.PI,
         arc = d3.arc().innerRadius(0).outerRadius(70).startAngle(0),
-        contextGroups,
-        contextMarker,
         updateMachine,
         spinMachine,
         upgradeMachine,
         preMachineWork,
-        enterContext,
-        resetContext,
-        incrementContexts,
+        resetMachine,
         timeStamp,
         wedges = 5,
-        showOutcome;
+        value,
+        outcome;
 
-    updateMachine = function (exploitVal, exploreVal, context) {
+    updateMachine = function (exploitVal, exploreVal) {
         var widthpct,
-            exploitSvgGroup = d3.select("#exploitcirclegroup" + context),
-            exploreSvgGroup = d3.select("#explorecirclegroup" + context);
-        d3.selectAll(".exploitgroupouter").style("opacity", 0);
-        d3.select("#exploitgroupouter" + context).style("opacity", 1);
-        d3.selectAll(".exploregroupouter").style("opacity", 0);
-        d3.select("#exploregroupouter" + context).style("opacity", 1);
+            exploitSvgGroup = d3.select("#exploitcirclegroup"),
+            exploreSvgGroup = d3.select("#explorecirclegroup");
         exploitSvgGroup.attr("transform", "translate(75, 75)");
         exploreSvgGroup.attr("transform", "translate(75, 75)");
         exploitSvgGroup.selectAll(".winningArc")
@@ -246,11 +236,11 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         }
     };
 
-    spinMachine = function (choiceId, choiceVal, outcome, context) {
+    spinMachine = function (choiceId, choiceVal, outcome) {
         var group,
             r,
-            exploitSvgGroup = d3.select("#exploitcirclegroup" + context),
-            exploreSvgGroup = d3.select("#explorecirclegroup" + context);
+            exploitSvgGroup = d3.select("#exploitcirclegroup"),
+            exploreSvgGroup = d3.select("#explorecirclegroup");
         if (choiceId === "explore") {
             group = exploreSvgGroup;
         } else {
@@ -271,8 +261,8 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             });
     };
 
-    upgradeMachine = function (newVal, context) {
-        var exploitSvgGroup = d3.select("#exploitcirclegroup" + context),
+    upgradeMachine = function (newVal) {
+        var exploitSvgGroup = d3.select("#exploitcirclegroup"),
             arcTween = function (newAngle) {
             return function(d) {
                 var interpolate = d3.interpolate(d.endAngle, newAngle);
@@ -288,25 +278,19 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             .attrTween("d", arcTween(newVal * tau / wedges));
     };
 
-    responseFn = function (choiceId, context) {
+    responseFn = function (choiceId) {
+        var nextValue;
         choiceTrial++;
-        var contextObj = contexts[context];
         $("#" + choiceId).addClass("clicked");
         $("#machinescreen").html("processing...");
-        if (condition) {
-            $("#idlerect").css("fill", "#CCCCFF");
-            $("#idletext").html("processing");
-        }
         if (choiceId === "exploit") {
-            contextObj.nextChoice = "exploit";
-            contextObj.nextValue = contextObj.value;
-            $("#exploitgroupinner" + context + " .spinnerbacking").css("opacity", 1);
+            nextValue = value;
+            $("#exploitgroupinner .spinnerbacking").css("opacity", 1);
         } else {
-            $("#exploregroupinner" + context + " .spinnerbacking").css("opacity", 1);
-            contextObj.nextChoice = "explore";
-            contextObj.nextValue = Math.random();
+            nextValue = Math.random();
+            $("#exploregroupinner .spinnerbacking").css("opacity", 1);
         }
-        contextObj.outcome = Math.random() < contextObj.nextValue;
+        outcome = Math.random() < nextValue;
         $(".choicebutton").off("click");
         psiTurk.recordTrialData({phase: "EXPERIMENT",
                                  trialType: "exploreexploit",
@@ -316,86 +300,33 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
                                  choiceTrial: choiceTrial,
                                  uniqueid: uniqueId,
                                  condition: condition,
-                                 context: context,
                                  response: choiceId === "explore" ? 1 : 0,
                                  rt: new Date().getTime() - timeStamp,
-                                 currentValue: contextObj.value,
-                                 nextValue: contextObj.nextValue,
-                                 outcome: contextObj.outcome,
+                                 currentValue: value,
+                                 nextValue: nextValue,
+                                 outcome: outcome,
                                  reset: resetArray[trial + 4 * condition - firstMachineTrial]
                                 });
-        setTimeout(functionList.pop(), 1000);
-    };
-
-    enterContext = function (context) {
-        var contextObj = contexts[context];
-        $("#exploreexploitdiv").hide();
-        $("#alternativecontents").show();
-        $("#alternativecontents").html("Click circled machine");
-        $("#context" + context).css("opacity", 1);
-        contextGroups.transition()
-            .duration(1500)
-            .attr("transform", function(d) {
-                return "translate(" + locations[d.loc][0] +
-                    "," + locations[d.loc][1] + ")";
-            });
-        contextMarker.transition()
-            .duration(1500)
-            .attr("cx", locations[contextObj.loc][0])
-            .attr("cy", locations[contextObj.loc][1]);
-        $("#contextmarker, #context" + context).click(function () {
-            $("#contextmarker, #context" + context).off("click");
-            $("#alternativecontents").hide();
-            $("#exploreexploitdiv").show();
-            functionList.pop()();
-        });
-    };
-
-    runChoice = function (context) {
-        $("#alternativecontents").hide();
-        $(".machinebutton").removeClass("clicked");
-        $("#start").prop("disabled", true);
-        $("#machinescreen").html("Select spinner.");
-        $("#machineid").html(context + 1);
-        updateMachine(contexts[context].value, "?", context);
-        $("#exploreexploit").show();
-        timeStamp = new Date().getTime();
-        $(".choicebutton").click(function () {responseFn(this.id, context); });
-    };
-
-    showOutcome = function (context) {
-        var contextObj = contexts[context];
-        updateMachine(contextObj.value, "?", context);
-        $("#machineid").html(context + 1);
-        $(".choicebutton").removeClass("clicked");
-        $("#" + contextObj.nextChoice).addClass("clicked");
-        $("#machinescreen").html("processing...");
-        $("#alternativecontents").hide();
-        $("#exploreexploitdiv").show();
+        updateMachine(value, "?");
         setTimeout(function () {
             var extraTime = 0;
-            if (contextObj.nextChoice === "explore") {
+            if (choiceId === "explore") {
                 extraTime = 1500;
-                updateMachine(contextObj.value, contextObj.nextValue, context);
-                if (contextObj.nextValue > contextObj.value) {
+                updateMachine(value, nextValue);
+                if (nextValue > value) {
                     $("#machinescreen").html("new spinner saved!");
-                    contextObj.value = contextObj.nextValue;
-                    upgradeMachine(contextObj.value, context);
-                    $("#savedrect").css("fill", "gold");
-                    $("#savedrect").css("opacity", 1);
-                    setTimeout(function () {
-                        $("#savedrect").css("opacity", 0);
-                    }, 1000);
+                    value = nextValue;
+                    upgradeMachine(value);
                 } else {
                     $("#machinescreen").html("new spinner not saved");
                 }
             }
             setTimeout(function () {
                 $("#machinescreen").html("running...");
-                spinMachine(contextObj.nextChoice, contextObj.nextValue, contextObj.outcome, context);
+                spinMachine(choiceId, nextValue, outcome);
             }, extraTime);
             setTimeout(function () {
-                if (contextObj.outcome) {
+                if (outcome) {
                     $("#machinescreen").html("Machine succeeded!<br/>Press START to begin video.");
                 } else {
                     $("#machinescreen").html("Machine failed.<br/>Press START to begin task.");
@@ -404,43 +335,43 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
                 $("#start").click(function () {
                     $("#start").off("click");
                     $("#exploreexploitdiv").hide();
-                    $("#mazediv").hide();
                     $("#bottominfodiv").hide();
                     $(".choicebutton").removeClass("clicked");
-                    $("#exploitgroupinner" + context + " .spinnerbacking").css("opacity", 0);
-                    $("#exploregroupinner" + context + " .spinnerbacking").css("opacity", 0);
-                    updateMachine(contextObj.value, "?", context);
-                    callback(contextObj.nextValue, contextObj.outcome, trial);
+                    $("#exploitgroupinner .spinnerbacking").css("opacity", 0);
+                    $("#exploregroupinner .spinnerbacking").css("opacity", 0);
+                    updateMachine(value, "?");
+                    callback(nextValue, outcome, trial);
                 });
             }, 2000 + extraTime);
-        }, 500);
+        }, 1500);
     };
 
-    resetContext = function (context) {
-        var contextObj = contexts[context];
-        contextObj.value = .333 + .333 * Math.random();
+    runChoice = function () {
+        $("#alternativecontents").hide();
+        $(".machinebutton").removeClass("clicked");
+        $("#start").prop("disabled", true);
+        $("#machinescreen").html("Select spinner.");
+        $("#machineid").html(1);
+        updateMachine(value, "?");
+        $("#exploreexploit").show();
+        timeStamp = new Date().getTime();
+        $(".choicebutton").click(function () {responseFn(this.id); });
+    };
+
+    // showOutcome = function () {
+    // };
+
+    resetMachine = function () {
+        value = .333 + .333 * Math.random();
         $("#machinescreen").html("Machine<br/>RESET");
         $("#start").prop("disabled", true);
-        updateMachine(0, "?", context);
-        $("#savedrect").css("fill", "gray");
-        $("#savedrect").css("opacity", 1);
+        updateMachine(0, "?");
         setTimeout(function () {
-            $("#savedrect").css("opacity", 0);
+            upgradeMachine(value);
         }, 1000);
-        setTimeout(function () {
-            upgradeMachine(contextObj.value, context);
-        }, 1000);
-        $("#alternativecontents").hide();
+        // $("#alternativecontents").hide();
         $("#exploreexploitdiv").show();
         setTimeout(functionList.pop(), 4000);
-    };
-
-    incrementContexts = function () {
-        contexts = contexts.map(function (obj) {
-            obj.loc = (obj.loc + 5) % 6;
-            return obj;
-        });
-        functionList.pop()();
     };
 
     preMachineWork = function () {
@@ -448,55 +379,44 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         $("#alternativecontents").show();
         $("#alternativecontents").html("Press START to begin task.<br/><button id=\"alternativestart\" class=\"machinebutton\"> START </button>");
         $("#alternativestart").click(function () {$("#alternativecontents").hide();
-                                                  $("#mazediv").hide();
                                                   $("#bottominfodiv").hide();
                                                   callback(0, 0, trial); });
     };
 
     this.run = function() {
         trial++;
-        $("#idlerect").css("fill", "white");
-        $("#idletext").html("idle");
-        $("#mazediv").show();
+        $("#exploreexploitdiv").show();
         $("#bottominfodiv").show();
 
-        if (trial + 4 * condition < firstMachineTrial) {
-            $("#trialsuntilmachines").html(firstMachineTrial - 4*condition - trial);
-        } else if (trial + 4 * condition === firstMachineTrial) {
-            $("#mazeblocker").hide();
-        }
+        // if (trial + 4 * condition < firstMachineTrial) {
+        //     $("#trialsuntilmachines").html(firstMachineTrial - 4*condition - trial);
+        // } else if (trial + 4 * condition === firstMachineTrial) {
+        //     $("#mazeblocker").hide();
+        // }
 
         if (trial < firstMachineTrial && condition === 1 && trial + 4 >= firstMachineTrial) {
             functionList = [function () {preMachineWork(); },
-                            function () {incrementContexts(); },
-                            function () {runChoice((trial + 4) % 6); },
-                            function () {enterContext((trial + 4) % 6); }];
+                            function () {runChoice(); }];
         } else if (trial < firstMachineTrial) {
             functionList = [function () {preMachineWork(); }];
         } else if (condition === 0) {
             functionList = [
-                function () {showOutcome(trial % 6); },
-                function () {incrementContexts(); },
-                function () {runChoice(trial % 6); },
-                function () {enterContext(trial % 6); },
+                // function () {showOutcome(); },
+                function () {runChoice(); }
             ];
         } else if (condition === 1 && trial < nTrials - 4){
             functionList = [
-                function () {showOutcome(trial % 6); },
-                function () {incrementContexts(); },
-                function () {enterContext(trial % 6); },
-                function () {runChoice((trial + 4) % 6); },
-                function () {enterContext((trial + 4) % 6); },
+                // function () {showOutcome(); },
+                function () {runChoice(); }
             ];
         } else {
             functionList = [
-                function () {showOutcome(trial % 6); },
-                function () {incrementContexts(); },
-                function () {enterContext(trial % 6); },
+                //FIX FUNCTION HERE
+                function () {}
             ];
         }
         if (trial > firstMachineTrial && resetArray[trial - firstMachineTrial - 1]) {
-            functionList.push(function () {resetContext((trial - 1) % 6); });
+            functionList.push(function () {resetMachine(); });
         }
 
         functionList.pop()();
@@ -517,17 +437,8 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             lastchosen = chosen;
         }
     })();
-    locations = _.range(6).map(function (i) {
-        return [100 + 200 * ((2.5-Math.abs(i - 2.5)) % 3), 75 + 150 * Math.floor(i/3)];
-    });
-    contexts = [{}, {}, {}, {}, {}, {}];
-    contexts = _.shuffle(contexts);
-    contexts = contexts.map(function (obj, i) {
-        obj.value = .333 + .333 * Math.random();
-        obj.nextValue = 0;
-        obj.loc = (i + 6 - firstMachineTrial % 6) % 6;
-        return obj;
-    });
+
+    value = .333 + .333 * Math.random();
 
     function arcTween (newAngle) {
         return function (d) {
@@ -539,219 +450,86 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         };
     }
 
-    _.range(contexts.length).map(function (x) {
-        var entiregroup,
-            circlegroup;
-        entiregroup = d3.select("#exploitsvg")
-            .append("g")
-            .attr("class", "exploitgroupouter")
-            .attr("id", "exploitgroupouter" + x)
-            .append("g")
-            .attr("class", "exploitgroupinner")
-            .attr("id", "exploitgroupinner" + x);
-        entiregroup.append("rect")
-            .attr("class", "spinnerbacking")
-            .attr("width",  150)
-            .attr("height", 150)
-            .style("opacity", 0)
-            .style("fill", "#444444");
-        circlegroup = entiregroup.append("g")
-            .attr("class", "exploitcirclegroup")
-            .attr("id", "exploitcirclegroup" + x)
-            .attr("transform", "translate(75, 75)");
-        circlegroup.append("path")
-            .datum({endAngle: tau})
-            .style("fill", "#222222")
-            .attr("d", arc);
-        _.range(wedges).map(function (x) {
-            circlegroup.append("g")
-                .attr("transform", "rotate(" + x / wedges * 360 + ")")
-                .append("path")
-                .datum({endAngle: 0})
-                .attr("class", "winningArc")
-                .style("fill", "orange")
-                .attr("d", arc);
-        });
-        entiregroup.append("polygon")
-            .attr("points", "65 0, 85 0, 75 20")
-            .style("fill", "black")
-            .style("stroke", "gray")
-            .style("stroke-width", 2);
-        entiregroup = d3.select("#exploresvg")
-            .append("g")
-            .attr("class", "exploregroupouter")
-            .attr("id", "exploregroupouter" + x)
-            .append("g")
-            .attr("class", "exploregroupinner")
-            .attr("id", "exploregroupinner" + x);
-        entiregroup.append("rect")
-            .attr("class", "spinnerbacking")
-            .attr("width",  150)
-            .attr("height", 150)
-            .style("opacity", 0)
-            .style("fill", "#444444");
-        circlegroup = entiregroup.append("g")
-            .attr("class", "explorecirclegroup")
-            .attr("id", "explorecirclegroup" + x)
-            .attr("transform", "translate(75, 75)");
-        circlegroup.append("path")
-            .datum({endAngle: tau})
-            .style("fill", "#222222")
-            .attr("d", arc);
-        _.range(wedges).map(function (x) {
-            circlegroup.append("g")
-                .attr("transform", "rotate(" + x / wedges * 360 + ")")
-                .append("path")
-                .datum({endAngle: 0})
-                .attr("class", "winningArc")
-                .style("fill", "orange")
-                .attr("d", arc);
-        });
-        circlegroup.append("text")
-            .attr("id", "questionMark")
-            .text("?")
-            .attr("text-anchor", "middle")
-            .attr("y", "10px")
-            .style("font-family", "sans-serif")
-            .style("font-size", "30px")
-            .style("fill", "lightgray");
-        entiregroup.append("polygon")
-            .attr("points", "65 0, 85 0, 75 20")
-            .style("fill", "black")
-            .style("stroke", "gray")
-            .style("stroke-width", 2);
-    });
-
-    maze.append("rect")
-        .attr("x", 3)
-        .attr("y", 3)
-        .attr("width", 594)
-        .attr("height", 294)
-        .style("fill", condition ? "#CCCCFF" : "#FFCCCC")
-        .style("stroke-width", "3")
-        .style("stroke", "black");
-    maze.append("rect")
-        .attr("id", "idlerect")
-        .attr("x", 3)
-        .attr("y", 3)
-        .attr("width", 200)
-        .attr("height", 150)
-        .style("fill", "white")
-        .style("stroke-width", "3")
-        .style("stroke", "black");
-    if (condition) {
-        maze.append("rect")
-            .attr("x", 200)
-            .attr("y", 3)
-            .attr("width", 200)
-            .attr("height", 150)
-            .style("fill", "#FFCCCC")
-            .style("stroke-width", "3")
-            .style("stroke", "black");
-        maze.append("rect")
-            .attr("x", 397)
-            .attr("y", 3)
-            .attr("width", 200)
-            .attr("height", 150)
-            .style("fill", "white")
-            .style("stroke-width", "3")
-            .style("stroke", "black");
-        maze.append("rect")
-            .attr("id", "savedrect")
-            .attr("x", 397)
-            .attr("y", 3)
-            .attr("width", 200)
-            .attr("height", 150)
-            .style("fill", "gold")
-            .style("opacity", "0")
-            .style("stroke-width", "3")
-            .style("stroke", "black");
-        maze.append("text")
-            .attr("x", 404)
-            .attr("y", 24)
-            .style("font-size", "20px")
-            .text("ready");
-        maze.append("text")
-            .attr("x", 10)
-            .attr("y", 174)
-            .style("font-size", "20px")
-            .text("processing");
-    } else {
-        maze.append("rect")
-            .attr("id", "savedrect")
-            .attr("x", 3)
-            .attr("y", 3)
-            .attr("width", 200)
-            .attr("height", 150)
-            .style("fill", "gold")
-            .style("opacity", "0")
-            .style("stroke-width", "3")
-            .style("stroke", "black");
-    }
-    maze.append("text")
-        .attr("id", "idletext")
-        .attr("x", 10)
-        .attr("y", 24)
-        .style("font-size", "20px")
-        .text("idle");
-    maze.append("text")
-        .attr("x", condition ? 207 : 10)
-        .attr("y", condition ? 24 : 174)
-        .style("font-size", "20px")
-        .text("cooling");
-    contextMarker = maze.append("circle")
-        .attr("id", "contextmarker")
-        .attr("r", "70")
-        .attr("cx", locations[0][0])
-        .attr("cy", locations[0][1])
-        .style("fill", "black")
-        .style("fill-opacity", .15)
-        .style("stroke", "black")
-        .style("stroke-width", 1);
-
-    contextGroups = maze.selectAll(".context")
-        .data(contexts)
-        .enter()
+    var entiregroup,
+        circlegroup;
+    entiregroup = d3.select("#exploitsvg")
         .append("g")
-        .attr("class", "context")
-        .attr("transform", function(d) {
-            return "translate(" + locations[d.loc][0] +
-                "," + locations[d.loc][1] + ")";
-        })
-        .attr("id", function (d, idx) {
-            return "context" + idx;
-        })
-        .style("opacity", 0);
-    contextGroups.append("rect")
-        .attr("class", "contextbox")
-        .attr("width", 120)
-        .attr("height", 70)
-        .attr("x", -60)
-        .attr("y", -35)
-        .attr("rx", 5)
-        .attr("ry", 5)
-        .style("fill", "gray")
-        .style("stroke", "black")
-        .style("stroke-width", 1);
-    contextGroups.append("use")
-        .attr("transform", "translate(-55, -25) scale(.35, .35)")
-        .attr("xlink:href", function (d, e) {
-            return "#exploitgroupinner" + e;
-        });
-    contextGroups.append("use")
-        .attr("transform", "translate(0, -25) scale(.35, .35)")
-        .attr("xlink:href", function (d, e) {
-            return "#exploregroupinner" + e;
-        });
-    contextGroups.append("text")
-        .text(function(d, e) { return e + 1; })
-        .style("font-size", "16px")
-        .style("font-family", "monospace")
-        .attr("x", 45)
-        .attr("y", -20);
-    _.range(contexts.length).map(function (x) {
-        updateMachine(contexts[x].value, "?", x);
+        .attr("class", "exploitgroupouter")
+        .attr("id", "exploitgroupouter")
+        .append("g")
+        .attr("class", "exploitgroupinner")
+        .attr("id", "exploitgroupinner");
+    entiregroup.append("rect")
+        .attr("class", "spinnerbacking")
+        .attr("width",  150)
+        .attr("height", 150)
+        .style("opacity", 0)
+        .style("fill", "#444444");
+    circlegroup = entiregroup.append("g")
+        .attr("class", "exploitcirclegroup")
+        .attr("id", "exploitcirclegroup")
+        .attr("transform", "translate(75, 75)");
+    circlegroup.append("path")
+        .datum({endAngle: tau})
+        .style("fill", "#222222")
+        .attr("d", arc);
+    _.range(wedges).map(function (x) {
+        circlegroup.append("g")
+            .attr("transform", "rotate(" + x / wedges * 360 + ")")
+            .append("path")
+            .datum({endAngle: 0})
+            .attr("class", "winningArc")
+            .style("fill", "orange")
+            .attr("d", arc);
     });
+    entiregroup.append("polygon")
+        .attr("points", "65 0, 85 0, 75 20")
+        .style("fill", "black")
+        .style("stroke", "gray")
+        .style("stroke-width", 2);
+    entiregroup = d3.select("#exploresvg")
+        .append("g")
+        .attr("class", "exploregroupouter")
+        .attr("id", "exploregroupouter")
+        .append("g")
+        .attr("class", "exploregroupinner")
+        .attr("id", "exploregroupinner");
+    entiregroup.append("rect")
+        .attr("class", "spinnerbacking")
+        .attr("width",  150)
+        .attr("height", 150)
+        .style("opacity", 0)
+        .style("fill", "#444444");
+    circlegroup = entiregroup.append("g")
+        .attr("class", "explorecirclegroup")
+        .attr("id", "explorecirclegroup")
+        .attr("transform", "translate(75, 75)");
+    circlegroup.append("path")
+        .datum({endAngle: tau})
+        .style("fill", "#222222")
+        .attr("d", arc);
+    _.range(wedges).map(function (x) {
+        circlegroup.append("g")
+            .attr("transform", "rotate(" + x / wedges * 360 + ")")
+            .append("path")
+            .datum({endAngle: 0})
+            .attr("class", "winningArc")
+            .style("fill", "orange")
+            .attr("d", arc);
+    });
+    circlegroup.append("text")
+        .attr("id", "questionMark")
+        .text("?")
+        .attr("text-anchor", "middle")
+        .attr("y", "10px")
+        .style("font-family", "sans-serif")
+        .style("font-size", "30px")
+        .style("fill", "lightgray");
+    entiregroup.append("polygon")
+        .attr("points", "65 0, 85 0, 75 20")
+        .style("fill", "black")
+        .style("stroke", "gray")
+        .style("stroke-width", 2);
 }
 
 function ConsumptionRewards(psiTurk, callback) {
