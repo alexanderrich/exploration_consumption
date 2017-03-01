@@ -29,8 +29,8 @@ function VideoPlayer() {
         totalPlayTime = 0,
         totalPlayTimePossible = 0;
     player = new YT.Player('player', {
-        height: '430',
-        width: '700',
+        height: '350',
+        width: '600',
         playerVars: {'controls': 0,
                      'disablekb': 1,
                      'start': videoChoice.start},
@@ -194,7 +194,8 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         resetArray,
         i,
         trial = -1,
-        choiceTrial = -1,
+        choiceNum = -1,
+        delayLength = 5 * condition,
         firstMachineTrial = nPreWorkPeriods,
         nTrials = nChoices + nPreWorkPeriods,
         functionList = [],
@@ -206,10 +207,20 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         upgradeMachine,
         preMachineWork,
         resetMachine,
+        updateQueue,
+        shiftQueue,
+        startOutcome,
         timeStamp,
         wedges = 5,
         value,
-        outcome;
+        outcome,
+        queueOffset = 5,
+        consumptionQueue = _.range(nTrials + queueOffset).fill("?"),
+        visibleQueueLength = 11,
+        queueIdx = 0;
+
+    consumptionQueue.fill("blank", 0, queueOffset);
+    consumptionQueue.fill("slider", queueOffset, queueOffset + nPreWorkPeriods);
 
     updateMachine = function (exploitVal, exploreVal) {
         var widthpct,
@@ -280,7 +291,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
 
     responseFn = function (choiceId) {
         var nextValue;
-        choiceTrial++;
+        choiceNum++;
         $("#" + choiceId).addClass("clicked");
         $("#machinescreen").html("processing...");
         if (choiceId === "exploit") {
@@ -291,13 +302,14 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             $("#exploregroupinner .spinnerbacking").css("opacity", 1);
         }
         outcome = Math.random() < nextValue;
+        consumptionQueue[trial + queueOffset + delayLength] = outcome ? "video" : "slider";
         $(".choicebutton").off("click");
         psiTurk.recordTrialData({phase: "EXPERIMENT",
                                  trialType: "exploreexploit",
                                  taskType: taskType,
-                                 outcomeNumFromChoice: trial + 4 * condition,
+                                 outcomeNumFromChoice: trial + delayLength,
                                  outcomeNumImmediate: trial,
-                                 choiceTrial: choiceTrial,
+                                 choiceNum: choiceNum,
                                  uniqueid: uniqueId,
                                  condition: condition,
                                  response: choiceId === "explore" ? 1 : 0,
@@ -305,7 +317,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
                                  currentValue: value,
                                  nextValue: nextValue,
                                  outcome: outcome,
-                                 reset: resetArray[trial + 4 * condition - firstMachineTrial]
+                                 reset: resetArray[trial + delayLength - firstMachineTrial]
                                 });
         updateMachine(value, "?");
         setTimeout(function () {
@@ -321,18 +333,18 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
                     $("#machinescreen").html("new spinner not saved");
                 }
             }
-            setTimeout(function () {
+           setTimeout(function () {
                 $("#machinescreen").html("running...");
                 spinMachine(choiceId, nextValue, outcome);
             }, extraTime);
             setTimeout(function () {
                 if (outcome) {
-                    $("#machinescreen").html("Machine succeeded!<br/>Press START to begin video.");
+                    $("#machinescreen").html("Machine succeeded!<br/>Video added to queue.");
                 } else {
-                    $("#machinescreen").html("Machine failed.<br/>Press START to begin task.");
+                    $("#machinescreen").html("Machine failed.<br/>Slider task added to queue.");
                 }
-                $("#start").prop("disabled", false);
-                $("#start").click(function () {
+                updateQueue();
+                setTimeout(function () {
                     $("#start").off("click");
                     $("#exploreexploitdiv").hide();
                     $("#bottominfodiv").hide();
@@ -340,8 +352,8 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
                     $("#exploitgroupinner .spinnerbacking").css("opacity", 0);
                     $("#exploregroupinner .spinnerbacking").css("opacity", 0);
                     updateMachine(value, "?");
-                    callback(nextValue, outcome, trial);
-                });
+                    functionList.pop()();
+                }, 2000);
             }, 2000 + extraTime);
         }, 1500);
     };
@@ -351,15 +363,11 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         $(".machinebutton").removeClass("clicked");
         $("#start").prop("disabled", true);
         $("#machinescreen").html("Select spinner.");
-        $("#machineid").html(1);
         updateMachine(value, "?");
-        $("#exploreexploit").show();
+        $("#exploreexploitdiv").show();
         timeStamp = new Date().getTime();
         $(".choicebutton").click(function () {responseFn(this.id); });
     };
-
-    // showOutcome = function () {
-    // };
 
     resetMachine = function () {
         value = .333 + .333 * Math.random();
@@ -380,47 +388,73 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         $("#alternativecontents").html("Press START to begin task.<br/><button id=\"alternativestart\" class=\"machinebutton\"> START </button>");
         $("#alternativestart").click(function () {$("#alternativecontents").hide();
                                                   $("#bottominfodiv").hide();
-                                                  callback(0, 0, trial); });
+                                                  callback(0, trial); });
+    };
+
+    startOutcome = function () {
+        $("#exploreexploitdiv").hide();
+        $("#alternativecontents").show();
+        $("#alternativecontents").html("Press START to begin task.<br/><button id=\"alternativestart\" class=\"machinebutton\"> START </button>");
+        $("#alternativestart").click(function () {$("#alternativecontents").hide();
+                                                  $("#bottominfodiv").hide();
+                                                  callback(outcome, trial); });
+    };
+
+    updateQueue = function () {
+        d3.selectAll(".queueitem")
+            .data(consumptionQueue.slice(queueIdx, queueIdx + visibleQueueLength))
+            .style("background-color", function (d) {
+                if (d === "?") {
+                    return "black";
+                } else if (d === "video") {
+                    return "blue";
+                } else if (d === "slider") {
+                    return "red";
+                } else {
+                    return  "";
+                }
+            })
+            .style("margin-left", "0px");
+    };
+
+    shiftQueue = function () {
+        if (trial === 0) {
+            functionList.pop()();
+        } else {
+            d3.selectAll(".queueitem")
+                .transition()
+                .duration(1500)
+                .style("margin-left", "-54px");
+            setTimeout(function () {
+                queueIdx++;
+                updateQueue();
+                functionList.pop()();
+            }, 2000);
+        }
     };
 
     this.run = function() {
         trial++;
-        $("#exploreexploitdiv").show();
-        $("#bottominfodiv").show();
+        $("#exploreexploitdiv").hide();
+        // $("#bottominfodiv").show();
+        // $("#inforeminder").hide();
 
-        // if (trial + 4 * condition < firstMachineTrial) {
-        //     $("#trialsuntilmachines").html(firstMachineTrial - 4*condition - trial);
-        // } else if (trial + 4 * condition === firstMachineTrial) {
-        //     $("#mazeblocker").hide();
-        // }
-
-        if (trial < firstMachineTrial && condition === 1 && trial + 4 >= firstMachineTrial) {
-            functionList = [function () {preMachineWork(); },
-                            function () {runChoice(); }];
+        if (trial < firstMachineTrial && condition === 1 && trial + delayLength >= firstMachineTrial) {
+            functionList = [preMachineWork, runChoice, shiftQueue];
         } else if (trial < firstMachineTrial) {
-            functionList = [function () {preMachineWork(); }];
+            functionList = [preMachineWork, shiftQueue];
         } else if (condition === 0) {
-            functionList = [
-                // function () {showOutcome(); },
-                function () {runChoice(); }
-            ];
-        } else if (condition === 1 && trial < nTrials - 4){
-            functionList = [
-                // function () {showOutcome(); },
-                function () {runChoice(); }
-            ];
+            functionList = [startOutcome, runChoice, shiftQueue];
+        } else if (condition === 1 && trial < nTrials - delayLength){
+            functionList = [startOutcome, runChoice, shiftQueue];
         } else {
-            functionList = [
-                //FIX FUNCTION HERE
-                function () {}
-            ];
+            functionList = [startOutcome, runChoice, shiftQueue];
         }
         if (trial > firstMachineTrial && resetArray[trial - firstMachineTrial - 1]) {
-            functionList.push(function () {resetMachine(); });
+            functionList.splice(2, 0, resetMachine);
         }
 
         functionList.pop()();
-        $("#inforeminder").hide();
     };
 
     $("#inforeminderbutton").click(function () {$("#inforeminder").toggle(400); });
@@ -530,13 +564,26 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         .style("fill", "black")
         .style("stroke", "gray")
         .style("stroke-width", 2);
+
+    d3.select("#consumptionqueue")
+        .selectAll("div")
+        .data(consumptionQueue.slice(queueIdx, queueIdx + visibleQueueLength))
+        .enter()
+        .append("div")
+        .attr("class", "queueitemframe")
+        .append("div")
+        .attr("class", "queueitem");
+
+    updateQueue();
+
+
+    $(".queueitemframe").eq(queueOffset).css({"border-color": "blue"});
 }
 
 function ConsumptionRewards(psiTurk, callback) {
     "use strict";
     var video,
         trialNum,
-        rewardProb,
         reward,
         sliderTask,
         currentTask,
@@ -558,7 +605,6 @@ function ConsumptionRewards(psiTurk, callback) {
                                      uniqueid: uniqueId,
                                      condition: condition,
                                      outcome: reward,
-                                     rewardProb: rewardProb,
                                      slidersMissed: -1,
                                      playTime: stat
                                     });
@@ -570,7 +616,6 @@ function ConsumptionRewards(psiTurk, callback) {
                                      uniqueid: uniqueId,
                                      condition: condition,
                                      outcome: reward,
-                                     rewardProb: rewardProb,
                                      slidersMissed: stat,
                                      playTime: -1
                                     });
@@ -592,9 +637,8 @@ function ConsumptionRewards(psiTurk, callback) {
         callback();
     };
 
-    this.setReward = function(_rewardProb, _reward, trial) {
+    this.setReward = function(_reward, trial) {
         reward = _reward;
-        rewardProb = _rewardProb;
         trialNum = trial;
         $("#time").html(30);
         timeLeft = totalTime;
@@ -643,7 +687,7 @@ function PracticeRewards (psiTurk, callback) {
         currentTask,
         video;
 
-    this.setReward = function (rewardProb, reward, trial) {
+    this.setReward = function (reward, trial) {
         // $("#alternativecontents").show();
         $("#consumptionblocker").show();
         if (reward) {

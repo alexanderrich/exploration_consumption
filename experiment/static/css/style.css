@@ -107,29 +107,28 @@ strong {
     padding-bottom: 20px;
 }
 
-#rewards {
-    pointer-events: none;
-    position: relative;
+#content {
     margin-left: auto;
     margin-right: auto;
-    width: 700px;
-    height: 550px;
+    /* overflow: auto; */
+    width: 600px;
+    height: 450px;
+    margin-bottom: 10px;
+}
+
+#rewards {
+    pointer-events: none;
+    /* position: relative; */
+    margin-left: auto;
+    margin-right: auto;
+    overflow: auto;
+    width: 600px;
+    height: 450px;
 }
 
 #holdspace {
     text-align: center;
     font-size: 28px;
-}
-
-.standardRewards {
-    margin-left: auto;
-    margin-right: auto;
-    width: 600px;
-    height: 500px;
-    text-align: center;
-    font-size: 45px;
-    font-family: sans-serif;
-    padding-top: 150px;
 }
 
 #rewardintro {
@@ -182,9 +181,8 @@ strong {
     padding-top: 100px;
     font-size: 30px;
     width: 600px;
-    height: 350px;
+    height: 400px;
     overflow: auto;
-    margin-bottom: 10px;
 }
 
 #maze {
@@ -218,8 +216,8 @@ strong {
 
 #machinescreen {
     width: 95%;
-    height: 120px;
-    margin-top: 15px;
+    height: 150px;
+    margin-top: 25px;
     margin-bottom: 15px;
     padding-left: 5px;
     background-color: black;
@@ -327,7 +325,6 @@ strong {
 }
 
 #sliders {
-    margin-bottom: 10px;
     width: 700px;
     height: 450px;
     overflow: auto;
@@ -385,4 +382,28 @@ input.slider[type="range"] {
     height: 270px;
     background: white;
     border: 2px solid black;
+}
+
+/* consumption queue */
+
+#consumptionqueue {
+    height: 100px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.queueitemframe {
+    float: left;
+    margin: 2px;
+    width: 50px;
+    height: 50px;
+    border: 3px solid black;
+    border-radius: 10px;
+    padding: 5px;
+}
+
+.queueitem {
+    width: 20px;
+    height: 20px;
 }
