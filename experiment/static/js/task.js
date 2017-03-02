@@ -9,7 +9,8 @@
 /*jslint browser: true*/
 /*global condition, uniqueId, adServerLoc, mode, document, PsiTurk, YT, $, _, d3, Phaser, window, setTimeout, clearTimeout, setInterval, clearInterval*/
 
-condition = parseInt(condition);
+// condition = parseInt(condition);
+condition = 1;
 
 var tag = document.createElement('script'),
     firstScriptTag = document.getElementsByTagName('script')[0],
@@ -195,8 +196,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         i,
         trial = -1,
         choiceNum = -1,
-        delayLength = 5 * condition,
-        firstMachineTrial = nPreWorkPeriods,
+        delayLength = 7 * condition,
         nTrials = nChoices + nPreWorkPeriods,
         functionList = [],
         runChoice,
@@ -205,7 +205,6 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         updateMachine,
         spinMachine,
         upgradeMachine,
-        preMachineWork,
         resetMachine,
         updateQueue,
         shiftQueue,
@@ -213,10 +212,10 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         timeStamp,
         wedges = 5,
         value,
-        outcome,
+        outcome = 0,
         queueOffset = 5,
         consumptionQueue = _.range(nTrials + queueOffset).fill("?"),
-        visibleQueueLength = 11,
+        visibleQueueLength = 13,
         queueIdx = 0;
 
     consumptionQueue.fill("blank", 0, queueOffset);
@@ -317,7 +316,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
                                  currentValue: value,
                                  nextValue: nextValue,
                                  outcome: outcome,
-                                 reset: resetArray[trial + delayLength - firstMachineTrial]
+                                 reset: resetArray[choiceNum - 1] || 0
                                 });
         updateMachine(value, "?");
         setTimeout(function () {
@@ -347,7 +346,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
                 setTimeout(function () {
                     $("#start").off("click");
                     $("#exploreexploitdiv").hide();
-                    $("#bottominfodiv").hide();
+                    $("#pointer").hide();
                     $(".choicebutton").removeClass("clicked");
                     $("#exploitgroupinner .spinnerbacking").css("opacity", 0);
                     $("#exploregroupinner .spinnerbacking").css("opacity", 0);
@@ -365,11 +364,22 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         $("#machinescreen").html("Select spinner.");
         updateMachine(value, "?");
         $("#exploreexploitdiv").show();
+        $("#pointer").show();
+        if (condition) {
+            $("#pointer").css("margin-left", "565px");
+        } else {
+            $("#pointer").css("margin-left", "227px");
+        }
         timeStamp = new Date().getTime();
         $(".choicebutton").click(function () {responseFn(this.id); });
     };
 
     resetMachine = function () {
+        if (condition) {
+            $("#pointer").css("margin-left", "565px");
+        } else {
+            $("#pointer").css("margin-left", "227px");
+        }
         value = .333 + .333 * Math.random();
         $("#machinescreen").html("Machine<br/>RESET");
         $("#start").prop("disabled", true);
@@ -377,41 +387,49 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         setTimeout(function () {
             upgradeMachine(value);
         }, 1000);
-        // $("#alternativecontents").hide();
         $("#exploreexploitdiv").show();
+        $("#pointer").show();
         setTimeout(functionList.pop(), 4000);
-    };
-
-    preMachineWork = function () {
-        $("#exploreexploitdiv").hide();
-        $("#alternativecontents").show();
-        $("#alternativecontents").html("Press START to begin task.<br/><button id=\"alternativestart\" class=\"machinebutton\"> START </button>");
-        $("#alternativestart").click(function () {$("#alternativecontents").hide();
-                                                  $("#bottominfodiv").hide();
-                                                  callback(0, trial); });
     };
 
     startOutcome = function () {
         $("#exploreexploitdiv").hide();
         $("#alternativecontents").show();
-        $("#alternativecontents").html("Press START to begin task.<br/><button id=\"alternativestart\" class=\"machinebutton\"> START </button>");
+        $("#pointer").show();
+        $("#pointer").animate({"margin-left": "227px"}, 750);
         $("#alternativestart").click(function () {$("#alternativecontents").hide();
-                                                  $("#bottominfodiv").hide();
-                                                  callback(outcome, trial); });
+                                                  $("#pointer").hide();
+                                                  $("#alternativestart").off("click");
+                                                  if (consumptionQueue[queueOffset + trial] === "slider") {
+                                                      callback(0, trial);
+                                                  } else {
+                                                      callback(1, trial);
+                                                  }});
     };
 
     updateQueue = function () {
         d3.selectAll(".queueitem")
-            .data(consumptionQueue.slice(queueIdx, queueIdx + visibleQueueLength))
-            .style("background-color", function (d) {
+            .data(consumptionQueue.slice(queueIdx, queueIdx + visibleQueueLength + 1))
+            // .style("background-color", function (d) {
+            //     if (d === "?") {
+            //         return "black";
+            //     } else if (d === "video") {
+            //         return "blue";
+            //     } else if (d === "slider") {
+            //         return "red";
+            //     } else {
+            //         return  "";
+            //     }
+            // })
+            .attr("src", function (d) {
                 if (d === "?") {
-                    return "black";
+                    return "static/images/unknownicon.png";
                 } else if (d === "video") {
-                    return "blue";
+                    return "static/images/youtubeicon.png";
                 } else if (d === "slider") {
-                    return "red";
+                    return "static/images/slidericon.png";
                 } else {
-                    return  "";
+                    return  "static/images/blankicon.png";
                 }
             })
             .style("margin-left", "0px");
@@ -424,7 +442,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             d3.selectAll(".queueitem")
                 .transition()
                 .duration(1500)
-                .style("margin-left", "-54px");
+                .style("margin-left", "-48px");
             setTimeout(function () {
                 queueIdx++;
                 updateQueue();
@@ -438,37 +456,24 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         $("#exploreexploitdiv").hide();
         // $("#bottominfodiv").show();
         // $("#inforeminder").hide();
-
-        if (trial < firstMachineTrial && condition === 1 && trial + delayLength >= firstMachineTrial) {
-            functionList = [preMachineWork, runChoice, shiftQueue];
-        } else if (trial < firstMachineTrial) {
-            functionList = [preMachineWork, shiftQueue];
-        } else if (condition === 0) {
-            functionList = [startOutcome, runChoice, shiftQueue];
-        } else if (condition === 1 && trial < nTrials - delayLength){
-            functionList = [startOutcome, runChoice, shiftQueue];
-        } else {
-            functionList = [startOutcome, runChoice, shiftQueue];
+        functionList = [startOutcome];
+        if (trial + delayLength >= nPreWorkPeriods && trial + delayLength < nTrials) {
+            functionList.push(runChoice);
         }
-        if (trial > firstMachineTrial && resetArray[trial - firstMachineTrial - 1]) {
-            functionList.splice(2, 0, resetMachine);
+        if (trial + delayLength > nPreWorkPeriods && resetArray[choiceNum]) {
+            functionList.push(resetMachine);
         }
-
+        functionList.push(shiftQueue);
         functionList.pop()();
     };
 
-    $("#inforeminderbutton").click(function () {$("#inforeminder").toggle(400); });
     (function () {
-        var lastchosen = -1,
-            chosen = -1;
+        var chosen;
         resetArray = [];
         for (i = 0; i < nChoices / 6; i++) {
-            while(chosen === lastchosen) {
-                chosen = Math.floor(Math.random() * 6);
-            }
+            chosen = Math.floor(Math.random() * 6);
             resetArray = [0, 0, 0, 0, 0, 0].concat(resetArray);
             resetArray[chosen] = 1;
-            lastchosen = chosen;
         }
     })();
 
@@ -567,17 +572,19 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
 
     d3.select("#consumptionqueue")
         .selectAll("div")
-        .data(consumptionQueue.slice(queueIdx, queueIdx + visibleQueueLength))
+        .data(consumptionQueue.slice(queueIdx, queueIdx + visibleQueueLength + 1))
         .enter()
         .append("div")
         .attr("class", "queueitemframe")
-        .append("div")
+        .append("img")
         .attr("class", "queueitem");
 
     updateQueue();
 
 
     $(".queueitemframe").eq(queueOffset).css({"border-color": "blue"});
+    $(".queueitemframe").eq(visibleQueueLength).append("<div id='queueitemblocker'></div>");
+    $(".queueitemframe").eq(visibleQueueLength).css({"border-color": "white"});
 }
 
 function ConsumptionRewards(psiTurk, callback) {
@@ -962,8 +969,8 @@ function experimentDriver() {
     var psiTurk = new PsiTurk(uniqueId, adServerLoc, mode),
         next,
         nChoices = [12, 60],
-        nPreWorkPeriods = [6, 10],
-        // nPreWorkPeriods = [0, 0],
+        nPreWorkPeriods = [8, 10],
+        // nPreWorkPeriods = [1, 0],
         functionList = [];
 
     next = function () {
@@ -988,21 +995,21 @@ function experimentDriver() {
                           "endingquestions.html",
                           "postquestionnaire.html"]);
     functionList = [
-        function () {
-            instructionDriver(["instructions/instruct_1.html",
-                               "instructions/instruct_2.html",
-                               "instructions/instruct_3.html",
-                               "instructions/instruct_4.html",
-                               "instructions/instruct_5.html",
-                               "instructions/instruct_6.html",
-                               "instructions/instruct_7.html"],
-                              "instructions/quiz.html",
-                              {range: "none_all",
-                               reset: "1_6",
-                               processnum: "4",
-                               misspenalty: "10percentage",
-                               pausepenalty: "10percentage"},
-                              psiTurk, next); },
+        // function () {
+        //     instructionDriver(["instructions/instruct_1.html",
+        //                        "instructions/instruct_2.html",
+        //                        "instructions/instruct_3.html",
+        //                        "instructions/instruct_4.html",
+        //                        "instructions/instruct_5.html",
+        //                        "instructions/instruct_6.html",
+        //                        "instructions/instruct_7.html"],
+        //                       "instructions/quiz.html",
+        //                       {range: "none_all",
+        //                        reset: "1_6",
+        //                        processnum: "4",
+        //                        misspenalty: "10percentage",
+        //                        pausepenalty: "10percentage"},
+        //                       psiTurk, next); },
         function () {
             videoPicker(psiTurk, next);
         },

@@ -111,7 +111,7 @@ strong {
     margin-left: auto;
     margin-right: auto;
     /* overflow: auto; */
-    width: 600px;
+    width: 700px;
     height: 450px;
     margin-bottom: 10px;
 }
@@ -174,14 +174,15 @@ strong {
 /* card task */
 
 #alternativecontents {
-    margin-left: auto;
-    margin-right: auto;
+    /* margin-left: auto; */
+    /* margin-right: auto; */
     position: relative;
     text-align: center;
-    padding-top: 100px;
+    padding-top: 150px;
+    margin-bottom: 10px;
     font-size: 30px;
-    width: 600px;
-    height: 400px;
+    width: 520px;
+    height: 350px;
     overflow: auto;
 }
 
@@ -191,8 +192,8 @@ strong {
 }
 
 #exploreexploitdiv {
-    margin-left: auto;
-    margin-right: auto;
+    /* margin-left: auto; */
+    /* margin-right: auto; */
     margin-bottom: 10px;
     position: relative;
     padding-top: 15px;
@@ -257,30 +258,6 @@ strong {
 
 #alternativestart {
     width: 200px;
-}
-
-#inforeminderbutton {
-    text-align: center;
-    width: 60px;
-    height: 30px;
-    border-radius: 5px;
-    border: 2px solid black;
-    background: gainsboro;
-    font-size: 20px;
-}
-
-#inforeminder {
-    display: none;
-}
-
-.info {
-    margin-left: auto;
-    margin-right: auto;
-    padding-top: 10px;
-    height: 60px;
-    border-radius: 5px;
-    border: 5px solid black;
-    background: white;
 }
 
 #trials {
@@ -390,20 +367,40 @@ input.slider[type="range"] {
     height: 100px;
     margin-left: auto;
     margin-right: auto;
+    overflow: hidden;
 }
+
+#consumptionqueue p {
+    margin-bottom: -6px;
+}
+
 
 
 .queueitemframe {
     float: left;
     margin: 2px;
-    width: 50px;
-    height: 50px;
+    width: 44px;
+    height: 44px;
     border: 3px solid black;
     border-radius: 10px;
-    padding: 5px;
+    padding: 4px;
+    position: relative;
 }
 
 .queueitem {
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
+}
+
+#queueitemblocker {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 50px;
+    height: 50px;
+    background-color: white;
+}
+
+#pointer {
+    margin-left: 227px;
 }
