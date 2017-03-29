@@ -29,27 +29,25 @@ optimal_values <- function (discount, ntrials, minreward=4, maxreward=12, pbad=.
               VoI_diff=VoI_diff))
 }
 
-optimal_values_indefinite <- function (discount, minreward=4, maxreward=12, pbad=.5, badcost=0, tol=.00001) {
-  ngood <- maxreward - minreward + 1
-  n <- ngood + 1
-  ptrans <- 1/ngood * (1-pbad)
+optimal_values_indefinite <- function (discount, outcomes=c(0:100), outcome_probs=c(), tol=.00001) {
+  outcome_probs <- outcome_probs/sum(outcome_probs)
+  n <- length(outcomes)
   trans_explore <- matrix(0, n, n)
   trans_exploit <- diag(n)
   rew_explore <- matrix(0, n, n)
-  rew_exploit <- diag(n) * c(badcost, minreward:maxreward)
-  reward_exploit <- c(badcost, minreward:maxreward)
+  rew_exploit <- diag(n) * outcomes
+  reward_exploit <- outcomes
   for (i in 1:n) {
     for (j in 1:n) {
       if (j > i) {
-        trans_explore[i, j] <- ptrans
+        trans_explore[i, j] <- outcome_probs[j]
         rew_explore[i, j] <- reward_exploit[j]
       } else if (i == j){
-        trans_explore[i,j] <- 1 - ptrans * (n - i)
-        rew_explore[i, j] <- (badcost * pbad + sum(reward_exploit[2:i])* ptrans)/(pbad + length(1:(i-1))*ptrans)
+        trans_explore[i,j] <- sum(outcome_probs[1:i])
+        rew_explore[i, j] <- (sum(reward_exploit[1:i]*outcome_probs[1:i]))/sum(outcome_probs[1:i])
       }
     }
   }
-  rew_explore[1,1] <- badcost
   values <- rep(0, n)
   delta <- tol + 1
   while (delta > tol ) {
@@ -64,10 +62,11 @@ optimal_values_indefinite <- function (discount, minreward=4, maxreward=12, pbad
     values <- pmax(values_exploit, values_explore)
     delta <- max(abs(values - old_values))
   }
-  reward_explore <- rep(pbad*badcost + ptrans*sum(minreward:maxreward), n)
+  reward_explore <- rep(sum(outcome_probs*outcomes), n)
   reward_diff <- reward_explore - reward_exploit
   VoI_diff <- values_explore - values_exploit - reward_diff
-  list(values_explore=values_explore,
+  data.frame(reward_idx=1:length(values_explore),
+       values_explore=values_explore,
        values_exploit=values_exploit,
        reward_explore=reward_explore,
        reward_exploit=reward_exploit,
@@ -77,7 +76,19 @@ optimal_values_indefinite <- function (discount, minreward=4, maxreward=12, pbad
        )
 }
 
-test <- optimal_values(5/6, 10, minreward=25, maxreward=100, pbad=0, badcost=0)
+df <- optimal_values_indefinite(5/6, outcomes=1:100, outcome_probs=c(33, rep(1, 99)))
+df$v_diff <- df$reward_diff + df$VoI_diff
+df$v_diff_8 <- df$reward_diff + .8 * df$VoI_diff
+df$v_diff_6 <- df$reward_diff + .6 * df$VoI_diff
+df$v_diff_4 <- df$reward_diff + .4 * df$VoI_diff
+df$v_diff_2 <- df$reward_diff + .2 * df$VoI_diff
+df$v_diff_0 <- df$reward_diff
+df <- df %>%
+  select(reward_idx, v_diff, v_diff_8, v_diff_6, v_diff_4, v_diff_2, v_diff_0) %>%
+  gather(bias, diff, -reward_idx)
+ggplot(df, aes(x=reward_idx, y=diff, group=bias)) + geom_hline(yintercept=0) + geom_line(aes(color=bias)) + xlim(0, 100) + ylim(-60, 60)
+
+test <- optimal_values(5/6, 10, minreward=0, maxreward=100, pbad=0, badcost=0)
 df <- melt(test$exploit_values)
 df <- setNames(df, c("trial", "rewardIdx", "exploit_value"))
 df$explore_value <- melt(test$explore_values)[,3]
