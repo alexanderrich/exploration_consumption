@@ -750,7 +750,7 @@ function practiceConsumption(psiTurk, callback) {
             $("#continue").click(
                 function () {
                     $("#rewardintro").hide();
-                    rewards.setReward(.5, reward, trials.shift());
+                    rewards.setReward(reward, trials.shift());
                 }
             );
         }
