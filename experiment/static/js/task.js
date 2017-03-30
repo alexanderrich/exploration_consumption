@@ -213,13 +213,11 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         wedges = 5,
         value,
         outcome = 0,
-        queueOffset = 5,
-        consumptionQueue = _.range(nTrials + queueOffset).fill("?"),
-        visibleQueueLength = 13,
+        consumptionQueue = _.range(nTrials).fill("?"),
+        visibleQueueLength = 8,
         queueIdx = 0;
 
-    consumptionQueue.fill("blank", 0, queueOffset);
-    consumptionQueue.fill("slider", queueOffset, queueOffset + nPreWorkPeriods);
+    consumptionQueue.fill("slider", 0, nPreWorkPeriods);
 
     updateMachine = function (exploitVal, exploreVal) {
         var widthpct,
@@ -301,7 +299,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             $("#exploregroupinner .spinnerbacking").css("opacity", 1);
         }
         outcome = Math.random() < nextValue;
-        consumptionQueue[trial + queueOffset + delayLength] = outcome ? "video" : "slider";
+        consumptionQueue[trial + delayLength] = outcome ? "video" : "slider";
         $(".choicebutton").off("click");
         psiTurk.recordTrialData({phase: "EXPERIMENT",
                                  trialType: "exploreexploit",
@@ -400,7 +398,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         $("#alternativestart").click(function () {$("#alternativecontents").hide();
                                                   $("#pointer").hide();
                                                   $("#alternativestart").off("click");
-                                                  if (consumptionQueue[queueOffset + trial] === "slider") {
+                                                  if (consumptionQueue[trial] === "slider") {
                                                       callback(0, trial);
                                                   } else {
                                                       callback(1, trial);
@@ -410,18 +408,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
     updateQueue = function () {
         d3.selectAll(".queueitem")
             .data(consumptionQueue.slice(queueIdx, queueIdx + visibleQueueLength + 1))
-            // .style("background-color", function (d) {
-            //     if (d === "?") {
-            //         return "black";
-            //     } else if (d === "video") {
-            //         return "blue";
-            //     } else if (d === "slider") {
-            //         return "red";
-            //     } else {
-            //         return  "";
-            //     }
-            // })
-            .attr("src", function (d) {
+            .attr("xlink:href", function (d) {
                 if (d === "?") {
                     return "static/images/unknownicon.png";
                 } else if (d === "video") {
@@ -432,7 +419,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
                     return  "static/images/blankicon.png";
                 }
             })
-            .style("margin-left", "0px");
+            .attr("x", "0px");
     };
 
     shiftQueue = function () {
@@ -442,7 +429,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             d3.selectAll(".queueitem")
                 .transition()
                 .duration(1500)
-                .style("margin-left", "-48px");
+                .attr("x", "-50px");
             setTimeout(function () {
                 queueIdx++;
                 updateQueue();
@@ -571,20 +558,26 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         .style("stroke-width", 2);
 
     d3.select("#consumptionqueue")
-        .selectAll("div")
+        .attr("width", (visibleQueueLength * 50).toString() + "px")
+        .selectAll("g")
         .data(consumptionQueue.slice(queueIdx, queueIdx + visibleQueueLength + 1))
         .enter()
-        .append("div")
+        .append("g")
         .attr("class", "queueitemframe")
-        .append("img")
-        .attr("class", "queueitem");
+        .attr("transform", function(d, i) {return "translate(" + (i*50) + ",30)";})
+        .append("image")
+        .attr("class", "queueitem")
+        .attr("width", "40px")
+        .attr("height", "40px");
+
+    d3.select("#consumptionqueue")
+        .append("text")
+        .attr("y", "20px")
+        .style("font-size", "18px")
+        .text("Work queue:");
 
     updateQueue();
 
-
-    $(".queueitemframe").eq(queueOffset).css({"border-color": "blue"});
-    $(".queueitemframe").eq(visibleQueueLength).append("<div id='queueitemblocker'></div>");
-    $(".queueitemframe").eq(visibleQueueLength).css({"border-color": "white"});
 }
 
 function ConsumptionRewards(psiTurk, callback) {

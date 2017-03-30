@@ -186,11 +186,6 @@ strong {
     overflow: auto;
 }
 
-#maze {
-    width: 600px;
-    height: 300px;
-}
-
 #exploreexploitdiv {
     /* margin-left: auto; */
     /* margin-right: auto; */
@@ -332,33 +327,12 @@ input.slider[type="range"] {
     font-size: 28px;
 }
 
-#mazediv {
-    margin-left: auto;
-    margin-right: auto;
-    position: relative;
-    width: 600px;
-    height: 310px;
-}
-
 #bottominfodiv {
     margin-left: auto;
     margin-right: auto;
     position: relative;
     width: 600px;
     height: 310px;
-}
-
-#mazeblocker {
-    text-align: center;
-    font-size: 30px;
-    padding-top: 80px;
-    position: absolute;
-    left: 15px;
-    top: 15px;
-    width: 570px;
-    height: 270px;
-    background: white;
-    border: 2px solid black;
 }
 
 /* consumption queue */
@@ -368,37 +342,6 @@ input.slider[type="range"] {
     margin-left: auto;
     margin-right: auto;
     overflow: hidden;
-}
-
-#consumptionqueue p {
-    margin-bottom: -6px;
-}
-
-
-
-.queueitemframe {
-    float: left;
-    margin: 2px;
-    width: 44px;
-    height: 44px;
-    border: 3px solid black;
-    border-radius: 10px;
-    padding: 4px;
-    position: relative;
-}
-
-.queueitem {
-    width: 30px;
-    height: 30px;
-}
-
-#queueitemblocker {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    width: 50px;
-    height: 50px;
-    background-color: white;
 }
 
 #pointer {
