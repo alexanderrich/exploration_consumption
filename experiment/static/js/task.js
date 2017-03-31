@@ -246,13 +246,11 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
 
     spinMachine = function (choiceId, choiceVal, outcome) {
         var group,
-            r,
-            exploitSvgGroup = d3.select("#exploitcirclegroup"),
-            exploreSvgGroup = d3.select("#explorecirclegroup");
+            r;
         if (choiceId === "explore") {
-            group = exploreSvgGroup;
+            group = d3.select("#explorecirclegroup");
         } else {
-            group = exploitSvgGroup;
+            group = d3.select("#exploitcirclegroup");
         }
         if (outcome) {
             r = 720 - 360 / wedges * choiceVal * Math.random();
@@ -293,10 +291,10 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         $("#machinescreen").html("processing...");
         if (choiceId === "exploit") {
             nextValue = value;
-            $("#exploitgroupinner .spinnerbacking").css("opacity", 1);
+            $("#exploitsvg .spinnerbacking").css("opacity", 1);
         } else {
             nextValue = Math.random();
-            $("#exploregroupinner .spinnerbacking").css("opacity", 1);
+            $("#exploresvg .spinnerbacking").css("opacity", 1);
         }
         outcome = Math.random() < nextValue;
         consumptionQueue[trial + delayLength] = outcome ? "video" : "slider";
@@ -346,8 +344,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
                     $("#exploreexploitdiv").hide();
                     $("#pointer").hide();
                     $(".choicebutton").removeClass("clicked");
-                    $("#exploitgroupinner .spinnerbacking").css("opacity", 0);
-                    $("#exploregroupinner .spinnerbacking").css("opacity", 0);
+                    $(".spinnerbacking").css("opacity", 0);
                     updateMachine(value, "?");
                     functionList.pop()();
                 }, 2000);
@@ -476,74 +473,50 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         };
     }
 
-    var entiregroup,
-        circlegroup;
-    entiregroup = d3.select("#exploitsvg")
-        .append("g")
-        .attr("class", "exploitgroupouter")
-        .attr("id", "exploitgroupouter")
-        .append("g")
-        .attr("class", "exploitgroupinner")
-        .attr("id", "exploitgroupinner");
+    function buildSpinner (container, id) {
+        var circlegroup;
+        circlegroup = container.append("g")
+            .attr("class", "spinner")
+            .attr("id", id)
+            .attr("transform", "translate(75, 75)");
+        circlegroup.append("path")
+            .datum({endAngle: tau})
+            .style("fill", "#222222")
+            .attr("d", arc);
+        _.range(wedges).map(function (x) {
+            circlegroup.append("g")
+                .attr("transform", "rotate(" + x / wedges * 360 + ")")
+                .append("path")
+                .datum({endAngle: 0})
+                .attr("class", "winningArc")
+                .style("fill", "orange")
+                .attr("d", arc);
+        });
+        return circlegroup;
+    }
+
+    var entiregroup;
+    entiregroup = d3.select("#exploitsvg");
     entiregroup.append("rect")
         .attr("class", "spinnerbacking")
         .attr("width",  150)
         .attr("height", 150)
         .style("opacity", 0)
         .style("fill", "#444444");
-    circlegroup = entiregroup.append("g")
-        .attr("class", "exploitcirclegroup")
-        .attr("id", "exploitcirclegroup")
-        .attr("transform", "translate(75, 75)");
-    circlegroup.append("path")
-        .datum({endAngle: tau})
-        .style("fill", "#222222")
-        .attr("d", arc);
-    _.range(wedges).map(function (x) {
-        circlegroup.append("g")
-            .attr("transform", "rotate(" + x / wedges * 360 + ")")
-            .append("path")
-            .datum({endAngle: 0})
-            .attr("class", "winningArc")
-            .style("fill", "orange")
-            .attr("d", arc);
-    });
+    buildSpinner(entiregroup, "exploitcirclegroup");
     entiregroup.append("polygon")
         .attr("points", "65 0, 85 0, 75 20")
         .style("fill", "black")
         .style("stroke", "gray")
         .style("stroke-width", 2);
-    entiregroup = d3.select("#exploresvg")
-        .append("g")
-        .attr("class", "exploregroupouter")
-        .attr("id", "exploregroupouter")
-        .append("g")
-        .attr("class", "exploregroupinner")
-        .attr("id", "exploregroupinner");
+    entiregroup = d3.select("#exploresvg");
     entiregroup.append("rect")
         .attr("class", "spinnerbacking")
         .attr("width",  150)
         .attr("height", 150)
         .style("opacity", 0)
         .style("fill", "#444444");
-    circlegroup = entiregroup.append("g")
-        .attr("class", "explorecirclegroup")
-        .attr("id", "explorecirclegroup")
-        .attr("transform", "translate(75, 75)");
-    circlegroup.append("path")
-        .datum({endAngle: tau})
-        .style("fill", "#222222")
-        .attr("d", arc);
-    _.range(wedges).map(function (x) {
-        circlegroup.append("g")
-            .attr("transform", "rotate(" + x / wedges * 360 + ")")
-            .append("path")
-            .datum({endAngle: 0})
-            .attr("class", "winningArc")
-            .style("fill", "orange")
-            .attr("d", arc);
-    });
-    circlegroup.append("text")
+    buildSpinner(entiregroup, "explorecirclegroup").append("text")
         .attr("id", "questionMark")
         .text("?")
         .attr("text-anchor", "middle")
@@ -575,6 +548,52 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         .attr("y", "20px")
         .style("font-size", "18px")
         .text("Work queue:");
+
+    var possibleSpinners = _.range(1, 21).map(function(x) {return x/20}).
+            concat(_.range(10).fill(0))
+            .map(function(x) {return {endAngle: x * tau / wedges}; });
+    var possibleSpinnerOrder = _.shuffle(_.range(30));
+
+    d3.select("#spinnerpickersvg")
+        .attr("width", "370px")
+        .attr("height", "310px")
+        .append("rect")
+        .attr("width", "370px")
+        .attr("height", "310px")
+        .style("fill", "lightgray");
+    d3.select("#spinnerpickersvg")
+        .selectAll("g")
+        .data(possibleSpinners)
+        .enter()
+        .append("g")
+        .attr("class", "spinnerpickeroption")
+        .attr("transform", function(d, i) {
+            return "translate(" + (5 + (possibleSpinnerOrder[i] % 6) * 60) + "," + (5 + Math.floor(possibleSpinnerOrder[i]/6) * 60) + ")scale(.4)";
+        })
+        .each(function (d, i) {
+            buildSpinner(d3.select(this), "spinner" + i);
+        })
+        .select(".spinner")
+        .each(function (d,i) {
+            d3.select(this)
+                .selectAll(".winningArc")
+                .datum(d)
+                .attr("d", arc);
+        });
+
+    d3.select("#spinnerpickersvg")
+        .selectAll(".spinnerpickeroption")
+        .append("rect")
+        .attr("class", "spinnercover")
+        .attr("width", 150)
+        .attr("height", 150)
+        .style("fill", "lightgray")
+        .style("stroke", "black")
+        .style("stroke-width", 2)
+        .on("click", function () {
+            d3.select(this)
+                .style("fill-opacity", 0);
+        });
 
     updateQueue();
 
