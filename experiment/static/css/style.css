@@ -61,7 +61,7 @@ strong {
     left: 20px;
     top: 26px;
     position: absolute;
-    /* display: none; */
+    display: none;
 }
 
 /* ad.html  - the ad that people view first */

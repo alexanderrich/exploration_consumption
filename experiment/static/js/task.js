@@ -206,6 +206,8 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         spinMachine,
         upgradeMachine,
         resetMachine,
+        showNewSpinnerPicker,
+        setOutcome,
         updateQueue,
         shiftQueue,
         startOutcome,
@@ -284,21 +286,62 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             .attrTween("d", arcTween(newVal * tau / wedges));
     };
 
+
     responseFn = function (choiceId) {
         var nextValue;
         choiceNum++;
+        $(".choicebutton").off("click");
         $("#" + choiceId).addClass("clicked");
-        $("#machinescreen").html("processing...");
         if (choiceId === "exploit") {
+            $("#machinescreen").html("processing...");
             nextValue = value;
             $("#exploitsvg .spinnerbacking").css("opacity", 1);
+            setTimeout(function () {
+                setOutcome(choiceId, nextValue);
+            }, 1500);
         } else {
-            nextValue = Math.random();
+            // nextValue = Math.random() > .333 ? Math.random() : 0;
             $("#exploresvg .spinnerbacking").css("opacity", 1);
+            showNewSpinnerPicker();
         }
+    };
+
+    showNewSpinnerPicker = function () {
+        var spinners = d3.selectAll(".spinnerpickeroption")
+                .data(possibleSpinners);
+        $("#machinescreen").html("processing...");
+        $("#spinnerpicker").show();
+        d3.selectAll(".spinnercover")
+            .style("fill-opacity", 0);
+        setTimeout(function () {
+            d3.selectAll(".spinnercover")
+                .style("fill-opacity", 1);
+            $("#machinescreen").html("Shuffling...");
+            possibleSpinnerOrder = _.shuffle(_.range(30));
+            spinners.attr("transform", function(d, i) {
+                    return "translate(" + (5 + (possibleSpinnerOrder[i] % 6) * 60) + "," +
+                        (5 + Math.floor(possibleSpinnerOrder[i]/6) * 60) + ")scale(.4)";
+                });
+        }, 1500);
+        setTimeout(function () {
+            $("#machinescreen").html("Select a new spinner.");
+            spinners.on("click", function(d, i) {
+                spinners.on("click", null);
+                $("#machinescreen").html("New spinner selected.");
+                d3.select(this)
+                    .select(".spinnercover")
+                    .style("fill-opacity", 0);
+                setTimeout(function () {
+                    $("#spinnerpicker").hide();
+                    setOutcome("explore", d);
+                }, 1500);
+            });
+        }, 2500);
+    };
+
+    setOutcome = function (choiceId, nextValue) {
         outcome = Math.random() < nextValue;
         consumptionQueue[trial + delayLength] = outcome ? "video" : "slider";
-        $(".choicebutton").off("click");
         psiTurk.recordTrialData({phase: "EXPERIMENT",
                                  trialType: "exploreexploit",
                                  taskType: taskType,
@@ -314,42 +357,39 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
                                  outcome: outcome,
                                  reset: resetArray[choiceNum - 1] || 0
                                 });
-        updateMachine(value, "?");
-        setTimeout(function () {
-            var extraTime = 0;
-            if (choiceId === "explore") {
-                extraTime = 1500;
-                updateMachine(value, nextValue);
-                if (nextValue > value) {
-                    $("#machinescreen").html("new spinner saved!");
-                    value = nextValue;
-                    upgradeMachine(value);
-                } else {
-                    $("#machinescreen").html("new spinner not saved");
-                }
+        var extraTime = 0;
+        if (choiceId === "explore") {
+            extraTime = 1500;
+            updateMachine(value, nextValue);
+            if (nextValue > value) {
+                $("#machinescreen").html("new spinner saved!");
+                value = nextValue;
+                upgradeMachine(value);
+            } else {
+                $("#machinescreen").html("new spinner not saved");
             }
-           setTimeout(function () {
-                $("#machinescreen").html("running...");
-                spinMachine(choiceId, nextValue, outcome);
-            }, extraTime);
+        }
+        setTimeout(function () {
+            $("#machinescreen").html("running...");
+            spinMachine(choiceId, nextValue, outcome);
+        }, extraTime);
+        setTimeout(function () {
+            if (outcome) {
+                $("#machinescreen").html("Machine succeeded!<br/>Video added to queue.");
+            } else {
+                $("#machinescreen").html("Machine failed.<br/>Slider task added to queue.");
+            }
+            updateQueue();
             setTimeout(function () {
-                if (outcome) {
-                    $("#machinescreen").html("Machine succeeded!<br/>Video added to queue.");
-                } else {
-                    $("#machinescreen").html("Machine failed.<br/>Slider task added to queue.");
-                }
-                updateQueue();
-                setTimeout(function () {
-                    $("#start").off("click");
-                    $("#exploreexploitdiv").hide();
-                    $("#pointer").hide();
-                    $(".choicebutton").removeClass("clicked");
-                    $(".spinnerbacking").css("opacity", 0);
-                    updateMachine(value, "?");
-                    functionList.pop()();
-                }, 2000);
-            }, 2000 + extraTime);
-        }, 1500);
+                $("#start").off("click");
+                $("#exploreexploitdiv").hide();
+                $("#pointer").hide();
+                $(".choicebutton").removeClass("clicked");
+                $(".spinnerbacking").css("opacity", 0);
+                updateMachine(value, "?");
+                functionList.pop()();
+            }, 2000);
+        }, 2000 + extraTime);
     };
 
     runChoice = function () {
@@ -549,9 +589,8 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         .style("font-size", "18px")
         .text("Work queue:");
 
-    var possibleSpinners = _.range(1, 21).map(function(x) {return x/20}).
-            concat(_.range(10).fill(0))
-            .map(function(x) {return {endAngle: x * tau / wedges}; });
+    var possibleSpinners = _.range(1, 21).map(function(x) {return x/20})
+            .concat(_.range(10).fill(0));
     var possibleSpinnerOrder = _.shuffle(_.range(30));
 
     d3.select("#spinnerpickersvg")
@@ -563,12 +602,14 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         .style("fill", "lightgray");
     d3.select("#spinnerpickersvg")
         .selectAll("g")
-        .data(possibleSpinners)
+        .data(possibleSpinners.map(function(x) {return {endAngle: x * tau / wedges}; }))
         .enter()
         .append("g")
         .attr("class", "spinnerpickeroption")
+        .attr("id", function(d, i) {return "spinnerpickeroption" + i; })
         .attr("transform", function(d, i) {
-            return "translate(" + (5 + (possibleSpinnerOrder[i] % 6) * 60) + "," + (5 + Math.floor(possibleSpinnerOrder[i]/6) * 60) + ")scale(.4)";
+            return "translate(" + (5 + (possibleSpinnerOrder[i] % 6) * 60) + "," +
+                (5 + Math.floor(possibleSpinnerOrder[i]/6) * 60) + ")scale(.4)";
         })
         .each(function (d, i) {
             buildSpinner(d3.select(this), "spinner" + i);
@@ -589,11 +630,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         .attr("height", 150)
         .style("fill", "lightgray")
         .style("stroke", "black")
-        .style("stroke-width", 2)
-        .on("click", function () {
-            d3.select(this)
-                .style("fill-opacity", 0);
-        });
+        .style("stroke-width", 2);
 
     updateQueue();
 
