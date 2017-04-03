@@ -215,8 +215,8 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         wedges = 5,
         value,
         outcome = 0,
-        consumptionQueue = _.range(nTrials).fill("?"),
         visibleQueueLength = 8,
+        consumptionQueue = _.range(nTrials).fill("?").concat(_.range(visibleQueueLength).fill("_")),
         queueIdx = 0;
 
     consumptionQueue.fill("slider", 0, nPreWorkPeriods);
