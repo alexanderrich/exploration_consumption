@@ -219,7 +219,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         consumptionQueue = _.range(nTrials).fill("?").concat(_.range(visibleQueueLength).fill("_")),
         queueIdx = 0;
 
-    consumptionQueue.fill("slider", 0, nPreWorkPeriods);
+    consumptionQueue.fill("sliderpre", 0, nPreWorkPeriods);
 
     updateMachine = function (exploitVal, exploreVal) {
         var widthpct,
@@ -379,11 +379,36 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             } else {
                 $("#machinescreen").html("Machine failed.<br/>Slider task added to queue.");
             }
-            updateQueue();
+            if (condition === 1) {
+                d3.select("#delaynuminqueue")
+                    .select(".queueitempicture")
+                    .attr("xlink:href", function () {
+                        if (outcome) {
+                            return "static/images/youtubeicon.png";
+                        } else {
+                            return "static/images/slidericon.png";
+                        }
+                    })
+                    .attr("y", -38)
+                    .transition()
+                    .duration(1000)
+                    .delay(500)
+                    .attr("y", 3);
+            }
+            else {
+                d3.select("#firstinqueue")
+                    .select(".queueitempicture")
+                    .attr("xlink:href", function () {
+                        if (outcome) {
+                            return "static/images/youtubeicon.png";
+                        } else {
+                            return "static/images/slidericon.png";
+                        }
+                    });
+            }
             setTimeout(function () {
                 $("#start").off("click");
                 $("#exploreexploitdiv").hide();
-                $("#pointer").hide();
                 $(".choicebutton").removeClass("clicked");
                 $(".spinnerbacking").css("opacity", 0);
                 updateMachine(value, "?");
@@ -399,22 +424,11 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         $("#machinescreen").html("Select spinner.");
         updateMachine(value, "?");
         $("#exploreexploitdiv").show();
-        $("#pointer").show();
-        if (condition) {
-            $("#pointer").css("margin-left", "565px");
-        } else {
-            $("#pointer").css("margin-left", "227px");
-        }
         timeStamp = new Date().getTime();
         $(".choicebutton").click(function () {responseFn(this.id); });
     };
 
     resetMachine = function () {
-        if (condition) {
-            $("#pointer").css("margin-left", "565px");
-        } else {
-            $("#pointer").css("margin-left", "227px");
-        }
         value = .333 + .333 * Math.random();
         $("#machinescreen").html("Machine<br/>RESET");
         $("#start").prop("disabled", true);
@@ -423,50 +437,56 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             upgradeMachine(value);
         }, 1000);
         $("#exploreexploitdiv").show();
-        $("#pointer").show();
         setTimeout(functionList.pop(), 4000);
     };
 
     startOutcome = function () {
         $("#exploreexploitdiv").hide();
         $("#alternativecontents").show();
-        $("#pointer").show();
-        $("#pointer").animate({"margin-left": "227px"}, 750);
+        d3.select("#firstinqueue").select("rect").style("fill-opacity", 0);
         $("#alternativestart").click(function () {$("#alternativecontents").hide();
-                                                  $("#pointer").hide();
                                                   $("#alternativestart").off("click");
-                                                  if (consumptionQueue[trial] === "slider") {
-                                                      callback(0, trial);
-                                                  } else {
+                                                  if (consumptionQueue[trial] === "video") {
                                                       callback(1, trial);
+                                                  } else {
+                                                      callback(0, trial);
                                                   }});
     };
 
     updateQueue = function () {
-        d3.selectAll(".queueitem")
+        d3.selectAll(".queueitempicture")
             .data(consumptionQueue.slice(queueIdx, queueIdx + visibleQueueLength + 1))
             .attr("xlink:href", function (d) {
-                if (d === "?") {
-                    return "static/images/unknownicon.png";
-                } else if (d === "video") {
+                if (d === "video") {
                     return "static/images/youtubeicon.png";
-                } else if (d === "slider") {
+                } else if (d === "slider" || d === "sliderpre") {
                     return "static/images/slidericon.png";
                 } else {
                     return  "static/images/blankicon.png";
                 }
-            })
-            .attr("x", "0px");
+            });
+        d3.selectAll(".queueiteminner")
+            .data(consumptionQueue.slice(queueIdx, queueIdx + visibleQueueLength + 1))
+            .attr("transform", "translate(0)")
+            .select("rect")
+            .style("opacity", function(d) {
+                if (d === "sliderpre" || d === "_" || condition === 0) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            });
+        d3.select("#firstinqueue").select("rect").style("fill-opacity", "");
     };
 
     shiftQueue = function () {
         if (trial === 0) {
             functionList.pop()();
         } else {
-            d3.selectAll(".queueitem")
+            d3.selectAll(".queueiteminner")
                 .transition()
                 .duration(1500)
-                .attr("x", "-50px");
+                .attr("transform", "translate(-55)");
             setTimeout(function () {
                 queueIdx++;
                 updateQueue();
@@ -478,8 +498,6 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
     this.run = function() {
         trial++;
         $("#exploreexploitdiv").hide();
-        // $("#bottominfodiv").show();
-        // $("#inforeminder").hide();
         functionList = [startOutcome];
         if (trial + delayLength >= nPreWorkPeriods && trial + delayLength < nTrials) {
             functionList.push(runChoice);
@@ -571,21 +589,49 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         .style("stroke-width", 2);
 
     d3.select("#consumptionqueue")
-        .attr("width", (visibleQueueLength * 50).toString() + "px")
+        .append("path")
+        .attr("d", "M 4 70 L 4 85 L 56 85 L56 70")
+        .style("stroke", "black")
+        .style("fill",  "none")
+        .style("stroke-width", 2);
+
+    d3.select("#consumptionqueue")
+        .attr("width", (visibleQueueLength * 55 + 5).toString() + "px")
         .selectAll("g")
         .data(consumptionQueue.slice(queueIdx, queueIdx + visibleQueueLength + 1))
         .enter()
         .append("g")
         .attr("class", "queueitemframe")
-        .attr("transform", function(d, i) {return "translate(" + (i*50) + ",30)";})
+        .attr("transform", function(d, i) {return "translate(" + (10 + i*55) + ",40)";})
+        .append("g")
+        .attr("class", "queueiteminner")
+        .each(function (d, i) {
+            if (i === 0) {
+                d3.select(this).attr("id", "firstinqueue");
+            } else if (i === delayLength) {
+                d3.select(this).attr("id", "delaynuminqueue");
+            }
+        })
         .append("image")
-        .attr("class", "queueitem")
+        .attr("class", "queueitempicture")
+        .attr("x", "3px")
+        .attr("y", "3px")
+        .attr("width", "34px")
+        .attr("height", "34px");
+
+    d3.selectAll(".queueiteminner")
+        .append("rect")
         .attr("width", "40px")
-        .attr("height", "40px");
+        .attr("height", "40px")
+        .style("stroke-width", "3px")
+        .style("stroke", "black")
+        .style("fill", "#666666")
+        .attr("fill-opacity", 1)
+        .style("border-radius", "5px");
 
     d3.select("#consumptionqueue")
         .append("text")
-        .attr("y", "20px")
+        .attr("y", "30px")
         .style("font-size", "18px")
         .text("Work queue:");
 
