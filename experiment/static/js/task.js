@@ -1,13 +1,12 @@
 /*
  * Requires:
- * phaser.js
  * jquery.js
  * underscore.js
  * d3.js
  */
 
 /*jslint browser: true*/
-/*global condition, uniqueId, adServerLoc, mode, document, PsiTurk, YT, $, _, d3, Phaser, window, setTimeout, clearTimeout, setInterval, clearInterval*/
+/*global condition, uniqueId, adServerLoc, mode, document, PsiTurk, YT, $, _, d3, window, setTimeout, clearTimeout, setInterval, clearInterval*/
 
 // condition = parseInt(condition);
 condition = 1;
@@ -429,7 +428,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
     };
 
     resetMachine = function () {
-        value = .333 + .333 * Math.random();
+        value = Math.ceil(3 + 7 * Math.random()) / 20;
         $("#machinescreen").html("Machine<br/>RESET");
         $("#start").prop("disabled", true);
         updateMachine(0, "?");
@@ -518,8 +517,6 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             resetArray[chosen] = 1;
         }
     })();
-
-    value = .333 + .333 * Math.random();
 
     function arcTween (newAngle) {
         return function (d) {
@@ -678,8 +675,9 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         .style("stroke", "black")
         .style("stroke-width", 2);
 
-    updateQueue();
 
+    value = Math.ceil(3 + 7 * Math.random()) / 20;
+    updateQueue();
 }
 
 function ConsumptionRewards(psiTurk, callback) {
