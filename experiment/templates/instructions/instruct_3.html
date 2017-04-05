@@ -6,24 +6,20 @@
 
 	  <div class="instructions well">
 
+
         <p>
-            Once the six machines are available, they will be displayed at the
-            bottom of the screen before each work period, with the currently
-            idle machine circled.
+            At the bottom of the experiment screen is a "work queue" showing the
+            tasks scheduled to be completed. Gray slider icons represent one
+            slider task, and red Youtube icons represent one Youtube task. At
+            first, the work queue will be filled with several slider tasks, which must be completed.
         </p>
 
-
-        <p id="processcoolinstr">
-        </p>
 
         <div class="instrimages">
-            <img id="img1" width="600px">
+            <img id="img1" width="600px" src="/static/images/queueimg1.png">
         </div>
 
-        <p>
-            As you make use of the six machines and they change state, for
-            example from "cooling" to "idle", they will rotate counterclockwise
-            around the machine display.
+        <p id="machineaccess">
         </p>
 
         <div class="instrimages">
@@ -32,17 +28,17 @@
 
 
 	  </div>
+
     <script>
      if (condition === 0) {
-         $("#processcoolinstr").html("Each machine has a \"current spinner\" and a \"new spinner\". When a machine is idle, you will have to make a choice between the machine's spinners, and then run the machine. After the machine runs and you complete the following work period, the machine will have to cool down for the next five work periods before becoming \"idle\" again and ready for you to make another choice.");
-         $("#img1").attr("src", "/static/images/instruct_3_img_cond0.png");
-         $("#img2").attr("src", "/static/images/instruct_3_img2_cond0.png");
+         $("#machineaccess").html("After a few work periods, the work queue will empty of pre-assigned slider tasks. At this point, you will get access to a machine that adds task to the queue. Based on your choice before each work period, it will add either a slider task or a Youtube task.");
+         $("#img2").attr("src", "/static/images/queueimg2_cond0.png");
      } else {
-         $("#processcoolinstr").html("Each machine has a \"current spinner\" and a \"new spinner\". When a machine is idle, you will have to make a choice between the machine's spinners. Each machine then takes four work periods to process, and then becomes \"ready\" and can be run. It will then have to cool down for one additional work period before becoming \"idle\" again and ready for you to make another choice.");
-         $("#img1").attr("src", "/static/images/instruct_3_img_cond1.png");
-         $("#img2").attr("src", "/static/images/instruct_3_img2_cond1.png");
+         $("#machineaccess").html("After a few work periods, empty gray boxes will begin appearing after the pre-assigned slider tasks. At this point, you will get access to a machine that puts a task in each box. Based on your choice before each work period, it will add either a slider task or a Youtube task. The machine will add each new task to the queue 7 periods ahead of when it will reach the start of queue and have to be completed.");
+         $("#img2").attr("src", "/static/images/queueimg2_cond1.png");
      }
     </script>
+
 
 	  <hr>
 

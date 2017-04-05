@@ -1088,21 +1088,21 @@ function experimentDriver() {
                           "endingquestions.html",
                           "postquestionnaire.html"]);
     functionList = [
-        // function () {
-        //     instructionDriver(["instructions/instruct_1.html",
-        //                        "instructions/instruct_2.html",
-        //                        "instructions/instruct_3.html",
-        //                        "instructions/instruct_4.html",
-        //                        "instructions/instruct_5.html",
-        //                        "instructions/instruct_6.html",
-        //                        "instructions/instruct_7.html"],
-        //                       "instructions/quiz.html",
-        //                       {range: "none_all",
-        //                        reset: "1_6",
-        //                        processnum: "4",
-        //                        misspenalty: "10percentage",
-        //                        pausepenalty: "10percentage"},
-        //                       psiTurk, next); },
+        function () {
+            instructionDriver(["instructions/instruct_1.html",
+                               "instructions/instruct_2.html",
+                               "instructions/instruct_3.html",
+                               "instructions/instruct_4.html",
+                               "instructions/instruct_5.html",
+                               "instructions/instruct_6.html",
+                               "instructions/instruct_7.html"],
+                              "instructions/quiz.html",
+                              {range: "five_onehundred",
+                               reset: "1_6",
+                               processnum: "7",
+                               misspenalty: "10percentage",
+                               pausepenalty: "10percentage"},
+                              psiTurk, next); },
         function () {
             videoPicker(psiTurk, next);
         },

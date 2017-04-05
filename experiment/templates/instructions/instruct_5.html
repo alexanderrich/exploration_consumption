@@ -7,38 +7,43 @@
 	  <div class="instructions well">
 
         <p>
-            If you choose "run new spinner", a random new spinner will be created.
-            The gold wedges on the new spinner can cover anywhere from 0% to 100% of its area.
-            The wedge area on each new spinner is totally
-            random and doesn't depend on the value of past spinners.
+            If you choose "run new spinner", a panel of 30 possible spinners
+            will appear. One third of them have no gold wedges, and always
+            produce slider tasks. The remaining two thirds have gold wedges
+            ranging evenly from 5% to 100% of the spinner's area. The thirty
+            spinners will be briefly visible, and then will be covered up and
+            <strong>randomly shuffled</strong>. You can then click any of the thirty squares in
+            the panel to reveal the selected spinner.
         </p>
 
-        <!-- <div class="instrimages">
-             <img width="700px" src="/static/images/instruct_5_img_example_spinners.png">
-             </div>
-           -->
+        <div class="instrimages">
+            <img width="700px" src="/static/images/spinnerpicker.png">
+        </div>
+
+        <p>
+            After the new spinner is chosen, the machine will run the new
+            spinner to produce a slider or Youtube task. If the new spinner
+            is worse than the current spinner, the
+            machine will then simply "forget" it and will remain on its
+            current spinner for the next choice. <strong>But if the new spinner is better
+            than the current spinner, it will be saved and will become the current spinner
+            for your next choice. This means that while choosing a new spinner
+            can be risky, it can also allow you to improve the machine so that it is more
+            likely to work in the future.</strong>
+        </p>
 
         <div class="instrimages">
             <img width="700px" src="/static/images/instruct_5_img.png">
         </div>
 
         <p>
-            After the new spinner is created, the machine will run the new
-            spinner. If the new spinner is worse than the current spinner, the
-            machine will then simply "forget" the new spinner and will remain on its
-            current spinner for future uses. <strong>But if the new spinner is better
-            than the current spinner, it will be saved and will become the current spinner
-            the next time you use the machine. This means that while running a new spinner
-            can be risky, it can also allow you to improve the machines so they are more
-            likely to work in the future.</strong>
-        </p>
-        <p>
-            For example, if the current-spinner gold wedges cover half of the
-            spinner, then choosing either the current spinner or a new spinner
-            will give you a 50% chance of the machine working. But, because a
-            good new spinner will be saved, choosing to try a new spinner
-            could increase the chance of the machine working in future uses as
-            well.
+            For example, if the current spinner is half gold, then choosing a
+            new spinner might lead to a spinner with no gold, making the machine
+            definitely produce a slider task for this choice. But choosing a new
+            spinner might also lead to a spinner that is 80% gold, giving the machine
+            a high chance of producing a Youtube task for this choice and
+            a high chance of producing Youtube tasks <strong>on
+            future choices</strong> if you continue to select the new 80%-gold current spinner.
         </p>
 
 
