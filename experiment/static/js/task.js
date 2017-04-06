@@ -299,7 +299,6 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
                 setOutcome(choiceId, nextValue);
             }, 1500);
         } else {
-            // nextValue = Math.random() > .333 ? Math.random() : 0;
             $("#exploresvg .spinnerbacking").css("opacity", 1);
             showNewSpinnerPicker();
         }
