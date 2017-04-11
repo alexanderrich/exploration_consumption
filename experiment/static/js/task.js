@@ -6,16 +6,12 @@
  */
 
 /*jslint browser: true*/
-/*global condition, uniqueId, adServerLoc, mode, document, PsiTurk, YT, $, _, d3, window, setTimeout, clearTimeout, setInterval, clearInterval*/
+/*global condition, uniqueId, adServerLoc, mode, document, PsiTurk, $, _, d3, window, setTimeout, clearTimeout, setInterval, clearInterval*/
 
 // condition = parseInt(condition);
-condition = 1;
+condition = 0;
 
-var tag = document.createElement('script'),
-    firstScriptTag = document.getElementsByTagName('script')[0],
-    videoChoice;
-tag.src = "https://www.youtube.com/iframe_api";
-firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+var videoChoice;
 
 function VideoPlayer() {
     "use strict";
@@ -27,19 +23,18 @@ function VideoPlayer() {
         timeStamp,
         playTime,
         totalPlayTime = 0,
+        firstplay = true,
         totalPlayTimePossible = 0;
-    player = new YT.Player('player', {
-        height: '350',
-        width: '600',
-        playerVars: {'controls': 0,
-                     'disablekb': 1,
-                     'start': videoChoice.start},
-        videoId: videoChoice.videoId
-    });
+    player = document.getElementById("video");
+    player.src = videoChoice.videosrc;
+    player.addEventListener("canplay",function() { if (firstplay) {
+        player.currentTime = videoChoice.start;
+        firstplay = false;
+    }});
 
     $(window).blur(function () {
         if (onVideo && playing) {
-            player.pauseVideo();
+            player.pause();
             playTime += (new Date().getTime()) - timeStamp;
             playing = false;
         }
@@ -47,7 +42,7 @@ function VideoPlayer() {
 
     $("body").keydown(function (e) {
         if(e.keyCode === 32 && onVideo && !playing) {
-            player.playVideo();
+            player.play();
             timeStamp = new Date().getTime();
             playing = true;
         } else if (e.keyCode === 32){
@@ -57,7 +52,7 @@ function VideoPlayer() {
 
     $("body").keyup(function (e) {
         if(e.keyCode === 32 && onVideo && playing) {
-            player.pauseVideo();
+            player.pause();
             playTime += (new Date().getTime()) - timeStamp;
             playing = false;
         }
@@ -74,7 +69,7 @@ function VideoPlayer() {
         $("#rewards").hide();
         onVideo = false;
         if (playing) {
-            player.pauseVideo();
+            player.pause();
             playTime += (new Date().getTime()) - timeStamp;
         }
         totalPlayTime += playTime;
@@ -382,7 +377,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
                     .select(".queueitempicture")
                     .attr("xlink:href", function () {
                         if (outcome) {
-                            return "static/images/youtubeicon.png";
+                            return "static/images/videoicon.png";
                         } else {
                             return "static/images/slidericon.png";
                         }
@@ -398,7 +393,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
                     .select(".queueitempicture")
                     .attr("xlink:href", function () {
                         if (outcome) {
-                            return "static/images/youtubeicon.png";
+                            return "static/images/videoicon.png";
                         } else {
                             return "static/images/slidericon.png";
                         }
@@ -456,7 +451,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             .data(consumptionQueue.slice(queueIdx, queueIdx + visibleQueueLength + 1))
             .attr("xlink:href", function (d) {
                 if (d === "video") {
-                    return "static/images/youtubeicon.png";
+                    return "static/images/videoicon.png";
                 } else if (d === "slider" || d === "sliderpre") {
                     return "static/images/slidericon.png";
                 } else {
@@ -791,7 +786,7 @@ function PracticeRewards (psiTurk, callback) {
         $("#consumptionblocker").show();
         if (reward) {
             currentTask = video;
-            $("#consumptionblocker").html("Youtube video");
+            $("#consumptionblocker").html("Video task");
         } else {
             currentTask = sliderTask;
             $("#consumptionblocker").html("Slider task");
@@ -836,7 +831,7 @@ function practiceConsumption(psiTurk, callback) {
             if (reward === 0) {
                 $("#rewardintrotext").html("Example outcome: <br/> Slider task");
             } else {
-                $("#rewardintrotext").html("Example outcome: <br/> Youtube video");
+                $("#rewardintrotext").html("Example outcome: <br/> Video task");
             }
             $("#continue").off("click");
             $("#continue").click(
@@ -861,13 +856,13 @@ function videoPicker(psiTurk, callback) {
         var choice = $("#videochoice").val();
         if (choice !== "noresp") {
             if (choice === "planetearth") {
-                videoChoice = {videoId: "EqxaanDEAHw", start: 25};
-            } else if (choice === "bakeoff") {
-                videoChoice = {videoId: "TOKv4dG8nQs", start: 230};
-            } else if (choice === "mythbusters"){
-                videoChoice = {videoId: "0zTtuuNK2N4", start: 118};
+                videoChoice = {videosrc: "/static/movies/Planet Earth Freshwater.mp4", start: 25};
+            } else if (choice === "partsunknown") {
+                videoChoice = {videosrc: "/static/movies/Anthony Bourdain Parts Unknown S05E04 Madagascar.mp4", start: 98};
+            } else if (choice === "unchainedreaction"){
+                videoChoice = {videosrc: "/static/movies/Unchained Reaction Season 1 Episode 6 - Movie Mayhem.mp4", start: 104};
             } else {
-                videoChoice = {videoId: "_W9JZkHdCdA", start: 95};
+                videoChoice = {videosrc: "/static/movies/Ellen Degeneres Here and Now.mp4", start: 95};
             }
             psiTurk.recordUnstructuredData("videoChoice", choice);
 
@@ -1128,9 +1123,7 @@ function experimentDriver() {
 }
 
 
-function onYouTubeIframeAPIReady() {
-    $(window).load(function () {
-        "use strict";
-        experimentDriver();
-    });
-}
+$(window).load(function () {
+    "use strict";
+    experimentDriver();
+});
