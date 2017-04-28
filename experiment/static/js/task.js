@@ -979,13 +979,13 @@ function endingQuestions(psiTurk, callback) {
     $("#misspct").html(misspct);
     $("#pausepct").html(pausepct);
     if (misspct > 10) {
-        losses += (misspct - 10) * .1;
+        losses += (misspct - 10) * .2;
     }
     if (pausepct > 20) {
-        losses += (pausepct - 20) * .1;
+        losses += (pausepct - 20) * .2;
     }
-    losses = Math.min(losses, 3);
-    bonus = 3 - losses;
+    losses = Math.min(losses, 5);
+    bonus = 5 - losses;
     $("#losses").html(losses.toFixed(2));
     psiTurk.recordUnstructuredData("bonus", bonus);
     psiTurk.recordUnstructuredData("uniqueid", uniqueId);
@@ -1094,8 +1094,8 @@ function experimentDriver() {
                               {range: "five_onehundred",
                                reset: "1_6",
                                processnum: "7",
-                               misspenalty: "10percentage",
-                               pausepenalty: "10percentage"},
+                               misspenalty: "20percentage",
+                               pausepenalty: "20percentage"},
                               psiTurk, next); },
         function () {
             videoPicker(psiTurk, next);
