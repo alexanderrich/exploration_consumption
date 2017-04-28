@@ -357,3 +357,28 @@ input.slider[type="range"] {
     height: 400px;
     width: 650px;
 }
+
+.bisquestion {
+    height: 100px;
+    width: 100%;
+    border-top: 2px solid gray;
+}
+
+.bisquestiontext {
+    float: left;
+    margin-right: 10px;
+    padding: 10px;
+    width: 200px;
+}
+
+.bisitem {
+    float: left;
+    padding: 10px;
+    width: 130px;
+    text-align: center;
+}
+
+.bisitem label {
+    font-size: 16px;
+    font-weight: normal;
+}

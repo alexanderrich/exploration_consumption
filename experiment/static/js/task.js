@@ -996,6 +996,35 @@ function endingQuestions(psiTurk, callback) {
     });
 }
 
+function bis(psiTurk, callback) {
+    "use strict";
+    var recordResponses;
+
+    recordResponses = function () {
+        var i,
+        allFilled = true;
+        for (i = 1; i< 31; i++) {
+            if($("input[name='bis" + i + "']:checked").val() === undefined) {
+                allFilled = false;
+            }
+        }
+        if(!allFilled) {
+            $("#blankmessage").html("<strong>Please answer all questions before continuing.</strong>");
+        } else {
+            for (i = 1; i< 31; i++) {
+                psiTurk.recordUnstructuredData("bis" + i, $("input[name='bis" + i + "']:checked").val());
+            }
+            callback();
+        }
+    };
+
+
+    psiTurk.showPage("bis.html");
+    $("#continue").click(function () {
+        recordResponses();
+    });
+}
+
 function questionnaire(psiTurk) {
     "use strict";
     var errorMessage = "<h1>Oops!</h1><p>Something went wrong submitting your HIT. This might happen if you lose your internet connection. Press the button to resubmit.</p><button id='resubmit'>Resubmit</button>",
@@ -1080,6 +1109,7 @@ function experimentDriver() {
                           "transition_fulltask.html",
                           "videopicker.html",
                           "endingquestions.html",
+                          "bis.html",
                           "postquestionnaire.html"]);
     functionList = [
         function () {
@@ -1104,7 +1134,8 @@ function experimentDriver() {
             transitionScreen("transition_practicedecision.html", psiTurk, next);
         },
         function () {
-            phaseDriver(nChoices[0], nPreWorkPeriods[0], ExploreExploitTask, PracticeRewards, "practice", psiTurk, next); },
+            phaseDriver(nChoices[0], nPreWorkPeriods[0], ExploreExploitTask, PracticeRewards, "practice", psiTurk, next);
+        },
         function () {
             transitionScreen("transition_practiceconsumption.html", psiTurk, next);
         },
@@ -1117,6 +1148,8 @@ function experimentDriver() {
             phaseDriver(nChoices[1], nPreWorkPeriods[1], ExploreExploitTask, ConsumptionRewards, "consumption", psiTurk, next); },
         function () {
             endingQuestions(psiTurk, next); },
+        function () {
+            bis(psiTurk, next); },
         function () {
             questionnaire(psiTurk); }];
     next();
