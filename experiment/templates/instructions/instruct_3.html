@@ -8,9 +8,10 @@
 
 
         <p>
-            At the bottom of the experiment screen is a "work queue" showing the
+            At the bottom of the experiment screen is a "<strong>work queue</strong>" showing the
             tasks scheduled to be completed. Gray slider icons represent one
-            slider task, and red video icons represent one video task. At
+            slider task, and red video icons represent one video task. You will always complete
+            the left-most task in the queue, and then the queue will shift to the left. At
             first, the work queue will be filled with several slider tasks which
             must be completed.
         </p>
@@ -32,10 +33,10 @@
 
     <script>
      if (condition === 0) {
-         $("#machineaccess").html("After a few work periods, the work queue will empty of pre-assigned slider tasks. At this point, you will get access to a machine that adds task to the queue. Based on your choice before each work period, it will add either a slider task or a video task.");
+         $("#machineaccess").html("When the work queue is empty, you will get access to a <strong>machine</strong> that adds task to the queue. Based on your choice before each work period, it will add either a slider task or a video task, and you will then complete the task.");
          $("#img2").attr("src", "/static/images/queueimg2_cond0.png");
      } else {
-         $("#machineaccess").html("After a few work periods, empty gray boxes will begin appearing after the pre-assigned slider tasks. At this point, you will get access to a machine that puts a task in each box. Based on your choice before each work period, it will add either a slider task or a video task. The machine will add each new task to the queue 7 periods ahead of when it will reach the start of queue and have to be completed.");
+         $("#machineaccess").html("When there are 7 tasks left in the queue, empty gray boxes will begin appearing at the end of the queue. At this point, you will get access to a <strong>machine</strong> that puts a task in each box. Based on your choice before each work period, it will add either a slider task or a video task. You will then complete the task in 7 work periods when it reaches the front of the queue.");
          $("#img2").attr("src", "/static/images/queueimg2_cond1.png");
      }
     </script>
