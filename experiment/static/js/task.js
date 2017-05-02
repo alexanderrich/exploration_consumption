@@ -8,8 +8,7 @@
 /*jslint browser: true*/
 /*global condition, uniqueId, adServerLoc, mode, document, PsiTurk, $, _, d3, window, setTimeout, clearTimeout, setInterval, clearInterval*/
 
-// condition = parseInt(condition);
-condition = 0;
+condition = parseInt(condition);
 
 var videoChoice;
 
@@ -195,12 +194,12 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         functionList = [],
         runChoice,
         tau = 2 * Math.PI,
-        arc = d3.arc().innerRadius(0).outerRadius(70).startAngle(0),
+        arc = d3.arc().innerRadius(0).outerRadius(85).startAngle(0),
         updateMachine,
         spinMachine,
         upgradeMachine,
         resetMachine,
-        showNewSpinnerPicker,
+        pickNewSpinner,
         setOutcome,
         updateQueue,
         shiftQueue,
@@ -219,8 +218,8 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         var widthpct,
             exploitSvgGroup = d3.select("#exploitcirclegroup"),
             exploreSvgGroup = d3.select("#explorecirclegroup");
-        exploitSvgGroup.attr("transform", "translate(75, 75)");
-        exploreSvgGroup.attr("transform", "translate(75, 75)");
+        exploitSvgGroup.attr("transform", "translate(90, 90)");
+        exploreSvgGroup.attr("transform", "translate(90, 90)");
         exploitSvgGroup.selectAll(".winningArc")
             .datum({endAngle: exploitVal * tau / wedges})
             .attr("d", arc);
@@ -258,7 +257,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             .attrTween("transform", function() {
                 var intrp = d3.interpolate(0, r);
                 return function (t){
-                    return "translate(75, 75) rotate(" + intrp(t) + ")";
+                    return "translate(90, 90) rotate(" + intrp(t) + ")";
                 };
             });
     };
@@ -295,41 +294,32 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             }, 1500);
         } else {
             $("#exploresvg .spinnerbacking").css("opacity", 1);
-            showNewSpinnerPicker();
+            pickNewSpinner();
         }
     };
 
-    showNewSpinnerPicker = function () {
+    pickNewSpinner = function () {
         var spinners = d3.selectAll(".spinnerpickeroption")
                 .data(possibleSpinners);
-        $("#machinescreen").html("processing...");
-        $("#spinnerpicker").show();
         d3.selectAll(".spinnercover")
-            .style("fill-opacity", 0);
-        setTimeout(function () {
-            d3.selectAll(".spinnercover")
-                .style("fill-opacity", 1);
-            $("#machinescreen").html("Shuffling...");
-            possibleSpinnerOrder = _.shuffle(_.range(30));
-            spinners.attr("transform", function(d, i) {
-                    return "translate(" + (5 + (possibleSpinnerOrder[i] % 6) * 60) + "," +
-                        (5 + Math.floor(possibleSpinnerOrder[i]/6) * 60) + ")scale(.4)";
-                });
-        }, 1500);
-        setTimeout(function () {
-            $("#machinescreen").html("Select a new spinner.");
-            spinners.on("click", function(d, i) {
-                spinners.on("click", null);
-                $("#machinescreen").html("New spinner selected.");
-                d3.select(this)
-                    .select(".spinnercover")
-                    .style("fill-opacity", 0);
-                setTimeout(function () {
-                    $("#spinnerpicker").hide();
-                    setOutcome("explore", d);
-                }, 1500);
-            });
-        }, 2500);
+            .style("fill-opacity", 1);
+        possibleSpinnerOrder = _.shuffle(_.range(30));
+        spinners.attr("transform", function(d, i) {
+            return "translate(" + (5 + Math.floor(possibleSpinnerOrder[i]/5) * 45) + "," +
+                (5 +  (possibleSpinnerOrder[i] % 5) * 45) + ")scale(.25)";
+        });
+        $("#machinescreen").html("Spinners shuffled.<br/>Select a new spinner.");
+        spinners.on("click", function(d, i) {
+            spinners.on("click", null);
+            $("#machinescreen").html("New spinner selected.");
+            d3.select(this)
+                .select(".spinnercover")
+                .style("fill-opacity", 0);
+            setTimeout(function () {
+                $("#exploresvg").show();
+                setOutcome("explore", d);
+            }, 1500);
+        });
     };
 
     setOutcome = function (choiceId, nextValue) {
@@ -414,7 +404,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         $("#alternativecontents").hide();
         $(".machinebutton").removeClass("clicked");
         $("#start").prop("disabled", true);
-        $("#machinescreen").html("Select spinner.");
+        $("#machinescreen").html("Select button.");
         updateMachine(value, "?");
         $("#exploreexploitdiv").show();
         timeStamp = new Date().getTime();
@@ -491,6 +481,15 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
     this.run = function() {
         trial++;
         $("#exploreexploitdiv").hide();
+        $("#exploresvg").hide();
+        d3.selectAll(".spinnerpickeroption")
+                .data(possibleSpinners)
+            .attr("transform", function(d, i) {
+                return "translate(" + (5 + Math.floor(i/5) * 45) + "," +
+                    (5 + (i % 5) * 45) + ")scale(.25)";
+            });
+        d3.selectAll(".spinnercover")
+            .style("fill-opacity", 0);
         functionList = [startOutcome];
         if (trial + delayLength >= nPreWorkPeriods && trial + delayLength < nTrials) {
             functionList.push(runChoice);
@@ -527,7 +526,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         circlegroup = container.append("g")
             .attr("class", "spinner")
             .attr("id", id)
-            .attr("transform", "translate(75, 75)");
+            .attr("transform", "translate(90, 90)");
         circlegroup.append("path")
             .datum({endAngle: tau})
             .style("fill", "#222222")
@@ -548,21 +547,21 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
     entiregroup = d3.select("#exploitsvg");
     entiregroup.append("rect")
         .attr("class", "spinnerbacking")
-        .attr("width",  150)
-        .attr("height", 150)
+        .attr("width",  180)
+        .attr("height", 180)
         .style("opacity", 0)
         .style("fill", "#444444");
     buildSpinner(entiregroup, "exploitcirclegroup");
     entiregroup.append("polygon")
-        .attr("points", "65 0, 85 0, 75 20")
+        .attr("points", "80 0, 100 0, 90 20")
         .style("fill", "black")
         .style("stroke", "gray")
         .style("stroke-width", 2);
     entiregroup = d3.select("#exploresvg");
     entiregroup.append("rect")
         .attr("class", "spinnerbacking")
-        .attr("width",  150)
-        .attr("height", 150)
+        .attr("width",  180)
+        .attr("height", 180)
         .style("opacity", 0)
         .style("fill", "#444444");
     buildSpinner(entiregroup, "explorecirclegroup").append("text")
@@ -574,7 +573,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         .style("font-size", "30px")
         .style("fill", "lightgray");
     entiregroup.append("polygon")
-        .attr("points", "65 0, 85 0, 75 20")
+        .attr("points", "80 0, 100 0, 90 20")
         .style("fill", "black")
         .style("stroke", "gray")
         .style("stroke-width", 2);
@@ -626,16 +625,15 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         .style("font-size", "18px")
         .text("Work queue:");
 
-    var possibleSpinners = _.range(1, 21).map(function(x) {return x/20})
-            .concat(_.range(10).fill(0));
+    var possibleSpinners = _.range(10).fill(0).concat(_.range(1, 21).map(function(x) {return x/20}));
     var possibleSpinnerOrder = _.shuffle(_.range(30));
 
     d3.select("#spinnerpickersvg")
-        .attr("width", "370px")
-        .attr("height", "310px")
+        .attr("width", "280px")
+        .attr("height", "235px")
         .append("rect")
-        .attr("width", "370px")
-        .attr("height", "310px")
+        .attr("width", "280px")
+        .attr("height", "235px")
         .style("fill", "lightgray");
     d3.select("#spinnerpickersvg")
         .selectAll("g")
@@ -645,8 +643,8 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         .attr("class", "spinnerpickeroption")
         .attr("id", function(d, i) {return "spinnerpickeroption" + i; })
         .attr("transform", function(d, i) {
-            return "translate(" + (5 + (possibleSpinnerOrder[i] % 6) * 60) + "," +
-                (5 + Math.floor(possibleSpinnerOrder[i]/6) * 60) + ")scale(.4)";
+            return "translate(" + (5 + Math.floor(possibleSpinnerOrder[i]/5) * 45) + "," +
+                (5 + (possibleSpinnerOrder[i] % 5) * 45) + ")scale(.25)";
         })
         .each(function (d, i) {
             buildSpinner(d3.select(this), "spinner" + i);
@@ -663,11 +661,12 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         .selectAll(".spinnerpickeroption")
         .append("rect")
         .attr("class", "spinnercover")
-        .attr("width", 150)
-        .attr("height", 150)
+        .attr("width", 180)
+        .attr("height", 180)
         .style("fill", "lightgray")
         .style("stroke", "black")
-        .style("stroke-width", 2);
+        .style("fill-opacity", 0)
+        .style("stroke-width", 3);
 
 
     value = Math.ceil(3 + 7 * Math.random()) / 20;
@@ -1086,7 +1085,6 @@ function experimentDriver() {
         next,
         nChoices = [12, 60],
         nPreWorkPeriods = [8, 10],
-        // nPreWorkPeriods = [1, 0],
         functionList = [];
 
     next = function () {
