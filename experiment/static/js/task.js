@@ -856,8 +856,8 @@ function videoPicker(psiTurk, callback) {
         if (choice !== "noresp") {
             if (choice === "planetearth") {
                 videoChoice = {videosrc: "/static/movies/Planet Earth Freshwater.mp4", start: 25};
-            } else if (choice === "partsunknown") {
-                videoChoice = {videosrc: "/static/movies/Anthony Bourdain Parts Unknown S05E04 Madagascar.mp4", start: 98};
+            } else if (choice === "bakeoff") {
+                videoChoice = {videosrc: "/static/movies/The Great Christmas Bake Off.mp4", start: 48};
             } else if (choice === "unchainedreaction"){
                 videoChoice = {videosrc: "/static/movies/Unchained Reaction Season 1 Episode 6 - Movie Mayhem.mp4", start: 104};
             } else {
