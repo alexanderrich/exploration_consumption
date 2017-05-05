@@ -159,17 +159,12 @@ strong {
 
 #trialsdiv {
     float: left;
-    width: 200px;
+    width: 300px;
 }
 
 #sliderpctdiv {
     float: left;
-    width: 200px;
-}
-
-#pausepctdiv {
-    float: left;
-    width: 200px;
+    width: 300px;
 }
 
 /* card task */

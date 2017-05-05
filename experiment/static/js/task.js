@@ -15,15 +15,7 @@ var videoChoice;
 function VideoPlayer() {
     "use strict";
     var player,
-        startPlaying,
-        stopPlaying,
-        onVideo = false,
-        playing = false,
-        timeStamp,
-        playTime,
-        totalPlayTime = 0,
-        firstplay = true,
-        totalPlayTimePossible = 0;
+        firstplay = true;
     player = document.getElementById("video");
     player.src = videoChoice.videosrc;
     player.addEventListener("canplay",function() { if (firstplay) {
@@ -31,56 +23,15 @@ function VideoPlayer() {
         firstplay = false;
     }});
 
-    $(window).blur(function () {
-        if (onVideo && playing) {
-            player.pause();
-            playTime += (new Date().getTime()) - timeStamp;
-            playing = false;
-        }
-    });
-
-    $("body").keydown(function (e) {
-        if(e.keyCode === 32 && onVideo && !playing) {
-            player.play();
-            timeStamp = new Date().getTime();
-            playing = true;
-        } else if (e.keyCode === 32){
-            return false;
-        }
-    });
-
-    $("body").keyup(function (e) {
-        if(e.keyCode === 32 && onVideo && playing) {
-            player.pause();
-            playTime += (new Date().getTime()) - timeStamp;
-            playing = false;
-        }
-    });
-
     this.run = function () {
         $("#rewards").show();
-        onVideo = true;
-        playTime = 0;
-        totalPlayTimePossible += 30000;
+        player.play();
+        // onVideo = true;
     };
 
     this.stop = function () {
         $("#rewards").hide();
-        onVideo = false;
-        if (playing) {
-            player.pause();
-            playTime += (new Date().getTime()) - timeStamp;
-        }
-        totalPlayTime += playTime;
-        playing = false;
-    };
-
-    this.getPlayTime = function () {
-        return playTime;
-    };
-
-    this.pausePct = function () {
-        return ((1 - (totalPlayTime / totalPlayTimePossible)) * 100) || 0;
+        player.pause();
     };
 
     this.practiceRun = function () {
@@ -123,7 +74,6 @@ function SliderTask() {
         $(".slider").trigger("input");
         $(".sliderdiv").css("background-color", "gray");
         $(".slider").prop("disabled", true);
-        // $("#slider1").prop("disabled", false);
         $("#sliderdiv1").css("background-color", "");
     };
 
@@ -691,15 +641,13 @@ function ConsumptionRewards(psiTurk, callback) {
             missPct,
             pausePct;
         if (reward) {
-            stat = video.getPlayTime();
             psiTurk.recordTrialData({phase: "EXPERIMENT",
                                      trialType: "consumption",
                                      trial: trialNum,
                                      uniqueid: uniqueId,
                                      condition: condition,
                                      outcome: reward,
-                                     slidersMissed: -1,
-                                     playTime: stat
+                                     slidersMissed: -1
                                     });
         } else {
             stat = sliderTask.getMisses();
@@ -714,18 +662,11 @@ function ConsumptionRewards(psiTurk, callback) {
                                     });
         }
         missPct = sliderTask.missPct();
-        pausePct = video.pausePct();
         $("#sliderpct").html(missPct.toFixed());
-        $("#pausepct").html(pausePct.toFixed());
         if (missPct > 10) {
             $("#sliderpctdiv").css("color", "red");
         } else {
             $("#sliderpctdiv").css("color", "black");
-        }
-        if (pausePct > 20) {
-            $("#pausepctdiv").css("color", "red");
-        } else {
-            $("#pausepctdiv").css("color", "black");
         }
         callback();
     };
@@ -750,11 +691,6 @@ function ConsumptionRewards(psiTurk, callback) {
 
     this.recordFinal = function(taskType) {
         psiTurk.recordUnstructuredData("misses_" + taskType, sliderTask.missPct().toString());
-        psiTurk.recordUnstructuredData("pauses_" + taskType, video.pausePct().toString());
-    };
-
-    this.getPlayTime = function() {
-        return video.getPlayTime();
     };
 
     decrementTime = function () {
@@ -771,7 +707,6 @@ function ConsumptionRewards(psiTurk, callback) {
     video = new VideoPlayer();
     $("#time").html("0");
     $("#sliderpct").html("0");
-    $("#pausepct").html("0");
 }
 
 function PracticeRewards (psiTurk, callback) {
@@ -781,7 +716,6 @@ function PracticeRewards (psiTurk, callback) {
         video;
 
     this.setReward = function (reward, trial) {
-        // $("#alternativecontents").show();
         $("#consumptionblocker").show();
         if (reward) {
             currentTask = video;
@@ -807,20 +741,17 @@ function PracticeRewards (psiTurk, callback) {
     video = new VideoPlayer();
     $("#time").html("0");
     $("#sliderpct").html("0");
-    $("#pausepct").html("0");
 }
 
 function practiceConsumption(psiTurk, callback) {
     "use strict";
-    var examples = [0, 0, 1],
-        trials = [-3, -2, -1],
+    var examples = [0, 0],
+        trials = [-2, -1],
         rewards,
         next;
 
     next = function () {
         if (examples.length === 0) {
-            // get play time of video to start for real task
-            videoChoice.start += Math.floor(rewards.getPlayTime() / 1000);
             callback();
         } else {
             var reward = examples.shift();
@@ -955,7 +886,6 @@ function endingQuestions(psiTurk, callback) {
     var recordResponses,
         points = psiTurk.getQuestionData().points_consumption,
         misspct = Math.floor(psiTurk.getQuestionData().misses_consumption),
-        pausepct = Math.floor(psiTurk.getQuestionData().pauses_consumption),
         losses = 0,
         bonus;
 
@@ -972,16 +902,10 @@ function endingQuestions(psiTurk, callback) {
 
 
     psiTurk.showPage("endingquestions.html");
-    $("body").off("keydown");
-    $("body").off("keyup");
     $("#pointsscored").html(points);
     $("#misspct").html(misspct);
-    $("#pausepct").html(pausepct);
     if (misspct > 10) {
         losses += (misspct - 10) * .2;
-    }
-    if (pausepct > 20) {
-        losses += (pausepct - 20) * .2;
     }
     losses = Math.min(losses, 5);
     bonus = 5 - losses;
@@ -1124,8 +1048,7 @@ function experimentDriver() {
                               {range: "five_onehundred",
                                reset: "1_6",
                                processnum: "7",
-                               misspenalty: "20percentage",
-                               pausepenalty: "20percentage"},
+                               misspenalty: "20percentage"},
                               psiTurk, next); },
         function () {
             videoPicker(psiTurk, next);
