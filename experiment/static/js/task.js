@@ -1111,6 +1111,8 @@ function experimentDriver() {
                           "postquestionnaire.html"]);
     functionList = [
         function () {
+            bis(psiTurk, next); },
+        function () {
             instructionDriver(["instructions/instruct_1.html",
                                "instructions/instruct_2.html",
                                "instructions/instruct_3.html",
@@ -1146,8 +1148,6 @@ function experimentDriver() {
             phaseDriver(nChoices[1], nPreWorkPeriods[1], ExploreExploitTask, ConsumptionRewards, "consumption", psiTurk, next); },
         function () {
             endingQuestions(psiTurk, next); },
-        function () {
-            bis(psiTurk, next); },
         function () {
             questionnaire(psiTurk); }];
     next();
