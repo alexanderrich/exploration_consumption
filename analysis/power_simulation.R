@@ -10,18 +10,21 @@ agentmaker <- function(intercept, slope) {
 }
 
 
-simulate_agent <- function (agent, id, condition, n_trials) {
+simulate_agent <- function (agent, id, condition) {
+  n_trials <- 48
   responses <- rep(0, n_trials)
   current_value <- rep(0, n_trials)
   new_spinner_value <- sample(seq(.05, 1, .05), n_trials, replace=TRUE) * (runif(n_trials) > .333)
   resets <- rep(0, n_trials)
   resets[seq(0, 54, 6) + sample(1:6, 10, replace=TRUE)] <-  1
   resets <- c(1, resets[1:(n_trials-1)])
-  reset_values <- sample(seq(.2, .5, .05), n_trials, replace=TRUE)
+  reset_values <- sample(seq(.2, .6, .05), replace=FALSE)
+  reset_idx <- 1
 
   for (i in 1:n_trials) {
     if (resets[i]) {
-      current_value[i] <- reset_values[i]
+      current_value[i] <- reset_values[reset_idx]
+      reset_idx <- reset_idx + 1
     }
     responses[i] <- runif(1) < agent(current_value[i])
     if (responses[i] * new_spinner_value[i] > current_value[i]) {
@@ -39,7 +42,7 @@ simulate_experiment <- function (n_per_condition, intercept_mean, intercept_sd, 
     condition <- ifelse(i > n_per_condition, 1, 0)
     agent <- agentmaker(rnorm(1, intercept_mean + condition*intercept_difference , intercept_sd),
                         rnorm(1, slope_mean, slope_sd))
-    results <- rbind.data.frame(results, simulate_agent(agent, i, condition, 42))
+    results <- rbind.data.frame(results, simulate_agent(agent, i, condition))
   }
   results
 }

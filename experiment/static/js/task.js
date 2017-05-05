@@ -136,6 +136,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
     "use strict";
     var responseFn,
         resetArray,
+        resetValues,
         i,
         trial = -1,
         choiceNum = -1,
@@ -362,7 +363,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
     };
 
     resetMachine = function () {
-        value = Math.ceil(3 + 7 * Math.random()) / 20;
+        value = resetValues.pop();
         $("#machinescreen").html("Machine<br/>RESET");
         $("#start").prop("disabled", true);
         updateMachine(0, "?");
@@ -455,11 +456,19 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         var chosen;
         resetArray = [];
         for (i = 0; i < nChoices / 6; i++) {
-            chosen = Math.floor(Math.random() * 6);
+            if (i === nChoices / 6 - 1) {
+                // make sure final reset isn't after the last choice
+                chosen = Math.floor(Math.random() * 5);
+            } else {
+                chosen = Math.floor(Math.random() * 6);
+            }
             resetArray = [0, 0, 0, 0, 0, 0].concat(resetArray);
             resetArray[chosen] = 1;
         }
     })();
+
+    //spread reset values over an even range of percentages
+    resetValues = _.shuffle([.2, .25, .3, .35, .4, .45, .5, .55, .6]);
 
     function arcTween (newAngle) {
         return function (d) {
@@ -619,7 +628,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         .style("stroke-width", 3);
 
 
-    value = Math.ceil(3 + 7 * Math.random()) / 20;
+    value = resetValues.pop();
     updateQueue();
 }
 
@@ -1007,7 +1016,7 @@ function experimentDriver() {
     "use strict";
     var psiTurk = new PsiTurk(uniqueId, adServerLoc, mode),
         next,
-        nChoices = [12, 60],
+        nChoices = [12, 48],
         nPreWorkPeriods = [8, 10],
         functionList = [];
 
