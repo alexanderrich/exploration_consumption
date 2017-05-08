@@ -14,19 +14,16 @@ var videoChoice;
 
 function VideoPlayer() {
     "use strict";
-    var player,
-        firstplay = true;
+    var player;
     player = document.getElementById("video");
     player.src = videoChoice.videosrc;
-    player.addEventListener("canplay",function() { if (firstplay) {
+    player.addEventListener("loadedmetadata",function() {
         player.currentTime = videoChoice.start;
-        firstplay = false;
-    }});
+    });
 
     this.run = function () {
         $("#rewards").show();
         player.play();
-        // onVideo = true;
     };
 
     this.stop = function () {
@@ -790,19 +787,27 @@ function practiceConsumption(psiTurk, callback) {
 }
 
 function videoPicker(psiTurk, callback) {
+    var videoIds = ["planetearth", "bakeoff", "unchainedreaction", "ellen"],
+        videoStarts = [25, 48, 104, 95],
+        i;
+
     psiTurk.showPage("videopicker.html");
+    for (i = 0; i < 4; i++) {
+        document.getElementById(videoIds[i]).addEventListener('loadedmetadata', (function (i) {
+            return function() {this.currentTime = videoStarts[i]; };
+        })(i));
+        document.getElementById(videoIds[i]).addEventListener('click', function () {
+            this.paused ? this.play() : this.pause();
+        });
+    }
+
     $("#continue").click(function () {
-        var choice = $("#videochoice").val();
-        if (choice !== "noresp") {
-            if (choice === "planetearth") {
-                videoChoice = {videosrc: "/static/movies/Planet Earth Freshwater.mp4", start: 25};
-            } else if (choice === "bakeoff") {
-                videoChoice = {videosrc: "/static/movies/The Great Christmas Bake Off.mp4", start: 48};
-            } else if (choice === "unchainedreaction"){
-                videoChoice = {videosrc: "/static/movies/Unchained Reaction Season 1 Episode 6 - Movie Mayhem.mp4", start: 104};
-            } else {
-                videoChoice = {videosrc: "/static/movies/Ellen Degeneres Here and Now.mp4", start: 95};
-            }
+        var choice = $("input[name='video']:checked").val();
+        if (choice !== undefined) {
+            videoChoice = {
+                videosrc: document.getElementById(choice).src,
+                start: document.getElementById(choice).currentTime
+            };
             psiTurk.recordUnstructuredData("videoChoice", choice);
 
             callback();

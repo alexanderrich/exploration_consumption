@@ -7,17 +7,33 @@
 	  <hr>
 
     <div class="instructions well">
-        <div class="question">
             <p class="questiontext">
-            Select a video to watch during the experiment. Choose whichever video seems most fun or interesting to you.
-                <select id="videochoice" name="videochoice">
-                    <option value="noresp" SELECTED></option>
-                    <option value="planetearth">Planet Earth: Freshwater (Nature documentary)</option>
-                    <option value="bakeoff">The Great Christmas Bake Off (British Baking Competition)</option>
-                    <option value="unchainedreaction">Unchained Reaction - Movie Mayhem (Building competition judged by Mythbusters hosts)</option>
-                    <option value="ellen">Ellen Degeneres Here and Now (Comedy special with popular talk show host)</option>
-                </select>
+            Select a video to watch during the experiment by clicking on the <strong>video's name</strong>. You can preview each video by clicking the video to play and pause. Choose whichever video seems most fun or interesting to you.
             </p>
+
+        <div>
+            <label>
+                <input type="radio" name="video" value="planetearth"/> Planet Earth: Freshwater (Nature documentary)
+            </label>
+            <video width="600px" id="planetearth" class="videopreview" src="/static/movies/Planet Earth Freshwater.mp4"></video>
+        </div>
+        <div>
+            <label>
+                <input type="radio" name="video" value="bakeoff"/> The Great Christmas Bake Off (British Baking Competition)
+            </label>
+            <video width="600px" id="bakeoff" class="videopreview" src="/static/movies/The Great Christmas Bake Off.mp4"></video>
+        </div>
+        <div>
+            <label>
+                <input type="radio" name="video" value="unchainedreaction"/> Unchained Reaction - Movie Mayhem (Building competition judged by Mythbusters hosts)
+            </label>
+            <video width="600px" id="unchainedreaction" class="videopreview" src="/static/movies/Unchained Reaction Season 1 Episode 6 - Movie Mayhem.mp4"></video>
+        </div>
+        <div>
+            <label>
+                <input type="radio" name="video" value="ellen"/> Ellen Degeneres Here and Now (Comedy special with popular talk show host)
+            </label>
+            <video width="600px" id="ellen" class="videopreview" src="/static/movies/Ellen Degeneres Here and Now.mp4"></video>
         </div>
 
     </div>
