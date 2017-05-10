@@ -151,13 +151,14 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         setOutcome,
         updateQueue,
         shiftQueue,
+        getWorkQueueData,
         startOutcome,
         timeStamp,
         wedges = 5,
         value,
         outcome = 0,
         visibleQueueLength = 8,
-        consumptionQueue = _.range(nTrials).fill("?").concat(_.range(visibleQueueLength).fill("_")),
+        consumptionQueue = _.range(nTrials).fill("?"),
         queueIdx = 0;
 
     consumptionQueue.fill("sliderpre", 0, nPreWorkPeriods);
@@ -310,33 +311,20 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             } else {
                 $("#machinescreen").html("Machine failed.<br/>Slider task added to queue.");
             }
-            if (condition === 1) {
-                d3.select("#delaynuminqueue")
-                    .select(".queueitempicture")
-                    .attr("xlink:href", function () {
-                        if (outcome) {
-                            return "static/images/videoicon.png";
-                        } else {
-                            return "static/images/slidericon.png";
-                        }
-                    })
-                    .attr("y", -38)
-                    .transition()
-                    .duration(1000)
-                    .delay(500)
-                    .attr("y", 3);
-            }
-            else {
-                d3.select("#firstinqueue")
-                    .select(".queueitempicture")
-                    .attr("xlink:href", function () {
-                        if (outcome) {
-                            return "static/images/videoicon.png";
-                        } else {
-                            return "static/images/slidericon.png";
-                        }
-                    });
-            }
+            d3.select("#choiceplaceinqueue")
+                .select(".queueitempicture")
+                .attr("xlink:href", function () {
+                    if (outcome) {
+                        return "static/images/videoicon.png";
+                    } else {
+                        return "static/images/slidericon.png";
+                    }
+                })
+                .attr("y", -38)
+                .transition()
+                .duration(1000)
+                .delay(500)
+                .attr("y", 3);
             setTimeout(function () {
                 $("#start").off("click");
                 $("#exploreexploitdiv").hide();
@@ -374,7 +362,6 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
     startOutcome = function () {
         $("#exploreexploitdiv").hide();
         $("#alternativecontents").show();
-        d3.select("#firstinqueue").select("rect").style("fill-opacity", 0);
         $("#alternativestart").click(function () {$("#alternativecontents").hide();
                                                   $("#alternativestart").off("click");
                                                   if (consumptionQueue[trial] === "video") {
@@ -384,9 +371,33 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
                                                   }});
     };
 
+    getWorkQueueData = function () {
+        var startIdx,
+            endIdx;
+        if (condition) {
+            startIdx = queueIdx;
+            endIdx = queueIdx + visibleQueueLength + 1;
+            if (endIdx <= consumptionQueue.length) {
+                return consumptionQueue.slice(startIdx, endIdx);
+            } else {
+                return consumptionQueue.slice(startIdx, consumptionQueue.length)
+                    .concat(_.range(endIdx - consumptionQueue.length).fill("_"));
+            }
+        } else {
+            startIdx = queueIdx - visibleQueueLength + 1;
+            endIdx = queueIdx + 2;
+            if (startIdx >= 0) {
+                return consumptionQueue.slice(startIdx, endIdx);
+            } else {
+                return _.range(-startIdx).fill("_")
+                    .concat(consumptionQueue.slice(0, endIdx));
+            }
+        }
+    };
+
     updateQueue = function () {
         d3.selectAll(".queueitempicture")
-            .data(consumptionQueue.slice(queueIdx, queueIdx + visibleQueueLength + 1))
+            .data(getWorkQueueData())
             .attr("xlink:href", function (d) {
                 if (d === "video") {
                     return "static/images/videoicon.png";
@@ -397,17 +408,16 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
                 }
             });
         d3.selectAll(".queueiteminner")
-            .data(consumptionQueue.slice(queueIdx, queueIdx + visibleQueueLength + 1))
+            .data(getWorkQueueData())
             .attr("transform", "translate(0)")
             .select("rect")
             .style("opacity", function(d) {
-                if (d === "sliderpre" || d === "_" || condition === 0) {
+                if (d === "_") {
                     return 0;
                 } else {
                     return 1;
                 }
             });
-        d3.select("#firstinqueue").select("rect").style("fill-opacity", "");
     };
 
     shiftQueue = function () {
@@ -535,6 +545,8 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         .style("stroke-width", 2);
 
     d3.select("#consumptionqueue")
+        .append("g")
+        .attr("transform", !condition ? "translate(" + (55 * (visibleQueueLength-1)) + ")" : "")
         .append("path")
         .attr("d", "M 4 70 L 4 85 L 56 85 L56 70")
         .style("stroke", "black")
@@ -543,8 +555,8 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
 
     d3.select("#consumptionqueue")
         .attr("width", (visibleQueueLength * 55 + 5).toString() + "px")
-        .selectAll("g")
-        .data(consumptionQueue.slice(queueIdx, queueIdx + visibleQueueLength + 1))
+        .selectAll(".queueitemframe")
+        .data(getWorkQueueData())
         .enter()
         .append("g")
         .attr("class", "queueitemframe")
@@ -552,10 +564,8 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         .append("g")
         .attr("class", "queueiteminner")
         .each(function (d, i) {
-            if (i === 0) {
-                d3.select(this).attr("id", "firstinqueue");
-            } else if (i === delayLength) {
-                d3.select(this).attr("id", "delaynuminqueue");
+            if (i === visibleQueueLength - 1) {
+                d3.select(this).attr("id", "choiceplaceinqueue");
             }
         })
         .append("image")
@@ -572,7 +582,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         .style("stroke-width", "3px")
         .style("stroke", "black")
         .style("fill", "#666666")
-        .attr("fill-opacity", 1)
+        .attr("fill-opacity", 0)
         .style("border-radius", "5px");
 
     d3.select("#consumptionqueue")
