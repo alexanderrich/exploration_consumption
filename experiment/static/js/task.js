@@ -336,7 +336,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             } else {
                 $("#machinescreen").html("Machine failed.<br/>Slider task added to queue.");
             }
-            d3.select("#choiceplaceinqueue")
+            d3.select(".choiceplaceinqueue")
                 .select(".queueitempicture")
                 .attr("xlink:href", function () {
                     if (outcome) {
@@ -362,7 +362,6 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
     };
 
     runChoice = function () {
-        $("#alternativecontents").hide();
         $(".machinebutton").removeClass("clicked");
         $("#start").prop("disabled", true);
         $("#machinescreen").html("Select button.");
@@ -387,8 +386,10 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
     startOutcome = function () {
         $("#exploreexploitdiv").hide();
         $("#alternativecontents").show();
-        $("#alternativestart").click(function () {$("#alternativecontents").hide();
-                                                  $("#alternativestart").off("click");
+        d3.select("#fillbehindmarker").style("fill-opacity", 1);
+        $(".outcomeplaceinqueue").click(function () {$("#alternativecontents").hide();
+                                                  d3.select("#fillbehindmarker").style("fill-opacity", 0);
+                                                  $(".outcomeplaceinqueue").off("click");
                                                   if (consumptionQueue[trial] === "video") {
                                                       callback(1, trial);
                                                   } else {
@@ -497,7 +498,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         var chosen;
         resetArray = [];
         for (i = 0; i < nChoices / 6; i++) {
-            if (i === nChoices / 6 - 1) {
+            if (i === 0) {
                 // make sure final reset isn't after the last choice
                 chosen = Math.floor(Math.random() * 5);
             } else {
@@ -578,14 +579,28 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         .style("stroke", "gray")
         .style("stroke-width", 2);
 
-    d3.select("#consumptionqueue")
-        .append("g")
-        .attr("transform", !condition ? "translate(" + (55 * (visibleQueueLength-1)) + ")" : "")
-        .append("path")
-        .attr("d", "M 4 70 L 4 85 L 56 85 L56 70")
+    var nextTaskMarker = d3.select("#consumptionqueue")
+            .append("g")
+            .attr("transform", !condition ? "translate(" + (55 * (visibleQueueLength-1)) + ", 70)" : "translate(0, 35)");
+
+    nextTaskMarker.append("rect")
+        .attr("x", 5)
+        .attr("width", 50)
+        .attr("height", 50)
+        .style("fill", "gold")
+        .style("fill-opacity", 0)
+        .attr("id", "fillbehindmarker")
+        .style("stroke-opacity", 0);
+
+    nextTaskMarker.append("path")
+        .attr("d", "M 4 35 L 4 50 L 56 50 L56 35")
         .style("stroke", "black")
         .style("fill",  "none")
         .style("stroke-width", 2);
+
+    nextTaskMarker.append("text")
+        .attr("y", 70)
+        .text("next task");
 
     d3.select("#consumptionqueue")
         .attr("width", (visibleQueueLength * 55 + 5).toString() + "px")
@@ -599,7 +614,12 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         .attr("class", "queueiteminner")
         .each(function (d, i) {
             if (i === visibleQueueLength - 1) {
-                d3.select(this).attr("id", "choiceplaceinqueue");
+                d3.select(this).classed("choiceplaceinqueue", true);
+                if (condition === 0) {
+                    d3.select(this).classed("outcomeplaceinqueue", true);
+                }
+            } else if (i === 0 && condition === 1) {
+                d3.select(this).classed("outcomeplaceinqueue", true);
             }
         })
         .append("image")
