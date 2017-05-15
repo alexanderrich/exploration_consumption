@@ -17,8 +17,12 @@ function VideoPlayer() {
     var player;
     player = document.getElementById("video");
     player.src = videoChoice.videosrc;
-    player.addEventListener("loadedmetadata",function() {
-        player.currentTime = videoChoice.start;
+    player.addEventListener("play",function() {
+        if (this.hassettime === undefined) {
+            this.currentTime = videoChoice.start;
+            this.volume = videoChoice.volume;
+            this.hassettime = true;
+        }
     });
 
     this.run = function () {
@@ -799,12 +803,19 @@ function practiceConsumption(psiTurk, callback) {
 function videoPicker(psiTurk, callback) {
     var videoIds = ["planetearth", "bakeoff", "unchainedreaction", "ellen"],
         videoStarts = [25, 48, 104, 95],
+        videoVolume = [.2, .5, 1, .8],
         i;
 
     psiTurk.showPage("videopicker.html");
     for (i = 0; i < 4; i++) {
-        document.getElementById(videoIds[i]).addEventListener('loadedmetadata', (function (i) {
-            return function() {this.currentTime = videoStarts[i]; };
+        document.getElementById(videoIds[i]).addEventListener('play', (function (i) {
+            return function() {
+                if (this.hassettime === undefined) {
+                    this.currentTime = videoStarts[i];
+                    this.volume = videoVolume[i];
+                    this.hassettime = true;
+                }
+            };
         })(i));
         document.getElementById(videoIds[i]).addEventListener('click', function () {
             this.paused ? this.play() : this.pause();
@@ -816,7 +827,8 @@ function videoPicker(psiTurk, callback) {
         if (choice !== undefined) {
             videoChoice = {
                 videosrc: document.getElementById(choice).src,
-                start: document.getElementById(choice).currentTime
+                start: document.getElementById(choice).currentTime,
+                volume: document.getElementById(choice).volume
             };
             psiTurk.recordUnstructuredData("videoChoice", choice);
 
