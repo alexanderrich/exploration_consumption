@@ -6,7 +6,7 @@
  */
 
 /*jslint browser: true*/
-/*global condition, uniqueId, adServerLoc, mode, document, PsiTurk, $, _, d3, window, setTimeout, clearTimeout, setInterval, clearInterval*/
+/*global condition, uniqueId, adServerLoc, mode, document, PsiTurk, $, _, d3, window, setTimeout, clearTimeout, setInterval, clearInterval, Audio*/
 
 condition = parseInt(condition);
 
@@ -43,6 +43,9 @@ function VideoPlayer() {
 function SliderTask() {
     "use strict";
     var misses,
+        noiseInterval,
+        noiseFn,
+        noise = new Audio("/static/audio/annoyingnoise.wav"),
         totalMisses = 0,
         total = 0;
 
@@ -60,6 +63,13 @@ function SliderTask() {
             }
         });
     });
+
+    noiseFn = function () {
+        setTimeout (function ()
+                    {
+            noise.play();
+        }, Math.random() * 400);
+    };
 
     this.practiceRun = function () {
         $("#sliders").show();
@@ -110,6 +120,7 @@ function SliderTask() {
             $("#slider5").prop("disabled", false);
             $("#sliderdiv5").css("background-color", "");
         }, 20000);
+        noiseInterval = setInterval(noiseFn, 1000);
     };
 
     this.getMisses = function () {
@@ -122,6 +133,7 @@ function SliderTask() {
     };
 
     this.stop = function () {
+        clearInterval(noiseInterval);
         misses = $(".slider").map(function () {
             return this.value;
         }).get().map(function (x) {
