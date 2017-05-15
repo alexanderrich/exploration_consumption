@@ -6,9 +6,10 @@
  */
 
 /*jslint browser: true*/
-/*global condition, uniqueId, adServerLoc, mode, document, PsiTurk, $, _, d3, window, setTimeout, clearTimeout, setInterval, clearInterval, Audio*/
+/*global condition, counterbalance, uniqueId, adServerLoc, mode, document, PsiTurk, $, _, d3, window, setTimeout, clearTimeout, setInterval, clearInterval, Audio*/
 
 condition = parseInt(condition);
+counterbalance = parseInt(counterbalance);
 
 var videoChoice;
 
@@ -177,7 +178,15 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         consumptionQueue = _.range(nTrials).fill("?"),
         queueIdx = 0;
 
-    consumptionQueue.fill("sliderpre", 0, nPreWorkPeriods);
+    consumptionQueue.fill("slider", 0, nPreWorkPeriods);
+    // for main task, get choice about extra videos and modify early work periods
+    if (taskType === "consumption") {
+        if (psiTurk.getQuestionData().extraVideoTime === "early") {
+            consumptionQueue.fill("video", 0, 2);
+        } else {
+            consumptionQueue.fill("video", nPreWorkPeriods - 2, nPreWorkPeriods);
+        }
+    }
 
     updateMachine = function (exploitVal, exploreVal) {
         var widthpct,
@@ -417,7 +426,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             .attr("xlink:href", function (d) {
                 if (d === "video") {
                     return "static/images/videoicon.png";
-                } else if (d === "slider" || d === "sliderpre") {
+                } else if (d === "slider") {
                     return "static/images/slidericon.png";
                 } else {
                     return  "static/images/blankicon.png";
@@ -849,6 +858,34 @@ function videoPicker(psiTurk, callback) {
     });
 }
 
+function extraVideos(psiTurk, callback) {
+    psiTurk.showPage("extravideos.html");
+    if (counterbalance) {
+        $(".thing1").html("two video tasks");
+        $(".thing2").html("eight slider tasks");
+    } else {
+        $(".thing2").html("two video tasks");
+        $(".thing1").html("eight slider tasks");
+    }
+
+    $(".extravideooptions").click(function () {
+        if (counterbalance) {
+            if (this.id === "option1") {
+                psiTurk.recordUnstructuredData("extraVideoTime", "early");
+            } else {
+                psiTurk.recordUnstructuredData("extraVideoTime", "late");
+            }
+        } else {
+            if (this.id === "option1") {
+                psiTurk.recordUnstructuredData("extraVideoTime", "late");
+            } else {
+                psiTurk.recordUnstructuredData("extraVideoTime", "early");
+            }
+        }
+        callback();
+    });
+}
+
 function transitionScreen(page, psiTurk, callback) {
     psiTurk.showPage(page);
     $("#continue").click(callback);
@@ -1066,6 +1103,7 @@ function experimentDriver() {
     psiTurk.preloadPages(["stage.html",
                           "practice.html",
                           "restart.html",
+                          "extravideos.html",
                           "instructions/instruct_1.html",
                           "instructions/instruct_2.html",
                           "instructions/instruct_3.html",
@@ -1114,6 +1152,9 @@ function experimentDriver() {
             practiceConsumption(psiTurk, next); },
         function () {
             transitionScreen("transition_fulltask.html", psiTurk, next);
+        },
+        function () {
+                extraVideos(psiTurk, next);
         },
         function () {
             phaseDriver(nChoices[1], nPreWorkPeriods[1], ExploreExploitTask, ConsumptionRewards, "consumption", psiTurk, next); },

@@ -29,7 +29,7 @@ threads = auto
 [Task Parameters]
 experiment_code_version = 2.3
 num_conds = 2
-num_counters = 1
+num_counters = 2
 
 [Shell Parameters]
 launch_in_sandbox_mode = true
