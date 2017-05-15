@@ -446,6 +446,15 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
     };
 
     shiftQueue = function () {
+        var trialsUntilChoice = nPreWorkPeriods - delayLength - trial;
+        if (trialsUntilChoice > 1) {
+            $("#rightofqueue").html(trialsUntilChoice.toString() + " tasks until machine available");
+        } else if (trialsUntilChoice === 1) {
+            $("#rightofqueue").html("1 task until machine available");
+        }
+        else if (trialsUntilChoice === 0){
+            $("#rightofqueue").html("");
+        }
         if (trial === 0) {
             functionList.pop()();
         } else {
@@ -609,12 +618,6 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         .style("fill", "#666666")
         .attr("fill-opacity", 0)
         .style("border-radius", "5px");
-
-    d3.select("#consumptionqueue")
-        .append("text")
-        .attr("y", "30px")
-        .style("font-size", "18px")
-        .text("Work queue:");
 
     var possibleSpinners = _.range(10).fill(0).concat(_.range(1, 21).map(function(x) {return x/20}));
     var possibleSpinnerOrder = _.shuffle(_.range(30));
@@ -1093,7 +1096,7 @@ function experimentDriver() {
     var psiTurk = new PsiTurk(uniqueId, adServerLoc, mode),
         next,
         nChoices = [12, 48],
-        nPreWorkPeriods = [8, 10],
+        nPreWorkPeriods = [10, 10],
         functionList = [];
 
     next = function () {

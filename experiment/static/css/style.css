@@ -366,10 +366,19 @@ input.slider[type="range"] {
 /* consumption queue */
 
 #consumptionqueue {
+    float: left;
     height: 100px;
     margin-left: auto;
     margin-right: auto;
     overflow: hidden;
+}
+
+
+#rightofqueue {
+    float: left;
+    width: 120px;
+    padding-top: 15px;
+    padding-left: 10px;
 }
 
 #video {
