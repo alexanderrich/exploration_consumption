@@ -8,10 +8,10 @@
 
     <div class="instructions well">
         <p id="toptext">
-            Before beginning this phase of the experiment, you must answer a few simple
+            Before beginning the experiment, you must answer a few simple
             questions to ensure you have read the instructions. If you do not
-            answer all questions correctly, you will be returned to the start of
-            this set of instructions and have a chance to retake this quiz.
+            answer all questions correctly, you will be returned to the start of the
+            instructions and have a chance to retake this quiz.
         </p>
         <form id="prequiz" action="debrief" method="post">
             <div class="question">
@@ -45,7 +45,7 @@
                         <select id="processnum" name="processnum" class="form-control">
                             <option value="noresp"></option>
 	                          <option value="1">Immediately</option>
-	                          <option value="7">In 7 work periods, after they reach the front of the work queue.</option>
+	                          <option value="8">In 8 work periods, after they reach the front of the work queue.</option>
 	                          <option value="100">In 100 work periods, after they reach the front of the work queue.</option>
                         </select>
                     </p>
@@ -65,7 +65,7 @@
         </form>
         <script>
          if (condition === 0) {
-             $("#processnum").val("7").change();
+             $("#processnum").val("8").change();
          } else {
              $("#cond1question").show();
              $("#processnum").val("noresp").change();

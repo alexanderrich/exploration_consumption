@@ -154,7 +154,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         i,
         trial = -1,
         choiceNum = -1,
-        delayLength = 7 * condition,
+        delayLength = 8 * condition,
         nTrials = nChoices + nPreWorkPeriods,
         functionList = [],
         runChoice,
@@ -174,7 +174,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         wedges = 5,
         value,
         outcome = 0,
-        visibleQueueLength = 8,
+        visibleQueueLength = 9,
         consumptionQueue = _.range(nTrials).fill("?"),
         queueIdx = 0;
 
@@ -581,7 +581,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
 
     var nextTaskMarker = d3.select("#consumptionqueue")
             .append("g")
-            .attr("transform", !condition ? "translate(" + (55 * (visibleQueueLength-1)) + ", 70)" : "translate(0, 35)");
+            .attr("transform", !condition ? "translate(" + (55 * (visibleQueueLength-1)) + ", 35)" : "translate(0, 35)");
 
     nextTaskMarker.append("rect")
         .attr("x", 5)
@@ -600,10 +600,11 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
 
     nextTaskMarker.append("text")
         .attr("y", 70)
+        .attr("x", condition ? 0 : -10)
         .text("next task");
 
     d3.select("#consumptionqueue")
-        .attr("width", (visibleQueueLength * 55 + 5).toString() + "px")
+        .attr("width", (visibleQueueLength * 55 + 7).toString() + "px")
         .selectAll(".queueitemframe")
         .data(getWorkQueueData())
         .enter()
@@ -809,8 +810,8 @@ function PracticeRewards (psiTurk, callback) {
 
 function practiceConsumption(psiTurk, callback) {
     "use strict";
-    var examples = [0, 0],
-        trials = [-2, -1],
+    var examples = [0, 0, 0],
+        trials = [-3, -2, -1],
         rewards,
         next;
 
@@ -847,7 +848,7 @@ function practiceConsumption(psiTurk, callback) {
 function videoPicker(psiTurk, callback) {
     var videoIds = ["planetearth", "bakeoff", "unchainedreaction", "ellen"],
         videoStarts = [25, 48, 104, 95],
-        videoVolume = [.2, .5, 1, .8],
+        videoVolume = [.25, .5, 1, .8],
         i;
 
     psiTurk.showPage("videopicker.html");
@@ -885,10 +886,10 @@ function extraVideos(psiTurk, callback) {
     psiTurk.showPage("extravideos.html");
     if (counterbalance) {
         $(".thing1").html("two video tasks");
-        $(".thing2").html("eight slider tasks");
+        $(".thing2").html("six slider tasks");
     } else {
         $(".thing2").html("two video tasks");
-        $(".thing1").html("eight slider tasks");
+        $(".thing1").html("six slider tasks");
     }
 
     $(".extravideooptions").click(function () {
@@ -1116,7 +1117,7 @@ function experimentDriver() {
     var psiTurk = new PsiTurk(uniqueId, adServerLoc, mode),
         next,
         nChoices = [12, 48],
-        nPreWorkPeriods = [10, 10],
+        nPreWorkPeriods = [8, 8],
         functionList = [];
 
     next = function () {
@@ -1156,7 +1157,7 @@ function experimentDriver() {
                               "instructions/quiz.html",
                               {range: "five_onehundred",
                                reset: "1_6",
-                               processnum: "7",
+                               processnum: "8",
                                misspenalty: "20percentage"},
                               psiTurk, next); },
         function () {

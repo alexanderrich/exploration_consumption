@@ -172,6 +172,7 @@ strong {
 #alternativecontents {
     /* margin-left: auto; */
     /* margin-right: auto; */
+    display: none;
     position: relative;
     text-align: center;
     padding-top: 150px;
