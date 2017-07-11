@@ -18,7 +18,7 @@ function VideoPlayer() {
     var player;
     player = document.getElementById("video");
     player.src = videoChoice.videosrc;
-    player.addEventListener("play",function() {
+    player.addEventListener("loadedmetadata",function() {
         if (this.hassettime === undefined) {
             this.currentTime = videoChoice.start;
             this.volume = videoChoice.volume;
@@ -399,26 +399,20 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
 
     getWorkQueueData = function () {
         var startIdx,
-            endIdx;
+            endIdx,
+            padding = 10,
+            paddedQueue;
+        paddedQueue = _.range(padding).fill("_")
+            .concat(consumptionQueue)
+            .concat(_.range(padding).fill("_"));
         if (condition) {
-            startIdx = queueIdx;
-            endIdx = queueIdx + visibleQueueLength + 1;
-            if (endIdx <= consumptionQueue.length) {
-                return consumptionQueue.slice(startIdx, endIdx);
-            } else {
-                return consumptionQueue.slice(startIdx, consumptionQueue.length)
-                    .concat(_.range(endIdx - consumptionQueue.length).fill("_"));
-            }
+            startIdx = queueIdx + padding;
+            endIdx = queueIdx + padding + visibleQueueLength + 1;
         } else {
-            startIdx = queueIdx - visibleQueueLength + 1;
-            endIdx = queueIdx + 2;
-            if (startIdx >= 0) {
-                return consumptionQueue.slice(startIdx, endIdx);
-            } else {
-                return _.range(-startIdx).fill("_")
-                    .concat(consumptionQueue.slice(0, endIdx));
-            }
+            startIdx = queueIdx + padding - visibleQueueLength + 1;
+            endIdx = queueIdx + padding + 2;
         }
+        return paddedQueue.slice(startIdx, endIdx);
     };
 
     updateQueue = function () {
@@ -853,7 +847,7 @@ function videoPicker(psiTurk, callback) {
 
     psiTurk.showPage("videopicker.html");
     for (i = 0; i < 4; i++) {
-        document.getElementById(videoIds[i]).addEventListener('play', (function (i) {
+        document.getElementById(videoIds[i]).addEventListener('loadedmetadata', (function (i) {
             return function() {
                 if (this.hassettime === undefined) {
                     this.currentTime = videoStarts[i];
@@ -869,12 +863,22 @@ function videoPicker(psiTurk, callback) {
 
     $("#continue").click(function () {
         var choice = $("input[name='video']:checked").val();
+        var idx;
         if (choice !== undefined) {
-            videoChoice = {
-                videosrc: document.getElementById(choice).src,
-                start: document.getElementById(choice).currentTime,
-                volume: document.getElementById(choice).volume
-            };
+            if (document.getElementById(choice).hassettime === true) {
+                videoChoice = {
+                    videosrc: document.getElementById(choice).src,
+                    start: document.getElementById(choice).currentTime,
+                    volume: document.getElementById(choice).volume
+                };
+            } else {
+                idx = videoIds.indexOf(choice);
+                videoChoice = {
+                    videosrc: document.getElementById(choice).src,
+                    start: videoStarts[idx],
+                    volume: videoVolume[idx]
+                };
+            }
             psiTurk.recordUnstructuredData("videoChoice", choice);
 
             callback();
