@@ -386,15 +386,14 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
     startOutcome = function () {
         $("#exploreexploitdiv").hide();
         $("#alternativecontents").show();
-        d3.select("#fillbehindmarker").style("fill-opacity", 1);
-        $(".outcomeplaceinqueue").click(function () {$("#alternativecontents").hide();
-                                                  d3.select("#fillbehindmarker").style("fill-opacity", 0);
-                                                  $(".outcomeplaceinqueue").off("click");
-                                                  if (consumptionQueue[trial] === "video") {
-                                                      callback(1, trial);
-                                                  } else {
-                                                      callback(0, trial);
-                                                  }});
+        d3.select("#taskpointer").style("fill-opacity", 1);
+        $("#alternativestart").click(function () {$("#alternativecontents").hide();
+                                                     $("#alternativestart").off("click");
+                                                     if (consumptionQueue[trial] === "video") {
+                                                         callback(1, trial);
+                                                     } else {
+                                                         callback(0, trial);
+                                                     }});
     };
 
     getWorkQueueData = function () {
@@ -469,6 +468,7 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         trial++;
         $("#exploreexploitdiv").hide();
         $("#exploresvg").hide();
+        d3.select("#taskpointer").style("fill-opacity", 0);
         d3.selectAll(".spinnerpickeroption")
                 .data(possibleSpinners)
             .attr("transform", function(d, i) {
@@ -577,13 +577,10 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
             .append("g")
             .attr("transform", !condition ? "translate(" + (55 * (visibleQueueLength-1)) + ", 35)" : "translate(0, 35)");
 
-    nextTaskMarker.append("rect")
-        .attr("x", 5)
-        .attr("width", 50)
-        .attr("height", 50)
-        .style("fill", "gold")
+    nextTaskMarker.append("path")
+        .attr("d", "M 25 -30 L 25 -10 L 20 -10 L 30 0 L 40 -10 L 35 -10 L 35 -30 Z")
         .style("fill-opacity", 0)
-        .attr("id", "fillbehindmarker")
+        .attr("id", "taskpointer")
         .style("stroke-opacity", 0);
 
     nextTaskMarker.append("path")
