@@ -1121,6 +1121,15 @@ function experimentDriver() {
         nPreWorkPeriods = [8, 8],
         functionList = [];
 
+    $(window).on("beforeunload", function(){
+		    psiTurk.saveData();
+		    $.ajax("quitter", {
+				    type: "POST",
+				    data: {uniqueId: psiTurk.taskdata.id}
+		    });
+		    return "By leaving or reloading this page, you opt out of the experiment.  Are you sure you want to leave the experiment?";
+    });
+
     next = function () {
         functionList.shift()();
     };
