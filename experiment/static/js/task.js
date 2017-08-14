@@ -179,14 +179,6 @@ function ExploreExploitTask(nChoices, nPreWorkPeriods, taskType, psiTurk, callba
         queueIdx = 0;
 
     consumptionQueue.fill("slider", 0, nPreWorkPeriods);
-    // for main task, get choice about extra videos and modify early work periods
-    if (taskType === "consumption") {
-        if (psiTurk.getQuestionData().extraVideoTime === "early") {
-            consumptionQueue.fill("video", 0, 2);
-        } else {
-            consumptionQueue.fill("video", nPreWorkPeriods - 2, nPreWorkPeriods);
-        }
-    }
 
     updateMachine = function (exploitVal, exploreVal) {
         var widthpct,
@@ -880,34 +872,6 @@ function videoPicker(psiTurk, callback) {
 
             callback();
         }
-    });
-}
-
-function extraVideos(psiTurk, callback) {
-    psiTurk.showPage("extravideos.html");
-    if (counterbalance) {
-        $(".thing1").html("two video tasks");
-        $(".thing2").html("six slider tasks");
-    } else {
-        $(".thing2").html("two video tasks");
-        $(".thing1").html("six slider tasks");
-    }
-
-    $(".extravideooptions").click(function () {
-        if (counterbalance) {
-            if (this.id === "option1") {
-                psiTurk.recordUnstructuredData("extraVideoTime", "early");
-            } else {
-                psiTurk.recordUnstructuredData("extraVideoTime", "late");
-            }
-        } else {
-            if (this.id === "option1") {
-                psiTurk.recordUnstructuredData("extraVideoTime", "late");
-            } else {
-                psiTurk.recordUnstructuredData("extraVideoTime", "early");
-            }
-        }
-        callback();
     });
 }
 
