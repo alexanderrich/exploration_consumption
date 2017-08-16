@@ -118,7 +118,7 @@ strong {
 }
 
 #rewards {
-    pointer-events: none;
+    /* pointer-events: none; */
     /* position: relative; */
     margin-left: auto;
     margin-right: auto;
@@ -382,9 +382,9 @@ input.slider[type="range"] {
     padding-left: 10px;
 }
 
-#video {
+video {
     height: 400px;
-    width: 700px;
+    width: 650px;
 }
 
 .bisquestion {
@@ -410,4 +410,37 @@ input.slider[type="range"] {
 .bisitem label {
     font-size: 16px;
     font-weight: normal;
+}
+
+.tab {
+    border: 2px solid black;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    height: 35px;
+    float: left;
+    text-align: center;
+}
+
+#planetearthtab {
+    width: 125px;
+    margin-left: 0px;
+    margin-right: 5px;
+}
+
+#bakeofftab {
+    width: 170px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+#unchainedreactiontab {
+    width: 180px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+#ellentab {
+    width: 145px;
+    margin-left: 5px;
+    margin-right: 0px;
 }

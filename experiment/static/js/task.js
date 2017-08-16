@@ -11,29 +11,88 @@
 condition = parseInt(condition);
 counterbalance = parseInt(counterbalance);
 
-var videoChoice;
+var videoInfo = [
+    {id: 'planetearth',
+     start: 25,
+     volume: .25},
+    {id: 'bakeoff',
+     start: 48,
+     volume: .5},
+    {id: 'unchainedreaction',
+     start: 104,
+     volume: 1},
+    {id: 'ellen',
+     start: 95,
+     volume: .8}
+];
 
 function VideoPlayer() {
     "use strict";
-    var player;
-    player = document.getElementById("video");
-    player.src = videoChoice.videosrc;
-    player.addEventListener("loadedmetadata",function() {
-        if (this.hassettime === undefined) {
-            this.currentTime = videoChoice.start;
-            this.volume = videoChoice.volume;
-            this.hassettime = true;
-        }
-    });
+    var players = [],
+        player,
+        i,
+        chosenPlayer = Math.floor(Math.random()*4),
+        switches = 0,
+        times = [0,0,0,0],
+        switchTime;
+
+    for(i = 0; i < videoInfo.length; i++){
+        player = document.getElementById(videoInfo[i].id);
+        player.addEventListener("loadedmetadata",(function (j) {
+            return function() {
+                if (this.hassettime === undefined) {
+                    this.currentTime = videoInfo[j].start;
+                    this.volume = videoInfo[j].volume;
+                    this.hassettime = true;
+                }
+            };
+        })(i));
+        $('#'+videoInfo[i].id+'tab').click((function (j) {
+            return function () {
+                if (chosenPlayer !== j) {
+                    var oldTime = switchTime;
+                    $('.tab').css('background-color', '');
+                    $(this).css('background-color', 'DeepSkyBlue');
+                    players[chosenPlayer].pause();
+                    $(players[chosenPlayer]).hide();
+                    chosenPlayer = j;
+                    $(players[chosenPlayer]).show();
+                    players[chosenPlayer].play();
+                    switches += 1;
+                    switchTime = new Date().getTime();
+                    times[j] = times[j] + switchTime - oldTime;
+                }
+            };
+        })(i));
+        $(player).hide();
+        players.push(player);
+    }
+    $("#" + videoInfo[chosenPlayer].id + 'tab').css('background-color', 'DeepSkyBlue');
+    $(players[chosenPlayer]).show();
+
 
     this.run = function () {
         $("#rewards").show();
-        player.play();
+        players[chosenPlayer].play();
+        switches = 0;
+        times = [0, 0, 0, 0];
+        switchTime = new Date().getTime();
     };
 
     this.stop = function () {
+        var oldTime = switchTime;
+        switchTime = new Date().getTime();
+        times[chosenPlayer] = times[chosenPlayer] + (switchTime - oldTime);
         $("#rewards").hide();
-        player.pause();
+        players[chosenPlayer].pause();
+    };
+
+    this.getData = function () {
+        return {'switches': switches,
+                'planetearth': times[0],
+                'bakeoff': times[1],
+                'unchainedreaction': times[2],
+                'ellen': times[3]};
     };
 
     this.practiceRun = function () {
@@ -689,13 +748,19 @@ function ConsumptionRewards(psiTurk, callback) {
             missPct,
             pausePct;
         if (reward) {
+            stat = video.getData();
             psiTurk.recordTrialData({phase: "EXPERIMENT",
                                      trialType: "consumption",
                                      trial: trialNum,
                                      uniqueid: uniqueId,
                                      condition: condition,
                                      outcome: reward,
-                                     slidersMissed: -1
+                                     slidersMissed: -1,
+                                     switches: stat.switches,
+                                     planetearth: stat.planetearth,
+                                     bakeoff: stat.bakeoff,
+                                     unchainedreaction: stat.unchainedreaction,
+                                     ellen: stat.ellen
                                     });
         } else {
             stat = sliderTask.getMisses();
@@ -706,7 +771,12 @@ function ConsumptionRewards(psiTurk, callback) {
                                      condition: condition,
                                      outcome: reward,
                                      slidersMissed: stat,
-                                     playTime: -1
+                                     playTime: -1,
+                                     switches: -1,
+                                     planetearth: -1,
+                                     bakeoff: -1,
+                                     unchainedreaction: -1,
+                                     ellen: -1
                                     });
         }
         missPct = sliderTask.missPct();
@@ -793,7 +863,7 @@ function PracticeRewards (psiTurk, callback) {
 
 function practiceConsumption(psiTurk, callback) {
     "use strict";
-    var examples = [0, 0, 0],
+    var examples = [1, 0, 0],
         trials = [-3, -2, -1],
         rewards,
         next;
@@ -809,7 +879,7 @@ function practiceConsumption(psiTurk, callback) {
             if (reward === 0) {
                 $("#rewardintrotext").html("Example outcome: <br/> Slider task");
             } else {
-                $("#rewardintrotext").html("Example outcome: <br/> Video task");
+                $("#rewardintrotext").html("Example outcome: <br/> Video");
             }
             $("#continue").off("click");
             $("#continue").click(
@@ -826,53 +896,6 @@ function practiceConsumption(psiTurk, callback) {
     $("#sliders").hide();
     rewards = new ConsumptionRewards(psiTurk, next, true);
     next();
-}
-
-function videoPicker(psiTurk, callback) {
-    var videoIds = ["planetearth", "bakeoff", "unchainedreaction", "ellen"],
-        videoStarts = [25, 48, 104, 95],
-        videoVolume = [.25, .5, 1, .8],
-        i;
-
-    psiTurk.showPage("videopicker.html");
-    for (i = 0; i < 4; i++) {
-        document.getElementById(videoIds[i]).addEventListener('loadedmetadata', (function (i) {
-            return function() {
-                if (this.hassettime === undefined) {
-                    this.currentTime = videoStarts[i];
-                    this.volume = videoVolume[i];
-                    this.hassettime = true;
-                }
-            };
-        })(i));
-        document.getElementById(videoIds[i]).addEventListener('click', function () {
-            this.paused ? this.play() : this.pause();
-        });
-    }
-
-    $("#continue").click(function () {
-        var choice = $("input[name='video']:checked").val();
-        var idx;
-        if (choice !== undefined) {
-            if (document.getElementById(choice).hassettime === true) {
-                videoChoice = {
-                    videosrc: document.getElementById(choice).src,
-                    start: document.getElementById(choice).currentTime,
-                    volume: document.getElementById(choice).volume
-                };
-            } else {
-                idx = videoIds.indexOf(choice);
-                videoChoice = {
-                    videosrc: document.getElementById(choice).src,
-                    start: videoStarts[idx],
-                    volume: videoVolume[idx]
-                };
-            }
-            psiTurk.recordUnstructuredData("videoChoice", choice);
-
-            callback();
-        }
-    });
 }
 
 function transitionScreen(page, psiTurk, callback) {
@@ -1113,7 +1136,6 @@ function experimentDriver() {
                           "transition_practicedecision.html",
                           "transition_practiceconsumption.html",
                           "transition_fulltask.html",
-                          "videopicker.html",
                           "endingquestions.html",
                           "bis.html",
                           "postquestionnaire.html"]);
@@ -1135,9 +1157,6 @@ function experimentDriver() {
                                misspenalty: "20percentage"},
                               psiTurk, next); },
         function () {
-            videoPicker(psiTurk, next);
-        },
-        function () {
             transitionScreen("transition_practicedecision.html", psiTurk, next);
         },
         function () {
@@ -1150,9 +1169,6 @@ function experimentDriver() {
             practiceConsumption(psiTurk, next); },
         function () {
             transitionScreen("transition_fulltask.html", psiTurk, next);
-        },
-        function () {
-                extraVideos(psiTurk, next);
         },
         function () {
             phaseDriver(nChoices[1], nPreWorkPeriods[1], ExploreExploitTask, ConsumptionRewards, "consumption", psiTurk, next); },
