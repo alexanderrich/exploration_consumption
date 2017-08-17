@@ -14,16 +14,16 @@ counterbalance = parseInt(counterbalance);
 var videoInfo = [
     {id: 'planetearth',
      start: 25,
-     volume: .25},
+     volume: .2},
     {id: 'bakeoff',
      start: 48,
-     volume: .5},
+     volume: .4},
     {id: 'unchainedreaction',
      start: 104,
-     volume: 1},
+     volume: .8},
     {id: 'ellen',
      start: 95,
-     volume: .8}
+     volume: .65}
 ];
 
 function VideoPlayer() {
@@ -108,6 +108,8 @@ function SliderTask() {
         noise = new Audio("/static/audio/annoyingnoise.wav"),
         totalMisses = 0,
         total = 0;
+
+    noise.volume = .8;
 
     $(".sliderdiv").each(function () {
         var div = $(this);
@@ -879,7 +881,7 @@ function practiceConsumption(psiTurk, callback) {
             if (reward === 0) {
                 $("#rewardintrotext").html("Example outcome: <br/> Slider task");
             } else {
-                $("#rewardintrotext").html("Example outcome: <br/> Video");
+                $("#rewardintrotext").html("Example outcome: <br/> Video task");
             }
             $("#continue").off("click");
             $("#continue").click(
