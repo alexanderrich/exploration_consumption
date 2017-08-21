@@ -127,10 +127,9 @@ function SliderTask() {
     });
 
     noiseFn = function () {
-        setTimeout (function ()
-                    {
+        if (Math.random() < .667) {
             noise.play();
-        }, Math.random() * 400);
+        }
     };
 
     this.practiceRun = function () {
@@ -182,7 +181,10 @@ function SliderTask() {
             $("#slider5").prop("disabled", false);
             $("#sliderdiv5").css("background-color", "");
         }, 20000);
-        noiseInterval = setInterval(noiseFn, 1000);
+        setTimeout(function () {
+            noiseFn();
+            noiseInterval = setInterval(noiseFn, 2000);
+        }, 1000);
     };
 
     this.getMisses = function () {

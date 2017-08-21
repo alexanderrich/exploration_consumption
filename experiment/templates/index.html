@@ -4,8 +4,7 @@ Enter Subject ID here: <input id="subnum" type="text" name="subnum" value=""><br
 <script>
  document.getElementById("submit").onclick = function () {
      var n = document.getElementById("subnum").value;
-     window.location.href = "exp?assignmentId=v3-" + n + "&hitId=v3-" + n +
-                            "&workerId=v3-" + n + "&mode=debug"
+     popup = window.open('exp?hitId=v3-' + n + '&assignmentId=v3-' + n + '&workerId=v3-' + n + '&mode=debug','Popup','toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=no,width='+screen.availWidth+',height='+screen.availHeight+'');
  }
 </script>
 </html>
