@@ -949,7 +949,6 @@ function instructionDriver(instructionPages, quizPage, answerKey, psiTurk, callb
             var allRight = true;
             $("select").each(function () {
                 psiTurk.recordTrialData({phase: "INSTRUCTQUIZ",
-                                         quiz: quizPage,
                                          question: this.id,
                                          answer: this.value,
                                          loop: loop});
@@ -965,7 +964,7 @@ function instructionDriver(instructionPages, quizPage, answerKey, psiTurk, callb
                 // Record that the user has finished the instructions and
                 // moved on to the experiment. This changes their status code
                 // in the database.
-                psiTurk.recordUnstructuredData("instructionloops_" + quizPage, loop);
+                psiTurk.recordUnstructuredData("instructionloops", loop);
                 psiTurk.finishInstructions();
                 // Move on to the experiment
                 callback();
