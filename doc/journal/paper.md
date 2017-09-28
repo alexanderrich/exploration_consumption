@@ -12,6 +12,84 @@ header-includes:
 
 # Does a present bias influence exploratory choice?
 
+# Exploration outside the lab
+
+Exploration has been studied outside the lab in a wide range of contexts. While
+these domains vary greatly in their superficial characteristics, a bias towards
+under-exploration has often been observed.
+
+Learned helplessness, a phenomenon applicable to many behaviors and domains, has
+been described as an example of insufficient exploration. In learned
+helplessness, an organism experiences the absence of control over the
+environment, learns that the environment is uncontrollable, and thus ceases to
+take actions that might allow it to discover that it can in fact exert control.
+Learned helplessness has been proposed to underly some forms of depression
+[@Abramson1978; @Abramson1989] as well as problems ranging from difficulties in
+school [@Diener1978] to poverty [@Evans2005]. While the cognitive appraisal of
+experienced events affects the development of learned helplessness
+[@Abramson1978], patterns of exploration clearly play a role as well [@Huys2009,
+@Teodorescu2014a]. In the case of depression, interventions aimed at increasing
+the exploration of activities that might be rewarding have been found to be as
+effective as those with a more cognitive orientation [@Jacobson1996].
+
+Under-exploration also seems to occur in the development of complex skills, such
+as flying a plane or playing a sport [@Gopher1989]. In these settings, an "emphasis
+change" training method that encourages people to continually explore the
+performance space leads to greater performance gains than unguided practice or more complex
+training methods.  Without this intervention, people often enter a "local
+maximum" in which exploration decreases and performance plateaus [@Yechiam2001].
+
+In many other areas under-exploration is less clearly
+established, but is suspected to play a role in maladaptive behavior.
+Insufficient exploratory interaction with outgroups may be one cause of
+stereotypes and prejudice [@Denrell2005most], and interventions that
+increase inter-group contact reduce stereotypes [@Shook2008]. The crowding
+out of exploration by exploitation is a concern in organizational behavior as
+well [@March1991; @Levinthal1993], prompting research into organizational
+structures that may preserve exploration [@Fang2010].
+
+# Exploration in the lab
+
+Lab studies of exploratory choice have allowed researchers to fully
+control the reward structure of the environment and precisely measure behavior,
+as well as comparing behavior to optimal patterns of choice and other formal models.
+These studies have yielded a number of insights into the factors leading to more
+or less exploration, including aspiration levels [@Wulff2015], uncertainty
+[@Speekenbrink2015], and the future value of information [@Rich2017; @Wilson2014a]
+
+Interestingly, under-exploration has not emerged as a clear pattern in lab
+experiments. Instead, results are mixed with people sometimes under-exploring,
+sometimes over-exploring, and sometimes exploring close to an optimal amount. To
+take two illustrative examples, [@Zwick2003] found that in a sequential
+search task people under-searched when there were no information costs but
+over-searched when there were information costs, and [@Teodorescu2014]
+found that people explored unknown alternatives too often or not often enough
+depending on whether rare outcomes were positive or negative. Similar results
+have been obtained within and across a variety of other studies and paradigms
+[@tversky1966information; @hertwig2004decisions; @Navarro2016; @Juni2016;
+@Sang2011].
+
+These experimental studies raise the question of why under-exploration appears
+more widespread in the field, but not in the lab. One possibility is that both
+forms of deviation from optimality are in fact prevalent, though perhaps in
+different settings, and that the seemingly general bias toward under-exploration
+is illusory. An alternative is that there are some important aspects of real-world
+decisions&mdash;or peoples' cognitive and motivational states when making those
+decisions&mdash;that makes differentiate them from decisions in the lab. In the
+current paper, we investigate one potential missing component of lab tests of
+exploratory choice: the distribution of choices and outcomes over time. We
+propose and test the hypothesis that because of people's bias towards immediate
+rewards, the spreading of choices over time may account for a portion of
+people's tendency to under-explore.
+
+# Exploration and myopia
+
+
+
+## Formal analysis
+
+## Capturing present bias in the lab
+
 # Experiment
 ## Methods
 
@@ -54,7 +132,10 @@ at any time by clicking one of four tabs above the player.
 
 To incentivize participants to attend to and perform the slider task, they were
 penalized if they missed more than 10% of the sliders. For each percentage over
-10% of sliders that were not set to 50 over the course of the experiment, 
+10% of sliders that were not set to 50 over the course of the experiment, $.20
+was deducted from a bonus that started at $5.00. For example, if a participant
+failed to set the sliders to 50 for 18% of sliders, their final bonus would be
+$3.40.
 
 #### Choice task.
 
@@ -120,3 +201,9 @@ past eight outcomes.
 Following the final work period, participants were asked to rate their enjoyment
 of the slider task and of the video task on a scale from 1 to 7, where 1
 indicated extremely unenjoyable and 7 indicated extremely enjoyable.
+
+## Results
+
+
+
+# References
