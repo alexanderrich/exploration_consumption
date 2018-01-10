@@ -8,6 +8,7 @@ bibliography: /Users/alex/Documents/exploration_consumption/doc/journal/paperlib
 header-includes:
 - \usepackage{soul}
 - \usepackage{color}
+geometry: margin=1in
 ---
 
 # Does a present bias influence exploratory choice?
@@ -52,7 +53,7 @@ structures that may preserve exploration [@Fang2010].
 
 Lab studies of exploratory choice have allowed researchers to fully
 control the reward structure of the environment and precisely measure behavior,
-as well as comparing behavior to optimal patterns of choice and other formal models.
+as well as compare behavior to optimal choice and other formal models.
 These studies have yielded a number of insights into the factors leading to more
 or less exploration, including aspiration levels [@Wulff2015], uncertainty
 [@Speekenbrink2015], and the future value of information [@Rich2017; @Wilson2014a]
@@ -82,11 +83,142 @@ propose and test the hypothesis that because of people's bias towards immediate
 rewards, the spreading of choices over time may account for a portion of
 people's tendency to under-explore.
 
-# Exploration and myopia
+# Temporal discounting
+
+Temporal discounting refers to the underweighting of temporally distant rewards
+relative to close ones, and is a ubiquitous phenomenon across decision-making
+agents including people, animals, and organizations. Temporal discounting is
+rational if it occurs at an exponential rate $\delta$, where the value of a reward $r$
+at time $t$ is
+
+$$
+V(r,t) = re^{-t\delta}
+$$
+
+In exponential discounting, each additional unit of waiting time decreases the
+value of a reward by an equal proportion [@samuelson1937note, @Frederick2002]. This means that the
+relative values of an early and a late rewards are the same no matter what time point they
+are considered from, or equivalently that their relative values are unaffected by
+adding an additional waiting time to both.
+
+An extensive literature documents that people and animals violate exponential discounting.
+Specifically, in the short term rewards are discounted at a steep rate with each
+additional unit of waiting time, while in the long term rewards are discounted
+at a shallow rate. This sort of non-exponential discounting leads to a present
+bias, in which in the short term people excessively over-weight immediate over
+future rewards. For example, people will often prefer a larger, later monetary
+reward to a smaller, sooner reward when both rewards are in the future, but will
+switch their preference when the time until both rewards is reduced so that the
+sooner reward is immediate or nearly immediate [@Kirby1995]. With monetary rewards, the delay
+or speed-up required to observe preference reversals is usually several days. With non-monetary rewards,
+such as the cessation of an annoying noise [@Solnick1980], watching a video
+when bored [@Navarick1998], or drinking soda
+when thirsty [@Brown2009], a bias towards immediate rewards has been observed on the scale of
+minutes or even seconds.
+
+There is debate about how to formally describe non-exponential discounting. Many
+studies have found that humans and animals appear to discount future rewards at
+a hyperbolic rate, allowing the value of a future reward to be written
+
+$$
+V(r, t) = \frac{r}{1+kt}
+$$
+
+for appropriate constant $k$ [@myerson1995discounting]. This formulation often fits data well, but is
+difficult to deal with analytically. An alternative is to posit that discounting
+after the present proceeds exponentially, but that there is a one-time drop in
+value when the reward goes from being immediate to being in the future [@Laibson1997]. In this
+model, known as the beta&ndash;delta model, the value of a future reward is
+
+$$
+V(r, t) = \begin{cases}
+r & \text{if }t=0\\
+\beta r e^{-t\delta} & \text{if }t>0
+\end{cases}
+$$
+
+where $\delta$ is the rate of exponential discounting and $\beta$ is the degree
+of present bias. This model suffers from ambiguity in when exactly the "present"
+ends and the future begins. (E.g., should the value of reward received in 30
+seconds be discounted by $\beta$, or should it be considered immediate?)
+However, it captures in a simple and tractible way many of the qualities of
+human intertemporal choice, and for this reason we will adopt it for our
+additional analyses below.
 
 
+# Exploration and temporal discounting
 
-## Formal analysis
+The rewards from exploratory choice are inherently distributed over time. In
+expectation, an exploitative action yields the greatest reward in the present,
+because it is the action *currently believed* to yield the highest reward.
+An exploratory action is expected to yield less immediate reward, but it can
+compensate for this by providing useful information. This information can allow
+the decision-maker to make better choices in the future, leading to higher rewards later on.
+
+Thus, temporal discounting plays a central role in determining the balance
+between exploration and exploitation. Rational, exponential discounting ensures
+that a decision-making agent explores neither too little nor too much given its
+degree of interest in the future. Some degree of discounting is generally good,
+because at some point the distant gains from continued exploration are not worth
+their immediate costs [@LeMens2011].
+But as past theoretical work has highlighted, discounting that is too steep or
+that exhibits a present bias can lead to chronic over-exploitation and
+under-exploration [@March1991, @Levinthal1993].
+
+To understand how patterns of discounting affect exploration, consider a simple
+scenario in which an agent must make a sequence of choices between
+two actions. Action $A$ is to choose a sure-bet option that always provides a
+payoff of 2. Action $B$ is to choose from a large set of uncertain
+options. Each uncertain option has a 25% chance of producing a payoff of 4, and
+a 75% chance of producing a payoff of 0. Once a high-payoff uncertain option is
+found, it can be selected on every subsequent choice.
+
+![Discounting vis](figures/discounting.pdf){#fig:discounting}
+
+This scenario presents an explore exploit dilemma because as long as a
+high-payoff option has not been found, the best immediate action is $A$, with an
+expected payoff of $2$, rather than action $B$, with an expected
+payoff of $.25\cdot4=1$. Long term payoffs, in contrast, are increased by
+exploring the options available through action $B$, because the agent may find a
+high-payoff option that can be exploited on all future choices.
+
+Whether the agent decides to forgo the immediate gains of exploiting $A$ in
+order to explore $B$ will depend on how much it values the future. Figure
+@fig:discounting shows the effects of various patterns of discounting on the
+expected rewards over a sequence of five choices. The left column shows the case of
+exponential discounting. The top graph shows the exponential discounting curve,
+with dots indicating the time and weight of each of the five choices. The bottom
+graph shows the change in expected reward at each choice that is caused by
+selecting action $B$ rather than $A$ at the *first* choice. (This analysis
+assumes that all subsequent choices are made optimally in terms of undiscounted
+rewards.) For mild exponential discounting, we see that at time 1, choosing $B$
+over $A$ causes a steep decrease in expected reward, because it trades an
+expected payoff of $2$ for an expected payoff of $1$. At times 2&ndash;5,
+however, the expected payoff goes up; choosing $B$ at time 1 can only increase
+payoffs at later times, by revealing an high-payoff option. At the far right of
+the graph, we see that summed discounted reward, in black, is positive, and thus that the
+agent will choose to explore. The undiscounted reward, in gray, is larger, but
+doesn't differ in sign from the reward after mild exponential discounting.
+
+The center column shows the case of beta&ndash;delta, or psuedo-hyperbolic,
+discounting. As the top graph shows, rewards from later time points are weighted
+much less than in exponential discounting. Because of this, the expected gain in
+future reward for choosing $B$ becomes smaller, while the immediate expected
+loss remains the same. The summed discounted reward becomes negative, and the
+agent adopts a completely exploitative policy of choosing $A$ instead of initially exploring the
+uncertain action $B$.
+
+To preview our experimental manipulation, the right column shows a case of
+beta&ndash;delta discounting considered from a temporal distance. Now, the first
+choice is at time 6, while the last is at time 5. Suppose the agent was given
+the opportunity to commit to a first action from time 1. As shown in the bottom
+graph, the sequence of rewards viewed from this distance is highly discounted,
+but is no longer heavily biased towards the first outcome. Instead, the expected
+discounted reward sequence is now a scaled version of the exponentially
+discounted rewards, since beta&ndash;delta discounding is identical to
+exponential discounting after the present. The summed expected rewards for
+exploration are greater than those for exploitation, so the agent will choose
+the exploratory action.
 
 ## Capturing present bias in the lab
 
@@ -205,5 +337,11 @@ indicated extremely unenjoyable and 7 indicated extremely enjoyable.
 ## Results
 
 
+# Discussion
+
+## Reasons our study didn't work...
+- Maybe our null result is wrong: other consumption reward literature has questionable statistics - maybe this really doesn't work that well? Need for new methods on how to quickly determine discount rates for consumption rewards.
+
+- Maybe our null result is right: exploration uses other system than intertemporal choice. Curiosity, etc? Ways to belance exploration and exploitation without explicit consideration of the future. Fragility of time.
 
 # References
