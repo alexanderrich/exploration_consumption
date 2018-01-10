@@ -34,13 +34,22 @@ create_graphs = function(rewardseq, beta, delta, initialrewardtime, maxtime) {
     scale_fill_manual(name="reward type", values=colors) +
     scale_x_continuous(breaks=c(seq(1, maxtime, 1), maxtime+2),
                        labels=c(seq(1, maxtime, 1), "sum"), limits=c(0, maxtime+2.5)) +
-    theme(legend.position="bottom") + ylab(expression(paste(Delta, " reward | explore")))
+    theme(legend.position="bottom") + ylab(expression(paste("explore ", Delta, " reward")))
 
   return( list(discountplot, rewardplot))
 }
 
-rewardseq = c(-1, .75, .5625, .375, .375)
+
+# Environment with sure bet of 2 or try to find a reward of 4 with chance .25
+rewardseq = c(-1, .75, .5625, .28125, .28125)
+exponential = create_graphs(rewardseq, 1, .9, 1, 10)
 immediate = create_graphs(rewardseq, .5, .9, 1, 10)
 delayed = create_graphs(rewardseq, .5, .9, 6, 10)
 
-plot_grid(immediate[[1]], delayed[[1]], immediate[[2]], delayed[[2]], axis='r', align='v', nrow=2)
+p = plot_grid(exponential[[1]], immediate[[1]], delayed[[1]], exponential[[2]], immediate[[2]], delayed[[2]], axis='r', align='v', nrow=2)
+
+p
+
+pdf("../doc/journal/figures/discounting.pdf", height=4, width=13, useDingbats = FALSE)
+p
+dev.off()
