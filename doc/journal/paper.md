@@ -272,7 +272,18 @@ present bias will be decreased, leading to greater exploration.
 # Experiment
 ## Methods
 
+The experiment was preregistered through the Open Science Framework. The
+preregistration can be found at: osf.io/3r9ke.
+
 ### Participants.
+
+One hundred people from the general community took part in the study in person
+at New York University. The participants had a mean age of 23.9 (SD=6.1). Fifty
+eight self-reported female, forty one male. Participants received $10 for
+taking part in the study, which lasted approximately one hour, and received a
+performance-based bonus of up to $5. All but one participant received a bonus of
+$5, with the remaining participant receiving $4.4. The experiment was approved
+by the Institutional Review Board at New York University.
 
 ### Design and procedure.
 
@@ -383,6 +394,29 @@ indicated extremely unenjoyable and 7 indicated extremely enjoyable.
 
 ## Results
 
+Our primary hypothesis was that participants in the delayed-outcome condition
+would take more exploratory actions (that is, choose a new spinner more often)
+than those in the immediate-outcome condition. A secondary hypothesis was that
+this change would be moderated by participants scores on the Barratt Impulsivity
+Scale. Specifically, we expected that highly impulsive participants would
+explore less and show a bigger difference in explroation between the delayed and
+immediate conditions.
+
+We tested these predictions via hierarchical Bayesian logistic regression on
+participant choices. All aspects of this analyses were preregistered prior to
+data collection. We included predictors for the value of the current spinner,
+the participant's BIS score, the participant's condition, and interactions
+between condition and current spinner value and condition and BIS score.
+Condition was set to -0.5 for the immediate condition and 0.5 for the delayed
+condition; current spinner value and BIS score were rescaled to have zero mean
+and unit variance. We assumed that participants varied in their overall tendency
+to explore (i.e., intercept) as well as their responsiveness to current spinner
+value (slope). Participant's individual-level parameters were assumed to be
+drawn from a t distribution with $df=5$, making our population level estimates
+robust to potential outliers. Additional details of the regression analysis are
+available in the supplemental material available online.
+
+The model posterior was estimated using the Stan modeling language INSERT STAN CITATION. 
 
 # Discussion
 
