@@ -220,7 +220,54 @@ exponential discounting after the present. The summed expected rewards for
 exploration are greater than those for exploitation, so the agent will choose
 the exploratory action.
 
-## Capturing present bias in the lab
+## Capturing present bias in exploratory choice
+
+As alluded to earlier, several approached have been used to study present bias
+in the lab. Many studies use monetary rewards, and offer participants various
+one-off choices between different quantities of money at different delays to
+determine their discounting curve [@myerson1995discounting]. However,
+exploratory choice is inherently not "one-off." Choices can only be considered
+exploratory or exploitative if they are embedded within an ordered sequence of
+choices, where the knowledge gained from one choice can be used to inform the
+next. Thus, to study present bias during exploratory choice, an experiment must
+include a sequence of choices and outcomes, with enough time between them for
+discounting of the future to be non-negligible. With monetary rewards, this
+means the choices in an experiment would have to be spread out over weeks or
+months. This leads us to consider non-monetary, directly consumable rewards.
+
+While people tend to discount money relatively slowly, they often discount
+primary rewards significantly for delays of minutes or seconds. This can be
+measured in a number of ways. In some cases, an explicit choice between
+a larger later and a smaller sooner reward is offered. @Mcclure2007, for
+example, found that thirsty participants showed present bias when asked to
+choose between larger and smaller juice rewards separated by a few minutes. In
+other cases, the choice between a smaller-sooner and larger-later reward is
+offered repeatedly, but without explicit description, and participants are
+allowed to build a preference through experience. Using this, researchers have
+found present biases on the scale of seconds for playing a video game, watching a movie, or relief from
+an annoying noise [@Navarick1998; @Millar1984; @Solnick1980].
+
+In the above studies, each choice is "one-off," creating rewards but not
+affecting future choices. @Brown2009 provided evidence of present bias in a task
+in which immediate consumption affected consumption from future choices. They
+created a life-cycle savings game in which participants gained income and
+decided how much to spend over 30 periods spaced a minute apart. They arrived to
+the experiment thirsty, and were allowed to consume their spent income in the
+form of soda. In the immediate-reward condition, participants made choices at
+each period and then immediately consumed their soda reward. In the
+delayed-reward condition, the experimenters imposed a 10 minute delay between
+choices and reward consumption; thus, after a choice was made, the soda earned
+from that choice was consumed 10 periods later. Participants in the
+delayed-reward condition were able to consume more total soda on average,
+suggesting that the temporal delay decreased their present bias and allowed them
+to choose in a manner leading to greater long-term reward.
+
+In the experiment that follows, we use an intervention similar to that of
+@Brown2009 to test for effects of present bias on exploratory choice. As
+indicated in Figure @fig:discounting, if an exploratory choice task is paired
+with immediate consumption we predict present bias to lead to underexploration.
+However, if a temporal delay is introduced between decisions and outcomes, the
+present bias will be decreased, leading to greater exploration.
 
 # Experiment
 ## Methods
