@@ -283,7 +283,9 @@ eight self-reported female, forty one male. Participants received $10 for
 taking part in the study, which lasted approximately one hour, and received a
 performance-based bonus of up to $5. All but one participant received a bonus of
 $5, with the remaining participant receiving $4.4. The experiment was approved
-by the Institutional Review Board at New York University.
+by the Institutional Review Board at New York University. Participants who
+failed a post-instructions questionnaire more than twice were excluded from
+further analyses. Ten participants were excluded in this manner.
 
 ### Design and procedure.
 
@@ -397,9 +399,9 @@ indicated extremely unenjoyable and 7 indicated extremely enjoyable.
 Our primary hypothesis was that participants in the delayed-outcome condition
 would take more exploratory actions (that is, choose a new spinner more often)
 than those in the immediate-outcome condition. A secondary hypothesis was that
-this change would be moderated by participants scores on the Barratt Impulsivity
+this change would be moderated by participants' scores on the Barratt Impulsivity
 Scale. Specifically, we expected that highly impulsive participants would
-explore less and show a bigger difference in explroation between the delayed and
+explore less and show a bigger difference in exploration between the delayed and
 immediate conditions.
 
 We tested these predictions via hierarchical Bayesian logistic regression on
@@ -407,16 +409,61 @@ participant choices. All aspects of this analyses were preregistered prior to
 data collection. We included predictors for the value of the current spinner,
 the participant's BIS score, the participant's condition, and interactions
 between condition and current spinner value and condition and BIS score.
-Condition was set to -0.5 for the immediate condition and 0.5 for the delayed
+Condition was coded as -0.5 for the immediate condition and 0.5 for the delayed
 condition; current spinner value and BIS score were rescaled to have zero mean
-and unit variance. We assumed that participants varied in their overall tendency
+and unit variance across participants. We assumed that individuals could vary in their overall tendency
 to explore (i.e., intercept) as well as their responsiveness to current spinner
-value (slope). Participant's individual-level parameters were assumed to be
+value (slope). Participants' individual-level parameters were assumed to be
 drawn from a t distribution with $df=5$, making our population level estimates
-robust to potential outliers. Additional details of the regression analysis are
-available in the supplemental material available online.
+robust to potential outliers. The priors on the
+the population-level predictor coefficients, and on the standard
+deviation of the t distributions from which individual-level parameters were drawn, were (truncated)
+normal distributions with a mean of 0 and a standard deviation of 5.
 
-The model posterior was estimated using the Stan modeling language INSERT STAN CITATION. 
+The model posterior was estimated using the Stan modeling language
+[@Carpenter2017]. We ran four chains of Hamiltonian Monte Carlo sampling, with
+1000 samples per chain, the first half of which were discarded as burn-in. We
+confirmed convergence using the $\hat{R}$ convergence criterion [@Gelman2014a].
+In the results below, we report 95% credible intervals (CIs) on model
+parameters of interest.
+
+We found a strongly negative effect of current spinner value on participant's
+probability of selecting a new spinner, $CI=[-4.18, -3.08]$. This indicates that
+participants understood the general structure of the task, and explored (i.e.,
+selected a new spinner) only when it was advantageous to do so. While the
+estimate was in the predicted direction, we found no clear effect of condition
+on the tendency to explore $CI=[-.11, .61]$. Additionally, there was no effect of BIS
+score on behavior $CI=[-.34, .36]$ and no interaction between BIS score and
+condition $CI=[-.21, .51]$. We did find a positive interaction between condition
+and current spinner value, $CI=[.07, 1.06]$. This means that while people in the
+delayed condition were not more or less likely to explore in general, they were
+more likely to explore for high current spinner values, and less likely to
+explore for low current spinner values. In other words, they were less sensitive
+to the current value of the spinner.
+
+Our preregistered analyses provided no support for our hypotheses. As an
+additional, exploratory analysis, we re-ran the Bayesian model replacing
+participants' BIS scores with their ratings difference between the slider task
+and the video task in post-experiment questionnaire. Our intuition was that
+participants who rated the video task much higher than the slider task may have
+felt a greater motivational pull to immediately watch a video instead of move
+slider, and may thus have been more susceptible to the delay manipulation.
+However, we found no main effect of ratings difference on exploration $CI=[-.32,
+.16]$, and no interaction between ratings difference and condition $CI=[-.33,
+.38]$. All other effects remained qualitatively the same.
+
+Finally, we examined whether the lower sensitivity to current spinner value in
+the delay condition might indicate that a group of participants in that
+condition were responding near-randomly, possibly due to confusion with the
+task, and if this could affect our other results. We found that that the
+individual-level effect of current spinner value did not differ significantly
+from zero for 14 of 44 participants in the delayed condition, and only 2 of 46
+participants in the immediate condition. To determine whether these near-random
+participants influenced our results, we re-ran our preregistered regression,
+including only the 30 participants with the highest-magnitude slopes in each
+condition from the initial analysis. We did not find that this new selection
+criterion affected our results. In particular, the credible interval for the
+main effect of delay still included zero, $CI=[-.08, .72]$.
 
 # Discussion
 
