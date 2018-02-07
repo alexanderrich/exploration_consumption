@@ -88,13 +88,13 @@ simulate_many_experiments <- function (n_simulations, n_per_condition, intercept
     N <- nrow(data)
     L <- n_per_condition*2
     y <- data$response
-    currentVal <- data$current_value - mean(data$current_value)/sd(data$current_value)
+    currentVal <- (data$current_value - mean(data$current_value))/sd(data$current_value)
     condition <- 2*data$condition - 1
     ll <- data$id
     fit <- sampling(model, data=c("N", "L", "y", "ll", "currentVal", "condition"), chains=4, iter=1000)
     extracted=extract(fit, permuted=FALSE, pars=c("intercept_mean", "intercept_sd",
                                                   "slope_mean", "slope_sd",
-                                                  "b_delay", "b_dalay_slope"))
+                                                  "b_delay", "b_delay_slope"))
     mon <- monitor(extracted, print=FALSE)
     output <- rbind(output, mon[5,])
   }
@@ -102,20 +102,30 @@ simulate_many_experiments <- function (n_simulations, n_per_condition, intercept
 }
 
 
-## data <- simulate_experiment(60, .45, .15, 15, 7, .075)
+data <- simulate_experiment(40, .45, .09, 24, 12, .075)
 
-## N <- nrow(data)
-## L <- 60*2
-## y <- data$response
-## currentVal <- (data$current_value - mean(data$current_value))/sd(data$current_value)
-## condition <- data$condition * 2 - 1
-## bis <- data$bis
-## ll <- data$id
-## model <- stan_model(file="stan_models/regression_nobis.stan")
-## fit <- sampling(model, data=c("N", "L", "y", "ll", "currentVal", "condition"), chains=4, iter=1000)
+N <- nrow(data)
+L <- 60*2
+y <- data$response
+currentVal <- (data$current_value - mean(data$current_value))/sd(data$current_value)
+condition <- data$condition * 2 - 1
+bis <- data$bis
+ll <- data$id
+model <- stan_model(file="stan_models/regression_nobis.stan")
 
-## model <- stan_model(file="stan_models/regression_bis.stan")
-## fit <- sampling(model, data=c("N", "L", "y", "ll", "currentVal", "condition", "bis"), chains=4, iter=1000)
+fit <- sampling(model, data=c("N", "L", "y", "ll", "currentVal", "condition"), chains=4, iter=1000)
+
+model <- stan_model(file="stan_models/regression_bis.stan")
+fit <- sampling(model, data=c("N", "L", "y", "ll", "currentVal", "condition", "bis"), chains=4, iter=1000)
+
+
+extracted=extract(fit, permuted=FALSE, pars=c("intercept_mean", "intercept_sd",
+                                              "slope_mean", "slope_sd",
+                                              "b_delay", "b_delay_slope"))
+
+mon <- monitor(extracted)
+
+mon[5,]
 
 
 ## print(fit, pars=c("intercept_mean", "intercept_sd",
@@ -132,7 +142,7 @@ simulate_many_experiments <- function (n_simulations, n_per_condition, intercept
 
 
 
-effects <- simulate_many_experiments(1, 40, .45, .15, 15, 7, .075)
+effects <- simulate_many_experiments(3, 40, .45, .09, 24, 12, .075)
 
 save(effects, file="power_effects.RData")
 

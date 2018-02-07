@@ -76,7 +76,7 @@ optimal_values_indefinite <- function (discount, outcomes=c(0:100), outcome_prob
        )
 }
 
-df <- optimal_values_indefinite(5/6, outcomes=1:100, outcome_probs=c(33, rep(1, 99)))
+df <- optimal_values_indefinite(5/6, outcomes=c(rep(0, 10), seq(5, 100, 5)), outcome_probs=rep(1, 30))
 df$v_diff <- df$reward_diff + df$VoI_diff
 df$v_diff_8 <- df$reward_diff + .8 * df$VoI_diff
 df$v_diff_6 <- df$reward_diff + .6 * df$VoI_diff
@@ -84,9 +84,9 @@ df$v_diff_4 <- df$reward_diff + .4 * df$VoI_diff
 df$v_diff_2 <- df$reward_diff + .2 * df$VoI_diff
 df$v_diff_0 <- df$reward_diff
 df <- df %>%
-  select(reward_idx, v_diff, v_diff_8, v_diff_6, v_diff_4, v_diff_2, v_diff_0) %>%
-  gather(bias, diff, -reward_idx)
-ggplot(df, aes(x=reward_idx, y=diff, group=bias)) + geom_hline(yintercept=0) + geom_line(aes(color=bias)) + xlim(0, 100) + ylim(-60, 60)
+  select(reward_idx, reward_exploit, v_diff, v_diff_8, v_diff_6, v_diff_4, v_diff_2, v_diff_0) %>%
+  gather(bias, diff, -reward_idx, -reward_exploit)
+ggplot(df, aes(x=reward_exploit, y=diff, group=bias)) + geom_hline(yintercept=0) + geom_line(aes(color=bias))
 
 test <- optimal_values(5/6, 10, minreward=0, maxreward=100, pbad=0, badcost=0)
 df <- melt(test$exploit_values)

@@ -4,9 +4,7 @@ library("RMySQL")
 library("jsonlite")
 
 ## for mysql
-con <- dbConnect(MySQL(),
-         user="lab", password="fishneversink",
-         dbname="mt_experiments", host="gureckislab.org")
+con = dbConnect(MySQL())
 on.exit(dbDisconnect(con))
 rs = dbSendQuery(con, "select * from exploration_consumption")
 data = fetch(rs, n=-1)
@@ -15,11 +13,13 @@ data = fetch(rs, n=-1)
 ## my_db <- src_sqlite("../experiment/participants.db")
 ## data <- collect(tbl(my_db, "exploration_consumption"))
 
-## data <- data[data$status %in% c(4, 7),]
-data <- data[data$status %in% c(3, 4, 7),]
-data <- data[data$codeversion %in% c("2.3"),]
+data <- data[data$status == 3, ]
+
+data <- data[data$codeversion == "3.0", ]
+
 
 datastrings <- data$datastring
+
 datastrings_json <- sapply(datastrings, fromJSON, simplify=F)
 
 trialdata <- sapply(datastrings_json,
@@ -62,16 +62,13 @@ consumptiondata <- Filter(function(x)!all(is.na(x)), consumptiondata)
 exploredata <- Filter(function(x)!all(is.na(x)), exploredata)
 
 
-write.csv(exploredata, file="../data/exploration_data_v2_3.csv")
-write.csv(consumptiondata, file="../data/consumption_data_v2_3.csv")
+write.csv(exploredata, file="../data/exploration_data_v3_0.csv")
+write.csv(consumptiondata, file="../data/consumption_data_v3_0.csv")
 
 
 questiondata <- sapply(datastrings_json,
                     function (x) {
                       y=x[["questiondata"]]
-                      if (is.null(y[["age"]])) {
-                        y$age <- -1
-                      }
                       y
                     },
                     simplify=F)
@@ -79,4 +76,4 @@ names(questiondata) <- NULL
 questiondata <- as.data.frame(do.call("rbind.data.frame", questiondata))
 rownames(questiondata) <- NULL
 
-write.csv(questiondata, file="../data/question_data_v2_3.csv")
+write.csv(questiondata, file="../data/question_data_v3_0.csv")
