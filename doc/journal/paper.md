@@ -409,7 +409,7 @@ participant choices. All aspects of this analyses were preregistered prior to
 data collection. We included predictors for the value of the current spinner,
 the participant's BIS score, the participant's condition, and interactions
 between condition and current spinner value and condition and BIS score.
-Condition was coded as -0.5 for the immediate condition and 0.5 for the delayed
+Condition was coded as -1 for the immediate condition and 1 for the delayed
 condition; current spinner value and BIS score were rescaled to have zero mean
 and unit variance across participants. We assumed that individuals could vary in their overall tendency
 to explore (i.e., intercept) as well as their responsiveness to current spinner
@@ -425,7 +425,10 @@ The model posterior was estimated using the Stan modeling language
 1000 samples per chain, the first half of which were discarded as burn-in. We
 confirmed convergence using the $\hat{R}$ convergence criterion [@Gelman2014a].
 In the results below, we report 95% credible intervals (CIs) on model
-parameters of interest.
+parameters of interest. An overview of the model posterior is displayed in Figure @fig:results
+
+
+![Results](figures/expresults.pdf){#fig:results}
 
 We found a strongly negative effect of current spinner value on participant's
 probability of selecting a new spinner, $CI=[-4.18, -3.08]$. This indicates that

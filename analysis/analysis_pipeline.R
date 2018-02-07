@@ -51,6 +51,8 @@ fit <- sampling(model, data=c("N", "L", "y", "ll", "currentVal", "condition", "b
 
 save(fit, file='model_fits/regression_bisT.RData')
 
+load(file='model_fits/regression_bisT.RData')
+
 ## Print summary statistics of population-level parameters.
 ## Parameter is "significantly" different from 0 if 95% credible interval excludes 0.
 print(fit, pars=c("intercept_mean", "intercept_sd",
@@ -74,24 +76,63 @@ extracted <- data.frame(extracted)
 extracted$sample <- 1:2000
 
 
-b_delay<- mean(extracted$b_delay)
-b_delay_slope <- mean(extracted$b_delay_slope)
+mean_intercept <- mean(extracted$intercept_mean)
+mean_slope <- mean(extracted$slope_mean)
+mean_delay<- mean(extracted$b_delay)
+mean_delay_slope <- mean(extracted$b_delay_slope)
+mean_bis <- mean(extracted$b_bis)
+mean_bis_delay <- mean(extracted$b_bis_delay)
 
 params_w_predictions <- extracted[rep(1:nrow(extracted), each=51), ]
 params_w_predictions <- params_w_predictions %>%
   mutate(x=rep(seq(from=0, to=1, length.out=51), 2000),
          x_norm=(x-mean(exploredata$currentValue))/sd(exploredata$currentValue),
-         cond0=1/(1 + exp(-1 * (intercept_mean - 0.5 * b_delay + slope_mean * x_norm  - 0.5 * b_delay_slope * x_norm))),
-         cond1=1/(1 + exp(-1 * (intercept_mean + 0.5 * b_delay + slope_mean * x_norm  + 0.5 * b_delay_slope * x_norm)))) %>%
+         cond0=1/(1 + exp(-1 * (intercept_mean - 1 * b_delay + slope_mean * x_norm  - 1 * b_delay_slope * x_norm))),
+         cond1=1/(1 + exp(-1 * (intercept_mean + 1 * b_delay + slope_mean * x_norm  + 1 * b_delay_slope * x_norm)))) %>%
   gather(condition, y, cond0, cond1) %>%
   group_by(x, condition) %>%
   summarize(lower=quantile(y, probs=.025),
             upper=quantile(y, probs=.975),
             y=mean(y))
+params_w_predictions$condition = factor(params_w_predictions$condition, levels=c('cond0','cond1'), labels=c('immediate', 'delayed'))
 
-ggplot() + geom_line(data=params_w_predictions, aes(x=x, y=y, color=condition)) +
-  geom_ribbon(data=params_w_predictions, aes(x=x, ymin=lower, ymax=upper, group=condition), alpha=.3)
+individuals_df = data.frame(ll=ll, condition=condition, bis=bis) %>% group_by(ll) %>% summarize_all(mean)
 
+individuals_w_predictions = data.frame()
+for (i in 1:nrow(individuals_df)) {
+  c = individuals_df[[i, "condition"]]
+  bis = individuals_df[[i, 'bis']]
+  subject_params <- cbind.data.frame(subject=rep(i, 2000),
+                                     condition=rep(c, 2000),
+                                     intercept=as.numeric(individuals$subj_intercept[,i]),
+                                     slope=as.numeric(individuals$subj_slope[,i]))
+  subject_params <- subject_params %>%
+    mutate(intercept=intercept + c * mean_delay + bis * mean_bis + c * bis * mean_bis_delay,
+           slope=slope +  c * mean_delay_slope)
+  subject_params <- subject_params[rep(1:nrow(subject_params), each=51), ]
+  subject_params <- subject_params %>%
+    mutate(x=rep(seq(from=0, to=1, length.out=51), 2000),
+           x_norm=(x-mean(exploredata$currentValue))/sd(exploredata$currentValue),
+           y=1/(1 + exp(-1 * (intercept + slope * x_norm)))) %>%
+    group_by(x) %>%
+    summarize(subject=first(subject),
+              condition=first(condition),
+              y=mean(y))
+  individuals_w_predictions <- rbind(individuals_w_predictions, subject_params)
+}
+individuals_w_predictions$condition = factor(individuals_w_predictions$condition, levels=c(-1, 1), labels=c('immediate', 'delayed'))
+
+
+ggplot() + geom_line(data=individuals_w_predictions, aes(x=x, y=y, group=subject, color=condition), size=.5, alpha=.3) +
+geom_line(data=params_w_predictions, aes(x=x, y=y, color=condition), size=2) +
+  theme_minimal() +
+  xlab("current spinner value") +
+  ylab("p(choose new spinner)") +
+  geom_ribbon(data=params_w_predictions, aes(x=x, ymin=lower, ymax=upper, group=condition), alpha=.3) +
+  theme(legend.position="bottom") +
+  scale_x_continuous(breaks=c(0, 0.25, 0.5, .75, 1), labels=c("0%", "25%", "50%", "75%", "100%"))
+
+ggsave(filename="../doc/journal/figures/expresults.pdf", width=10, height=4, useDingbats=F)
 
 summary(colMeans(individuals$subj_slope))
 
