@@ -1,0 +1,77 @@
+<div id="container-instructions">
+
+    <div class="header">
+        <h1>Post-experiment questions</h1>
+    </div>
+
+	  <hr>
+
+    <div class="instructions well">
+        <p>
+            You missed <strong><span id="misspct"></span>%</strong>
+            of sliders, subtracting <strong>$<span id="losses"></span></strong>
+            from your bonus.
+        </p>
+        <p>Your total bonus is <strong>$<span id="totalbonus"></span></strong>.</p>
+        </p>
+        <p id="toptext">
+            Before finishing the experiment, please answer a few brief questions:
+        </p>
+        <form id="endingquestions" action="debrief" method="post">
+            <div class="question">
+                <p class="questiontext">
+                    On a scale from 1 to 7, where 1 is very un-enjoyable
+                    and 7 is very enjoyable, how enjoyable did you find the
+                    <strong>slider</strong> task?
+                    <select id="sliderenjoyment" name="sliderenjoyment">
+                        <option value="noresp" SELECTED></option>
+                        <option value="1">1 - very un-enjoyable</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4 - moderately enjoyable</option>
+                        <option value="5">5 </option>
+                        <option value="6">6</option>
+                        <option value="7">7 - very enjoyable</option>
+                    </select>
+                </p>
+            </div>
+            <div class="question">
+                <p class="questiontext">
+                    On a scale from 1 to 7, where 1 is very un-enjoyable
+                    and 7 is very enjoyable, how enjoyable did you find
+                    the <strong>video</strong> task?
+                    <select id="videoenjoyment" name="videoenjoyment">
+                        <option value="noresp" SELECTED></option>
+                        <option value="1">1 - very un-enjoyable</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4 - moderately enjoyable</option>
+                        <option value="5">5 </option>
+                        <option value="6">6</option>
+                        <option value="7">7 - very enjoyable</option>
+                    </select>
+                </p>
+            </div>
+            <div class="question">
+                <p class="questiontext">
+                    Did you have any technical issues, such as the video not loading fast enough, during the video task?
+                    <select id="technicalissues" name="technicalissues">
+                        <option value="noresp" SELECTED></option>
+                        <option value="no">There were no technical issues</option>
+                        <option value="alittle">There were minor technical issues that didn't greatly affect my enjoyment</option>
+                        <option value="alot">There were major technical issues that greatly affected my enjoyment</option>
+                        <option value="unplayable">The video failed to play at all.</option>
+                    </select>
+                </p>
+            </div>
+        </form>
+
+    </div>
+
+	  <hr>
+    <p id="blankmessage"></p>
+
+    <button type="button" id="continue" value="next" class="btn btn-primary btn-lg continue">
+        Next <span class="glyphicon glyphicon-arrow-right"></span>
+    </button>
+</div>

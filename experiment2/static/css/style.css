@@ -1,0 +1,446 @@
+
+body {
+    padding:0px;
+    margin: 0px;
+    background-color: white;
+    color: black;
+    font-weight: 300;
+    font-size: 13pt;
+}
+
+
+/* text styling */
+strong {
+  font-weight: 600;
+}
+
+.warm {
+  color: steelblue;
+  text-align: justify;
+}
+
+.cool {
+  color: #ccccff;
+}
+
+
+/* these are all the same for now, but easy to modify individually */
+#container-ad, #container-error, #container-exp, #container-consent, #container-instructions, #container-questionnaire {
+    /* position: absolute; */
+    margin-left: auto;
+    margin-right: auto;
+    width: 800px;
+    padding-top: 5%;
+    padding-bottom: 5%;
+    /* border: 18px solid #f3f3f3; */
+    background: white;
+}
+
+#container-consent, #container-exp {  /* override padding to fit long consent forms and exp display*/
+  padding: 10px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 1%;
+}
+
+.instrimages {
+    text-align: center;
+    padding-top: 20px;
+    padding-bottom: 20px;
+
+}
+
+#choiceholder{
+    margin-left: auto;
+    margin-right: auto;
+    width: 600px;
+}
+
+/* ad.html  - the ad that people view first */
+#adlogo {
+    float: right;
+    width: 140px;
+    padding: 2px;
+    border: 1px solid #ccc;
+}
+
+/* consent.html - the consent form */
+#consent {
+  margin: 0 auto;
+  margin-top: 0;
+  width: 800px;
+  font-size: 100%;
+}
+
+.legal {
+  text-align: justify;
+  font-size: 11pt;
+  line-height: 1.1em;
+}
+
+#trial {
+  margin: 0 auto;
+  width: 800px;
+  text-align: center;
+}
+
+#query {
+  color: darkgray;
+}
+
+.question {
+  margin-bottom: 30px;
+}
+
+/* errors */
+#error img {
+  padding-right: 10px;
+  padding-top: 15px;
+}
+
+#expdiv {
+    position: relative;
+    font-family: sans-serif;
+    width: 750px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-bottom: 20px;
+}
+
+#content {
+    margin-left: auto;
+    margin-right: auto;
+    /* overflow: auto; */
+    width: 750px;
+    /* height: 700px; */
+    margin-bottom: 10px;
+    position: relative;
+}
+
+#rewards {
+    /* pointer-events: none; */
+    /* position: relative; */
+    margin-left: auto;
+    margin-right: auto;
+    overflow: hidden;
+    width: 650px;
+    height: 450px;
+}
+
+#holdspace {
+    text-align: center;
+    font-size: 28px;
+}
+
+#rewardintro {
+    margin-left: auto;
+    margin-right: auto;
+    width: 600px;
+    height: 500px;
+    text-align: center;
+    font-size: 45px;
+    font-family: sans-serif;
+    padding-top: 200px;
+}
+
+#topinfo {
+    margin-left: auto;
+    margin-right: auto;
+    width: 700px;
+    height: 30px;
+    font-size: 25px;
+    font-family: sans-serif;
+}
+
+#timediv {
+    float: left;
+    width: 100px;
+}
+
+#trialsdiv {
+    float: left;
+    width: 300px;
+}
+
+#sliderpctdiv {
+    float: left;
+    width: 300px;
+}
+
+/* card task */
+
+#alternativecontents {
+    /* margin-left: auto; */
+    /* margin-right: auto; */
+    display: none;
+    position: relative;
+    text-align: center;
+    padding-top: 150px;
+    margin-bottom: 10px;
+    font-size: 30px;
+    width: 520px;
+    height: 350px;
+    overflow: auto;
+}
+
+#exploreexploitdiv {
+    /* margin-left: auto; */
+    /* margin-right: auto; */
+    margin-bottom: 10px;
+    position: relative;
+    padding-top: 15px;
+    width: 750px;
+    height: 400px;
+    font-size: 18px;
+    font-family: monospace;
+    overflow: hidden;
+    border: 10px solid black;
+    border-radius: 20px;
+    background-color: gray;
+}
+
+.machinesvg {
+    width: 180px;
+    height: 180px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+#exploresvg {
+    top: 40px;
+    left: 60px;
+    position: absolute;
+    display: none;
+}
+
+#exploitsvg {
+    top: 40px;
+    /* left: 120px; */
+    position: absolute;
+}
+
+#machinescreen {
+    width: 200px;
+    height: 150px;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    padding: 5px;
+    background-color: black;
+    color: lime;
+}
+
+#exploitdiv {
+    float: left;
+    text-align: center;
+    width: 200px;
+    padding: 10px;
+    padding-top: 15px;
+    position: relative;
+}
+
+#explorediv {
+    float: left;
+    text-align: center;
+    width: 300px;
+    padding: 10px;
+    position: relative;
+}
+
+#screendiv {
+    width: 220px;
+    padding: 10px;
+    float: left;
+}
+
+.machinebutton {
+    width: 170px;
+    height: 70px;
+    background-color: gainsboro;
+    border: 3px solid black;
+    border-radius: 10px;
+}
+
+#explore {
+    margin-top: 10px;
+}
+
+#exploit {
+    margin-top: 212px;
+}
+
+
+
+.clicked {
+    background-color: #444444;
+}
+
+.machinebutton:disabled {
+    color: #888888;
+    border-color: #888888;
+}
+
+#alternativestart {
+    width: 200px;
+}
+
+#trials {
+    position: relative;
+    font-size: 24px;
+    margin-top: 30px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 450px;
+}
+
+#consumptionblocker {
+    font-size: 30px;
+    text-align: center;
+    padding-top: 75px;
+    display: none;
+    position: absolute;
+    width: 300px;
+    height: 200px;
+    left: 200px;
+    top: 120px;
+    border: 5px solid black;
+    border-radius: 10px;
+    background: gray;
+}
+
+/* game */
+
+
+.progress {
+    margin-left: auto;
+    margin-right: auto;
+    width: 80px;
+}
+
+.progress-bar {
+    -webkit-transition: none;
+    -moz-transition: none;
+    -ms-transition: none;
+    -o-transition: none;
+    transition: none;
+}
+
+#sliders {
+    width: 700px;
+    /* height: 700px; */
+    overflow: auto;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.sliderdiv {
+    width: 100%;
+    height: 60px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+input.slider[type="range"] {
+    width: 400px;
+    margin: 10px;
+    float: left;
+}
+
+.sliderlabel {
+    float: left;
+    margin: 10px;
+}
+
+#sliderinstructions {
+    text-align: center;
+    font-size: 28px;
+}
+
+#bottominfodiv {
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    width: 600px;
+    height: 310px;
+}
+
+/* consumption queue */
+
+#consumptionqueue {
+    float: left;
+    height: 110px;
+    margin-left: auto;
+    margin-right: auto;
+    overflow: hidden;
+}
+
+
+#rightofqueue {
+    float: left;
+    width: 120px;
+    padding-top: 15px;
+    padding-left: 10px;
+}
+
+video {
+    height: 400px;
+    width: 650px;
+}
+
+.bisquestion {
+    height: 100px;
+    width: 100%;
+    border-top: 2px solid gray;
+}
+
+.bisquestiontext {
+    float: left;
+    margin-right: 10px;
+    padding: 10px;
+    width: 200px;
+}
+
+.bisitem {
+    float: left;
+    padding: 10px;
+    width: 130px;
+    text-align: center;
+}
+
+.bisitem label {
+    font-size: 16px;
+    font-weight: normal;
+}
+
+.tab {
+    border: 2px solid black;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    height: 35px;
+    float: left;
+    text-align: center;
+}
+
+#planetearthtab {
+    width: 125px;
+    margin-left: 0px;
+    margin-right: 5px;
+}
+
+#bakeofftab {
+    width: 170px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+#unchainedreactiontab {
+    width: 180px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+#ellentab {
+    width: 145px;
+    margin-left: 5px;
+    margin-right: 0px;
+}

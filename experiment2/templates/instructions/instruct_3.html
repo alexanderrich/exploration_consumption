@@ -1,0 +1,59 @@
+<div id="container-instructions">
+
+	  <h1>Instructions</h1>
+
+	  <hr>
+
+	  <div class="instructions well">
+
+
+        <p>
+            At the bottom of the experiment screen is a queue of work periods. Gray slider icons represent one
+            slider task, and red video icons represent one video task.
+            <span id="queuemovement"></span>
+        </p>
+
+
+        <div class="instrimages">
+            <img id="img1" width="600px">
+        </div>
+
+        <p id="machineaccess">
+        </p>
+
+
+
+	  </div>
+
+    <script>
+     if (condition === 0) {
+         $("#queuemovement").html("You will always complete the right-most item in the queue, and then the items in the queue will shift to the left. The queue acts as a history of your past work periods.");
+         $("#machineaccess").html("At the beginning of the experiment, you will have to complete 8 pre-assigned slider tasks. Then you will get access to a <strong>machine</strong> that adds tasks to the queue. Based on your choice before each work period, it will add either a slider task or a video task, and you will then complete the task.");
+         $("#img1").attr("src", "/static/images/instruct_3_img_cond0.png");
+     } else {
+         $("#queuemovement").html("You will always complete the left-most task in the queue, and then the items in the queue will shift to the left.");
+         $("#machineaccess").html("At the beginning of the experiment, the queue will be filled with 8 pre-assigned slider tasks that you have to complete. You will also get access to a <strong>machine</strong> that adds tasks to the queue. Based on your choice before each work period, it will add either a slider task or a video task. You will then complete the task in 8 work periods when it reaches the front of the queue.");
+         $("#img1").attr("src", "/static/images/instruct_3_img_cond1.png");
+     }
+    </script>
+
+
+	  <hr>
+
+    <div class="instructionsnav">
+        <div class="row">
+            <div class="col-xs-2">
+                <button type="button" id="next" value="next" class="btn btn-primary btn-lg previous">
+                <span class="glyphicon glyphicon-arrow-left"></span> Previous
+                </button>
+            </div>
+            <div class="col-xs-8">
+            </div>
+            <div class="col-xs-2">
+                <button type="button" id="next" value="next" class="btn btn-primary btn-lg continue">
+                    Next <span class="glyphicon glyphicon-arrow-right"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
