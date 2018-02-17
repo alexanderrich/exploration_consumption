@@ -103,6 +103,7 @@ function VideoPlayer() {
 function SliderTask() {
     "use strict";
     var misses,
+        nsliders,
         noiseInterval,
         noiseFn,
         noise = new Audio("/static/audio/annoyingnoise.wav"),
@@ -145,8 +146,12 @@ function SliderTask() {
     };
 
     this.run = function (totalTime) {
-        var nsliders = (totalTime - 5) / 5,
-            i;
+        var i;
+
+        nsliders = (totalTime - 5) / 5;
+
+        $('#progress-bar').css('width', '100%');
+        $('#progress-bar').animate({width: '0%'}, totalTime*1000, 'linear');
         for(i = 0; i < nsliders; i++) {
             $("#slidersholder").append(slidertemplate({num: i}));
         }
@@ -196,9 +201,9 @@ function SliderTask() {
         $("#sliders").show();
     };
 
-    this.getMisses = function () {
+    this.getData = function () {
         //return number of sliders missed
-        return misses;
+        return {misses: misses, nsliders: nsliders};
     };
 
     this.missPct = function () {
@@ -219,6 +224,34 @@ function SliderTask() {
     };
 }
 
+function MultiConsumptionRewards(psiTurk, callback) {
+    "use strict";
+    var next,
+        rewardMaker,
+        rewardSequence;
+
+    this.setReward = function (_rewardSequence) {
+        var r;
+        rewardSequence = _rewardSequence;
+        r = rewardSequence.shift();
+        rewardMaker.setReward(r.reward, r.trial, r.time);
+    };
+
+    next = function () {
+        var r;
+        if(rewardSequence.length === 0) {
+            callback();
+        } else {
+            r = rewardSequence.shift();
+            setTimeout(function () {
+                rewardMaker.setReward(r.reward, r.trial, r.time);
+            }, 2000);
+        }
+    };
+
+    rewardMaker = new ConsumptionRewards(psiTurk, next);
+}
+
 
 function ConsumptionRewards(psiTurk, callback) {
     "use strict";
@@ -227,11 +260,7 @@ function ConsumptionRewards(psiTurk, callback) {
         reward,
         sliderTask,
         currentTask,
-        totalTime,
-        timeLeft,
-        decrementTime,
-        recordData,
-        timeInterval;
+        recordData;
 
     recordData = function () {
         var stat,
@@ -253,14 +282,15 @@ function ConsumptionRewards(psiTurk, callback) {
                                      ellen: stat.ellen
                                     });
         } else {
-            stat = sliderTask.getMisses();
+            stat = sliderTask.getData();
             psiTurk.recordTrialData({phase: "EXPERIMENT",
                                      trialType: "consumption",
                                      trial: trialNum,
                                      uniqueid: uniqueId,
                                      condition: condition,
                                      outcome: reward,
-                                     slidersMissed: stat,
+                                     slidersTotal: stat.nsliders,
+                                     slidersMissed: stat.misses,
                                      playTime: -1,
                                      switches: -1,
                                      planetearth: -1,
@@ -279,13 +309,9 @@ function ConsumptionRewards(psiTurk, callback) {
         callback();
     };
 
-    this.setReward = function(_reward, trial, _totalTime) {
+    this.setReward = function(_reward, trial, totalTime) {
         reward = _reward;
-        totalTime = _totalTime;
         trialNum = trial;
-        $("#time").html(totalTime);
-        timeLeft = totalTime;
-        timeInterval = setInterval(decrementTime, 1000);
         setTimeout(function () {
             currentTask.stop();
             recordData();
@@ -299,30 +325,19 @@ function ConsumptionRewards(psiTurk, callback) {
         }
     };
 
-    this.recordFinal = function(taskType) {
-        psiTurk.recordUnstructuredData("misses_" + taskType, sliderTask.missPct().toString());
-    };
-
-    decrementTime = function () {
-        timeLeft--;
-        if (timeLeft >= 0) {
-            $("#time").html(timeLeft);
-        }
-        if (timeLeft === 0) {
-            clearInterval(timeInterval);
-        }
+    this.recordFinal = function() {
+        psiTurk.recordUnstructuredData("misses", sliderTask.missPct().toString());
     };
 
     sliderTask = new SliderTask();
     video = new VideoPlayer();
-    $("#time").html("0");
     $("#sliderpct").html("0");
 }
 
 
 function practiceConsumption(psiTurk, callback) {
     "use strict";
-    var examples = [1, 0, 0],
+    var examples = [0, 0, 0],
         trials = [-3, -2, -1],
         rewards,
         next;
@@ -344,7 +359,8 @@ function practiceConsumption(psiTurk, callback) {
             $("#continue").click(
                 function () {
                     $("#rewardintro").hide();
-                    rewards.setReward(reward, trials.shift(), 75);
+                    // rewards.setReward(reward, trials.shift(), 70);
+                    rewards.setReward([{reward: 0, trial: -3, time: 30}, {reward: 1, trial: -3, time: 30}]);
                 }
             );
         }
@@ -353,7 +369,8 @@ function practiceConsumption(psiTurk, callback) {
     psiTurk.showPage("practice.html");
     $("#rewards").hide();
     $("#sliders").hide();
-    rewards = new ConsumptionRewards(psiTurk, next, true);
+    // rewards = new ConsumptionRewards(psiTurk, next);
+    rewards = new MultiConsumptionRewards(psiTurk, next);
     next();
 }
 
@@ -362,12 +379,48 @@ function transitionScreen(page, psiTurk, callback) {
     $("#continue").click(callback);
 }
 
-function phaseDriver(nChoices, nPreWorkPeriods, ExploreFn, RewardFn, taskType, psiTurk, callback) {
+function ChoiceTask(ntrials, psiTurk, rewardSetter) {
+    var previousChoice = 0;
+
+    this.run = function() {
+        if (previousChoice === 0) {
+            $('#lastchoicespan').html('');
+        } else if (previousChoice === 1) {
+            $('#lastchoicespan').html('Option A').removeClass('btn-danger').addClass('btn-primary');
+        } else {
+            $('#lastchoicespan').html('Option B').removeClass('btn-primary').addClass('btn-danger');
+        }
+        $('#exploreexploitdiv').show();
+        $('.choicebutton').click(function () {
+            $('.choicebutton').off('click');
+            responseFn(this.id);
+        });
+    };
+
+    function responseFn(id) {
+        var choice = parseInt(id[id.length-1]),
+            choseWait = (choice + counterbalance) % 2,
+            waitAdd = choseWait * [-5, 0, 5][condition],
+            randomAdd = [-5, 0, 5][Math.floor(Math.random()*3)],
+            rewardsequence;
+
+        previousChoice = choice;
+
+        rewardsequence = [{reward: 0, trial: 0, time: 60 - randomAdd - waitAdd}, {reward: 1, trial: 0, time: 30 + randomAdd + waitAdd}];
+        if (choseWait === 0) {
+            rewardsequence = [rewardsequence[1], rewardsequence[0]];
+        }
+
+        $('#exploreexploitdiv').hide();
+        rewardSetter(rewardsequence);
+    }
+}
+
+function phaseDriver(nTrials, ChoiceFn, RewardFn, psiTurk, callback) {
     "use strict";
     var exploreExploit,
         rewards,
         nextChoice,
-        nTrials = nChoices + nPreWorkPeriods,
         trial = 0;
 
     nextChoice = function () {
@@ -376,7 +429,7 @@ function phaseDriver(nChoices, nPreWorkPeriods, ExploreFn, RewardFn, taskType, p
             trial++;
             exploreExploit.run();
         } else {
-            rewards.recordFinal(taskType);
+            rewards.recordFinal();
             psiTurk.saveData({
                 success: callback,
                 error: callback});
@@ -388,7 +441,7 @@ function phaseDriver(nChoices, nPreWorkPeriods, ExploreFn, RewardFn, taskType, p
     $("#sliders").hide();
 
     rewards = new RewardFn(psiTurk, nextChoice);
-    exploreExploit = new ExploreFn(nChoices, nPreWorkPeriods, taskType, psiTurk, rewards.setReward);
+    exploreExploit = new ChoiceFn(nTrials, psiTurk, rewards.setReward);
     nextChoice();
 }
 
@@ -440,7 +493,7 @@ function endingQuestions(psiTurk, callback) {
     "use strict";
     var recordResponses,
         points = psiTurk.getQuestionData().points_consumption,
-        misspct = Math.floor(psiTurk.getQuestionData().misses_consumption),
+        misspct = Math.floor(psiTurk.getQuestionData().misses),
         losses = 0,
         bonus;
 
@@ -562,8 +615,7 @@ function experimentDriver() {
     "use strict";
     var psiTurk = new PsiTurk(uniqueId, adServerLoc, mode),
         next,
-        nChoices = [12, 48],
-        nPreWorkPeriods = [8, 8],
+        nChoices = [30],
         functionList = [];
 
     // $(window).on("beforeunload", function(){
@@ -620,11 +672,14 @@ function experimentDriver() {
         // function () {
         //     phaseDriver(nChoices[0], nPreWorkPeriods[0], ExploreExploitTask, PracticeRewards, "practice", psiTurk, next);
         // },
+        // function () {
+        //     transitionScreen("transition_practiceconsumption.html", psiTurk, next);
+        // },
         function () {
-            transitionScreen("transition_practiceconsumption.html", psiTurk, next);
+            phaseDriver(nChoices, ChoiceTask, MultiConsumptionRewards, psiTurk, next);
         },
-        function () {
-            practiceConsumption(psiTurk, next); },
+        // function () {
+        //     practiceConsumption(psiTurk, next); },
         // function () {
         //     transitionScreen("transition_fulltask.html", psiTurk, next);
         // },
