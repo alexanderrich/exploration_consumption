@@ -151,7 +151,7 @@ function SliderTask() {
         nsliders = (totalTime - 5) / 5;
 
         $('#progress-bar').css('width', '100%');
-        $('#progress-bar').animate({width: '0%'}, totalTime*1000, 'linear');
+        $('#progress-bar').animate({width: '0%'}, (totalTime - 1)*1000, 'linear');
         for(i = 0; i < nsliders; i++) {
             $("#slidersholder").append(slidertemplate({num: i}));
         }
@@ -337,7 +337,7 @@ function ConsumptionRewards(psiTurk, callback) {
 
 function practiceConsumption(psiTurk, callback) {
     "use strict";
-    var examples = [0, 0, 0],
+    var examples = [0, 0, 1],
         trials = [-3, -2, -1],
         rewards,
         next;
@@ -359,8 +359,7 @@ function practiceConsumption(psiTurk, callback) {
             $("#continue").click(
                 function () {
                     $("#rewardintro").hide();
-                    // rewards.setReward(reward, trials.shift(), 70);
-                    rewards.setReward([{reward: 0, trial: -3, time: 30}, {reward: 1, trial: -3, time: 30}]);
+                    rewards.setReward(reward, trials.shift(), 30);
                 }
             );
         }
@@ -369,8 +368,7 @@ function practiceConsumption(psiTurk, callback) {
     psiTurk.showPage("practice.html");
     $("#rewards").hide();
     $("#sliders").hide();
-    // rewards = new ConsumptionRewards(psiTurk, next);
-    rewards = new MultiConsumptionRewards(psiTurk, next);
+    rewards = new ConsumptionRewards(psiTurk, next);
     next();
 }
 
@@ -380,37 +378,87 @@ function transitionScreen(page, psiTurk, callback) {
 }
 
 function ChoiceTask(ntrials, psiTurk, rewardSetter) {
-    var previousChoice = 0;
+    var trial = 0,
+        envTrial = 0,
+        envNumber = 0,
+        previousChoice = 0,
+        diffSequence,
+        sideSequence;
+
+    diffSequence = [[0,1,2],
+                    [0,2,1],
+                    [1,0,2],
+                    [1,2,0],
+                    [2,0,1]
+                    [2,1,0]][condition];
+    sideSequence = [[0,0,0], [0,0,1],
+                    [0,1,0], [0,1,1],
+                    [1,0,0], [1,0,1],
+                    [1,1,0], [1,1,1],
+                   ][counterbalance];
 
     this.run = function() {
+        var offbutton,
+            num,
+            instructedoption;
+        $('#choiceinfo').html('&nbsp;');
         if (previousChoice === 0) {
             $('#lastchoicespan').html('');
         } else if (previousChoice === 1) {
-            $('#lastchoicespan').html('Option A').removeClass('btn-danger').addClass('btn-primary');
+            $('#lastchoicespan').html('Option A').css('background-color', '#428bca');
         } else {
-            $('#lastchoicespan').html('Option B').removeClass('btn-primary').addClass('btn-danger');
+            $('#lastchoicespan').html('Option B').css('background-color', '#d9534f');
         }
         $('#exploreexploitdiv').show();
-        $('.choicebutton').click(function () {
-            $('.choicebutton').off('click');
-            responseFn(this.id);
-        });
+        if (envTrial < 2) {
+            offbutton = (envTrial) === 0 ? 2 : 1;
+            instructedoption = (envTrial) === 0 ? 'A' : 'B';
+            $('#choice' + offbutton).prop('disabled', true);
+            $('#choice' + envTrial + 1).click(function () {
+                $('#choice' + envTrial + 1).off('click');
+                $('#choice' + offbutton).prop('disabled', false);
+                responseFn(this.id);
+            });
+            $('#choiceinfo').html("New options! Choose Option " + instructedoption);
+        } else {
+            $('#choiceinfo').html('Choose either option');
+            $('.choicebutton').click(function () {
+                $('.choicebutton').off('click');
+                responseFn(this.id);
+            });
+        }
     };
 
     function responseFn(id) {
         var choice = parseInt(id[id.length-1]),
-            choseWait = (choice + counterbalance) % 2,
-            waitAdd = choseWait * [-5, 0, 5][condition],
-            randomAdd = [-5, 0, 5][Math.floor(Math.random()*3)],
+            choseWait = (choice + sideSequence[envNumber]) % 2,
+            waitAdd = (choseWait * 2 - 1) * [-5, 0, 5][diffSequence[envNumber]],
             rewardsequence;
 
         previousChoice = choice;
 
-        rewardsequence = [{reward: 0, trial: 0, time: 60 - randomAdd - waitAdd}, {reward: 1, trial: 0, time: 30 + randomAdd + waitAdd}];
+        rewardsequence = [{reward: 0, trial: 0, time: 60 - waitAdd}, {reward: 1, trial: 0, time: 30 + waitAdd}];
         if (choseWait === 0) {
             rewardsequence = [rewardsequence[1], rewardsequence[0]];
         }
 
+        psiTurk.recordTrialData({phase: "EXPERIMENT",
+                                 trialType: "choice",
+                                 trial: trial,
+                                 envTrial: envTrial,
+                                 uniqueid: uniqueId,
+                                 condition: condition,
+                                 counterbalance: counterbalance,
+                                 choiceButton: choice,
+                                 choiceOutcome: choseWait,
+                                 videoTime: 30 - waitAdd - randomAdd
+                                });
+        trial += 1;
+        envTrial += 1;
+        if (envTrial === 10) {
+            envTrial = 0;
+            envNumber += 1;
+        }
         $('#exploreexploitdiv').hide();
         rewardSetter(rewardsequence);
     }
@@ -615,7 +663,7 @@ function experimentDriver() {
     "use strict";
     var psiTurk = new PsiTurk(uniqueId, adServerLoc, mode),
         next,
-        nChoices = [30],
+        nChoices = 30,
         functionList = [];
 
     // $(window).on("beforeunload", function(){
@@ -639,52 +687,35 @@ function experimentDriver() {
                           "instructions/instruct_2.html",
                           "instructions/instruct_3.html",
                           "instructions/instruct_4.html",
-                          "instructions/instruct_5.html",
-                          "instructions/instruct_6.html",
-                          "instructions/instruct_7.html",
                           "instructions/quiz.html",
-                          "transition_practicedecision.html",
                           "transition_practiceconsumption.html",
                           "transition_fulltask.html",
                           "endingquestions.html",
                           "bis.html",
                           "postquestionnaire.html"]);
     functionList = [
-        // function () {
-        //     bis(psiTurk, next); },
-        // function () {
-        //     instructionDriver(["instructions/instruct_1.html",
-        //                        "instructions/instruct_2.html",
-        //                        "instructions/instruct_3.html",
-        //                        "instructions/instruct_4.html",
-        //                        "instructions/instruct_5.html",
-        //                        "instructions/instruct_6.html",
-        //                        "instructions/instruct_7.html"],
-        //                       "instructions/quiz.html",
-        //                       {range: "five_onehundred",
-        //                        reset: "1_6",
-        //                        processnum: "8",
-        //                        misspenalty: "20percentage"},
-        //                       psiTurk, next); },
-        // function () {
-        //     transitionScreen("transition_practicedecision.html", psiTurk, next);
-        // },
-        // function () {
-        //     phaseDriver(nChoices[0], nPreWorkPeriods[0], ExploreExploitTask, PracticeRewards, "practice", psiTurk, next);
-        // },
-        // function () {
-        //     transitionScreen("transition_practiceconsumption.html", psiTurk, next);
-        // },
+        function () {
+            bis(psiTurk, next); },
+        function () {
+            instructionDriver(["instructions/instruct_1.html",
+                               "instructions/instruct_2.html",
+                               "instructions/instruct_3.html",
+                               "instructions/instruct_4.html"],
+                              "instructions/quiz.html",
+                              {optioneffect: "both",
+                               misspenalty: "20percentage"},
+                              psiTurk, next); },
+        function () {
+            transitionScreen("transition_practiceconsumption.html", psiTurk, next);
+        },
+        function () {
+            practiceConsumption(psiTurk, next); },
+        function () {
+            transitionScreen("transition_fulltask.html", psiTurk, next);
+        },
         function () {
             phaseDriver(nChoices, ChoiceTask, MultiConsumptionRewards, psiTurk, next);
         },
-        // function () {
-        //     practiceConsumption(psiTurk, next); },
-        // function () {
-        //     transitionScreen("transition_fulltask.html", psiTurk, next);
-        // },
-        // function () {
-        //     phaseDriver(nChoices[1], nPreWorkPeriods[1], ExploreExploitTask, ConsumptionRewards, "consumption", psiTurk, next); },
         function () {
             endingQuestions(psiTurk, next); },
         function () {
