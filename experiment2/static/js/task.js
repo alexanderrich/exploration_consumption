@@ -9,7 +9,7 @@
 /*global condition, counterbalance, uniqueId, adServerLoc, mode, document, PsiTurk, $, _, d3, window, setTimeout, clearTimeout, setInterval, clearInterval, Audio*/
 
 condition = parseInt(condition);
-counterbalance = parseInt(counterbalance);
+// counterbalance = parseInt(counterbalance);
 
 var videoInfo = [
     {id: 'planetearth',
@@ -391,11 +391,9 @@ function ChoiceTask(ntrials, psiTurk, rewardSetter) {
                     [1,2,0],
                     [2,0,1]
                     [2,1,0]][condition];
-    sideSequence = [[0,0,0], [0,0,1],
-                    [0,1,0], [0,1,1],
-                    [1,0,0], [1,0,1],
-                    [1,1,0], [1,1,1],
-                   ][counterbalance];
+    sideSequence = [Math.floor(Math.random() * 2),
+                    Math.floor(Math.random() * 2),
+                    Math.floor(Math.random() * 2)];
 
     this.run = function() {
         var offbutton,
@@ -448,7 +446,6 @@ function ChoiceTask(ntrials, psiTurk, rewardSetter) {
                                  envTrial: envTrial,
                                  uniqueid: uniqueId,
                                  condition: condition,
-                                 counterbalance: counterbalance,
                                  choiceButton: choice,
                                  choiceOutcome: choseWait,
                                  videoTime: 30 - waitAdd - randomAdd
@@ -666,14 +663,14 @@ function experimentDriver() {
         nChoices = 30,
         functionList = [];
 
-    // $(window).on("beforeunload", function(){
-		//     psiTurk.saveData();
-		//     $.ajax("quitter", {
-		// 		    type: "POST",
-		// 		    data: {uniqueId: psiTurk.taskdata.id}
-		//     });
-		//     return "By leaving or reloading this page, you opt out of the experiment.  Are you sure you want to leave the experiment?";
-    // });
+    $(window).on("beforeunload", function(){
+		    psiTurk.saveData();
+		    $.ajax("quitter", {
+				    type: "POST",
+				    data: {uniqueId: psiTurk.taskdata.id}
+		    });
+		    return "By leaving or reloading this page, you opt out of the experiment.  Are you sure you want to leave the experiment?";
+    });
 
     next = function () {
         functionList.shift()();
