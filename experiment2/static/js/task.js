@@ -249,6 +249,10 @@ function MultiConsumptionRewards(psiTurk, callback) {
         }
     };
 
+    this.recordFinal = function() {
+        rewardMaker.recordFinal();
+    };
+
     rewardMaker = new ConsumptionRewards(psiTurk, next);
 }
 
@@ -412,8 +416,8 @@ function ChoiceTask(ntrials, psiTurk, rewardSetter) {
             offbutton = (envTrial) === 0 ? 2 : 1;
             instructedoption = (envTrial) === 0 ? 'A' : 'B';
             $('#choice' + offbutton).prop('disabled', true);
-            $('#choice' + envTrial + 1).click(function () {
-                $('#choice' + envTrial + 1).off('click');
+            $('#choice' + (envTrial + 1)).click(function () {
+                $('#choice' + (envTrial + 1)).off('click');
                 $('#choice' + offbutton).prop('disabled', false);
                 responseFn(this.id);
             });
@@ -435,7 +439,7 @@ function ChoiceTask(ntrials, psiTurk, rewardSetter) {
 
         previousChoice = choice;
 
-        rewardsequence = [{reward: 0, trial: 0, time: 60 - waitAdd}, {reward: 1, trial: 0, time: 30 + waitAdd}];
+        rewardsequence = [{reward: 0, trial: trial, time: 60 - waitAdd}, {reward: 1, trial: trial, time: 30 + waitAdd}];
         if (choseWait === 0) {
             rewardsequence = [rewardsequence[1], rewardsequence[0]];
         }
@@ -448,7 +452,7 @@ function ChoiceTask(ntrials, psiTurk, rewardSetter) {
                                  condition: condition,
                                  choiceButton: choice,
                                  choiceOutcome: choseWait,
-                                 videoTime: 30 - waitAdd - randomAdd
+                                 videoTime: 30 + waitAdd
                                 });
         trial += 1;
         envTrial += 1;
