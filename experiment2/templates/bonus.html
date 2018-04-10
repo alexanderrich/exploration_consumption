@@ -1,0 +1,22 @@
+<html>
+Enter Subject ID here: <input id="subnum" type="text" name="subnum" value=""><br>
+<input id="submit" type="submit" value="Submit">
+<p>Bonus amount: <span id="bonus" ></span></p>
+<script src="/static/lib/jquery-min.js" type="text/javascript"> </script>
+<script>
+ document.getElementById("submit").onclick = function () {
+     console.log('submitted');
+     var n = document.getElementById("subnum").value;
+    $.ajax({
+        dataType: "json",
+        url: "/get_bonus",
+        data: {workerid: n},
+        success: function (data) {
+            console.log("success");
+            bonus = data.bonus;
+            $('#bonus').html(bonus);
+        }
+    });
+ }
+</script>
+</html>

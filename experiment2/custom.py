@@ -108,3 +108,24 @@ def compute_bonus():
         return jsonify(**resp)
     except:
         abort(404)  # again, bad to display HTML, but...
+
+@custom_code.route('/get_bonus', methods=['GET'])
+def get_bonus():
+    # check that user provided the correct keys
+    # errors will not be that gracefull here if being
+    # accessed by the Javascrip client
+    if not request.args.has_key('workerid'):
+        raise ExperimentError('improper_inputs')  # i don't like returning HTML to JSON requests...  maybe should change this
+    uniqueId = 'v3-' + request.args['workerid']
+
+    try:
+        # lookup user in database
+        user = Participant.query.\
+           filter(Participant.workerid == uniqueId).\
+           one()
+        db_session.commit()
+        resp = {"bonus": user.bonus}
+        return jsonify(**resp)
+    except:
+        resp = {"bonus": -1}
+        return jsonify(**resp)
