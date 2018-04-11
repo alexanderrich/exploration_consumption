@@ -6,7 +6,7 @@ Enter Subject ID here: <input id="subnum" type="text" name="subnum" value=""><br
 <script>
  document.getElementById("submit").onclick = function () {
      console.log('submitted');
-     var n = document.getElementById("subnum").value;
+     var n = 'v4-' + document.getElementById("subnum").value;
     $.ajax({
         dataType: "json",
         url: "/get_bonus",

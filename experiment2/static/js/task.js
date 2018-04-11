@@ -9,7 +9,6 @@
 /*global condition, counterbalance, uniqueId, adServerLoc, mode, document, PsiTurk, $, _, d3, window, setTimeout, clearTimeout, setInterval, clearInterval, Audio*/
 
 condition = parseInt(condition);
-// counterbalance = parseInt(counterbalance);
 
 var videoInfo = [
     {id: 'planetearth',
@@ -393,7 +392,7 @@ function ChoiceTask(ntrials, psiTurk, rewardSetter) {
                     [0,2,1],
                     [1,0,2],
                     [1,2,0],
-                    [2,0,1]
+                    [2,0,1],
                     [2,1,0]][condition];
     sideSequence = [Math.floor(Math.random() * 2),
                     Math.floor(Math.random() * 2),

@@ -116,7 +116,7 @@ def get_bonus():
     # accessed by the Javascrip client
     if not request.args.has_key('workerid'):
         raise ExperimentError('improper_inputs')  # i don't like returning HTML to JSON requests...  maybe should change this
-    uniqueId = 'v3-' + request.args['workerid']
+    uniqueId = request.args['workerid']
 
     try:
         # lookup user in database
