@@ -4,7 +4,10 @@ library("RMySQL")
 library("jsonlite")
 
 ## for mysql
-con = dbConnect(MySQL())
+sqlinfo = scan("sqlinfo.txt", what="", sep="\n")
+con <- dbConnect(MySQL(),
+         user=sqlinfo[1], password=sqlinfo[2],
+         dbname=sqlinfo[3], host=sqlinfo[4])
 on.exit(dbDisconnect(con))
 rs = dbSendQuery(con, "select * from exploration_consumption")
 data = fetch(rs, n=-1)

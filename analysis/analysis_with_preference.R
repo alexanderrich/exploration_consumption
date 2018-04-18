@@ -36,6 +36,10 @@ questiondata$bis <-  rowSums(select(questiondata, bis1:bis30))
 questiondata = questiondata %>% mutate(enjoymentdiff = videoenjoyment - sliderenjoyment)
 exploredata <- merge(exploredata, select(questiondata, uniqueid, bis, enjoymentdiff), by="uniqueid")
 
+mean(questiondata$videoenjoyment)
+mean(questiondata$sliderenjoyment)
+t.test(questiondata$enjoymentdiff)
+
 chosenValues = exploredata %>%
   mutate(chosenValue=ifelse(response, .333, currentValue)) %>%
   group_by(condition, uniqueid) %>%
