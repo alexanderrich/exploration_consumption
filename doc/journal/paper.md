@@ -1,5 +1,5 @@
 ---
-title: Does a present bias influence exploratory choice?
+title: Does present bias influence exploratory choice?
 author: 
 - Alexander S. Rich
 - Todd M. Gureckis
@@ -269,7 +269,152 @@ with immediate consumption we predict present bias to lead to underexploration.
 However, if a temporal delay is introduced between decisions and outcomes, the
 present bias will be decreased, leading to greater exploration.
 
-# Experiment
+# Experiment 1
+
+## Methods
+
+### Participants
+Forty participants completed the experiment, which was conducted over
+Amazon Mechanical Turk (AMT) using the psiTurk framework [@Gureckis2015a].
+Participants were paid $5.00 for their participation, with a performance-based
+bonus of up to $3.00. All participants received the full $3.00 bonus.
+Participants were pseudo-randomly counterbalanced across two conditions.
+
+
+### Design and procedure
+
+#### Consumption tasks
+Participants were informed that their job was to perform a monotonous slider task that
+would be split into 30-second "work periods," but that they would be able to
+make choices throughout the experiment that would give them a chance to watch a
+YouTube video instead. The number of remaining work periods in the experiment was shown
+at the top of the screen, as was the number of seconds left in the current work period.
+
+The slider task was based of a task previously used by [@Gill2012]. In each
+period of the slider task, five horizontal sliders appeared on the screen (Figure XXX). Each
+started at a random setting between 0 and 100, with the slider's value
+shown to its right, and with a random horizontal offset so that the
+sliders were not aligned. The participant's task was to use the mouse to move
+each slider to "50" before the work period ended. When a participant released
+the mouse at the correct setting, the slider turned green to show it had been
+completed. To ensure that the task took close to the allotted 30 seconds, at the
+beginning of the task only the top slider was enabled, and the other four were
+grayed out. Additional sliders were enabled at five-second intervals, such that
+all five sliders were available after 20 seconds.
+
+Before beginning the experiment, participants chose one of four videos available
+on YouTube: an episode of "Planet Earth", and episode of "The Great British
+Bakeoff", and episode of "Mythbusters", or an Ellen Degeneres comedy special.
+The video was embedded in the experiment with all user controls (such as
+skipping ahead) disabled (Figure XXX). When given access to the video, participants had to keep the
+browser window open and hold down the space bar for the video to play. This allowed us to ensure that
+participants maintained engagement with the content.
+
+Participants completed a total of 70 work
+periods. For the first 10 work periods, participants simply clicked a button to begin the
+slider task. After these initial periods, participants gained access to six
+machines that could potentially complete the slider task for the participant,
+allowing the participant to watch their chosen video instead. However, the
+machines did not always function, and participants had to make a decision about
+how to set the machine before each use.
+
+#### Decision-making task
+Following the initial 10 periods, participants were shown a machine before each
+work period and,
+as shown in Figure XXX, had to select
+between two circular spinners with arrows at the top: the "current spinner"
+(exploit) and the "new spinner" (explore).
+The current spinner was split into
+five black and five gold wedges. If a participant chose the
+current spinner, it spun and, if the arrow landed on gold, the machine
+worked and the participant could watch the video. Initially, the
+current spinner's gold wedges were randomly set for each machine to cover between
+1/3 and 2/3 of the spinner.
+
+The new spinner initially showed a question mark. If a participant chose the
+new spinner, then a new spinner was
+created and appeared on the machine. The new spinner's gold wedge could cover anywhere from
+0% to 100% of the spinner. The new spinner then
+spun and, if the arrow landed on gold, the machine worked.
+
+Critically, if the new spinner had a greater gold area than the current
+spinner, the new spinner was "saved" and the current spinner was
+updated to the new spinner.  This created an explore&ndash;exploit tradeoff in which 
+choosing a new spinner carried immediate risk, but could carry long-term
+benefits by improving the current spinner from its initial value.
+
+The experiment's two conditions differed in what occured after the participant spun the spinner.
+In the immediate condition, the machine ran immediately after the choice was made and affected the
+next work period, as shown in Figure XXX and Figure XXX. It then "cooled off" for the
+following five periods, as choices were made with the other five machines. In the delayed condition,
+each machine was presented to the participant four work periods before it was scheduled to run, and the participant
+made a choice at that time. The machine then had to "process" for four work periods, thus delaying hte outcome by over
+2 minutes (Figure XXX). The participant then returned to the machine to observe its outcome and either perform the 
+slider task or watch the video. The machine then cooled off for a single period before being ready for another
+choice. 
+<!-- The timeline for the delayed condition is shown in Figure XXX. -->
+
+The machine ran immediately after the choice was
+made, and affected the next work period, as shown in
+Figure XXX and Figure XXX. 
+
+Finally, in order to induce exploration throughout the entire experiment, the
+six machines would occasionally "reset" after they ran. When this occurred,
+the current spinner would be set to a new random value between 1/3 and 2/3 gold.
+Participants were informed that this would occur randomly on
+1/6 of trials. In fact, the procedure was designed so exactly one of the six
+machines would reset on each cycle through the machines, and no machine would be
+reset on two consecutive uses.
+
+#### Training, incentives, and post-experiment questions
+Before beginning the full experiment, participants completed two
+practice phases. First, they performed several trials of practice using the
+machines, with the actual work periods removed. Then, they performed two work
+periods practicing the slider task and one work period practicing the video task.
+During the machine choices, participants had access to an "info" button at the
+bottom of the screen that provided reminders about the dynamics of the task.
+
+Participants were given a performance-based bonus of $3.00 for completing the
+consumption tasks accurately. If they missed fewer than 10% of sliders throughout
+the experiment and left the video paused less than 20% of the time, they were
+not penalized. However, if they missed more sliders or left the video paused for
+longer, they lost 10 cents from their bonus for each additional percentage of
+sliders missed or time with the video paused. The running percentage of sliders
+missed and video pause time was displayed at the top of the screen throughout
+the experiment.
+
+Following the experiment, participants were asked to rate their enjoyment of the
+slider task and of the video-watching task on a 1 to 7 scale.
+
+## Results
+
+Participants rated the video as more enjoyable on average (5.65 out of 7) than the
+slider task (3.13 out of 7), $t(39)=9.26$, $p<.001$.
+
+To analyze participants' trial-by-trial decision-making, we conducted a hierarchical
+Bayesian logistic regression using the Stan modeling language [@stan-software:2015].
+This approach allowed us to estimate population-level effects of the
+current-spinner value and of condition, while also allowing for individual
+differences. The regression model included an intercept term as well as terms
+for the value of the current spinner, the participant's condition, and a
+condition by value of current spinner interaction.
+
+The results of the regression are shown in Figure XXX. 
+Participants were less likely to choose a new spinner when the current spinner
+has a high value, $p>.999$. However, in this experiment we found no evidence of
+an effect of condition, with a posterior probability of $p=.558$ that the effect of condition was
+greater than 0. This means that participants were no more likely to explore a new spinner when there
+was a temporal delay imposed between their choices and the received outcomes.
+However, there may have been a small interaction between current spinner value and
+condition, such that participants in the delayed condition were less sensitive
+to the value of the spinner when making their choices. This might indicate that
+the delayed condition was confusing to some participants, as a few individuals
+(as seen in Figure XXX) changed their behavior very little
+across current-spinner values. The posterior probability that this interaction
+was above 0 is $p=.934$.
+
+
+# Experiment 2
 ## Methods
 
 The experiment was preregistered through the Open Science Framework. The
@@ -447,7 +592,9 @@ to the current value of the spinner.
 Our preregistered analyses provided no support for our hypotheses. As an
 additional, exploratory analysis, we re-ran the Bayesian model replacing
 participants' BIS scores with their ratings difference between the slider task
-and the video task in post-experiment questionnaire. Our intuition was that
+and the video task in post-experiment questionnaire. Over all, participants rated
+the video task as more enjoyable (6.37 out of 7 on average) than the slider task,
+(3.43 out of 7), $t(89)=16.3, p<.001$. Our intuition was that
 participants who rated the video task much higher than the slider task may have
 felt a greater motivational pull to immediately watch a video instead of move
 slider, and may thus have been more susceptible to the delay manipulation.
