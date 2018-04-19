@@ -398,23 +398,69 @@ current-spinner value and of condition, while also allowing for individual
 differences. The regression model included an intercept term as well as terms
 for the value of the current spinner, the participant's condition, and a
 condition by value of current spinner interaction.
+We included predictors for the value of the current spinner,
+the participant's condition, and the interaction
+between condition and current spinner value.
+Condition was coded as -1 for the immediate condition and 1 for the delayed
+condition; current spinner value was rescaled to have zero mean
+and unit variance across participants. We assumed that individuals could vary in their overall tendency
+to explore (i.e., intercept) as well as their responsiveness to current spinner
+value (slope). Participants' individual-level parameters were assumed to be
+drawn from a t distribution with $df=5$, making our population level estimates
+robust to potential outliers. The priors on the
+the population-level predictor coefficients, and on the standard
+deviation of the t distributions from which individual-level parameters were drawn, were (truncated)
+normal distributions with a mean of 0 and a standard deviation of 5.
 
-The results of the regression are shown in Figure XXX. 
+The model posterior was estimated using the Stan modeling language
+[@Carpenter2017]. We ran four chains of Hamiltonian Monte Carlo sampling, with
+1000 samples per chain, the first half of which were discarded as burn-in. We
+confirmed convergence using the $\hat{R}$ convergence criterion [@Gelman2014a].
+In the results below, we report 95% credible intervals (CIs) on model
+parameters of interest. An overview of the model posterior is displayed in Figure XXX.
+
 Participants were less likely to choose a new spinner when the current spinner
-has a high value, $p>.999$. However, in this experiment we found no evidence of
-an effect of condition, with a posterior probability of $p=.558$ that the effect of condition was
-greater than 0. This means that participants were no more likely to explore a new spinner when there
+has a high value, $CI=[-3.49, -2.20]$. However, in this experiment we found no evidence of
+an effect of condition, $CI=[-.48, .65]$. This means that participants were no more likely 
+to explore a new spinner when there
 was a temporal delay imposed between their choices and the received outcomes.
 However, there may have been a small interaction between current spinner value and
 condition, such that participants in the delayed condition were less sensitive
-to the value of the spinner when making their choices. This might indicate that
+to the value of the spinner when making their choices $CI=[-.03, 1.25]$. This might indicate that
 the delayed condition was confusing to some participants, as a few individuals
 (as seen in Figure XXX) changed their behavior very little
-across current-spinner values. The posterior probability that this interaction
-was above 0 is $p=.934$.
+across current-spinner values. 
 
 
 # Experiment 2
+
+In Experiment 1, we found no evidence of the delay in rewards leading to an
+increase in exploratory choice. However, there were several potential flaws in
+the experiment design which may have prevented present bias from occurring or
+its effects from being observed. In Experiment 2, we preregistered the design,
+collected a larger sample, and attempted to improve on
+Experiment 1 in several ways.
+
+We conducted Experiment 2 in person, rather than using AMT. This ensures
+that participants had few distractions from the consumption tasks, potentially
+increasing their motivational effect. We also made the slider task more aversive
+and the video task more pleasant. To do so, we added an intermittent static
+noise during the slider tasks, and allowed people to switch among the four
+videos at will, without having to hold down the space bar to keep the video
+playing.
+
+To simplify and improve the exploratory choice task, in Experiment 2 there is a
+single machine, rather than six. Rather than the machine "processing" for four
+trials in the delayed condition, outcomes are added to a "work queue" that
+delays the consumption task by eight trials. This is both simpler and increases
+the delay length. The visual appearance of the exploratory choice task was also
+redesigned to make the statistics of the task more transparent.
+
+Finally, we measured participants' impulsivity, a potentially important
+covariate, using the Barratt Impulsiveness Scale [@Patton1995]. There is
+evidence that this scale correlates with present-focused behavior in repeated
+choice tasks [@Otto2012], though other studies have not found a relation [@Brown2009].
+
 ## Methods
 
 The experiment was preregistered through the Open Science Framework. The
@@ -614,6 +660,91 @@ including only the 30 participants with the highest-magnitude slopes in each
 condition from the initial analysis. We did not find that this new selection
 criterion affected our results. In particular, the credible interval for the
 main effect of delay still included zero, $CI=[-.08, .72]$.
+
+# Experiment 3
+
+In both Experiments 1 and 2, we found no evidence that delaying rewards affected
+the degree of exploratory behavior, and thus no evidence that exploratory choice
+is influenced by present bias. Experiment 2 attempted to fix several flaws of
+Experiment 1: collecting data in person, making the consumption tasks more
+pleasant and aversive, increasing the reward delay, and simplifying the
+exploratory choice task. This may indicate that there is truly no effect of
+present bias on exploratory choice, but it remains possible that this null
+effect is due to a weakness in our experiment design.
+
+The most apparent potential weakness is that the consumption tasks did not
+induce very much present bias, or that discounting of these stimuli occurred on
+a scale much longer than the delay of a few minutes used in our experiments. Our
+use of these stimuli was based on several past studies. Access to videos has
+been shown to induce present bias with a delay of around a minute [@Navarick1998], and
+cessation of annoying noises can induce present bias with a delay of around ten
+seconds [@Solnick1980]. However, these studies were were small and differed from
+the current setting in important ways. For example @Solnick1980 had participants
+make choices about noise cessation while solving math problems, which prevented
+them from focusing fully on the choice task. 
+
+It may be that the consumption
+tasks and setting we used did not, in fact induce present bias, which would mean
+that inducing a delay would have no predicted effect. Therefore, in Experiment 3
+we conducted a simple follow-up experiment using the two consumption tasks to
+test whether people have a present bias for watching the video immediately,
+based on past experiments which studied time preferences for videos or video
+games [@Millar1984; @Navarick1998].
+
+## Methods
+
+### Participants.
+
+### Design and procedure.
+
+As in Experiment 2, the Barratt Impulsiveness Scale was administered prior to
+completing the main task.
+
+In the main task, participants were instructed that they would have to make
+a series of choices between two buttons. They were told that after selecting a
+button they would spend some amount of time performing a boring slider task and
+a fun video task, and that their choice could affect the amount of time spent on
+each task and the order of the tasks. They were also instructed that for their
+first two choices they would have to click first one button, then the other, to
+ensure that they had experienced both outcomes, and that occasionally the
+outcomes would change, at which point they would be instructed to try each of
+the two buttons again. On all other trials, they were told to select whichever button
+they preferred.
+
+The slider and video tasks were very similar to the tasks used in Experiment 2.
+To prevent participants from explicitly measuring the amount of video and slider
+time following a choice, the timer showing how many seconds remaining in the
+consumption task was removed. For the slider task, it was replaced by horizontal
+red "progress bar" that steadily shrank over the course of the task, thereby
+indicating seconds remaining. For the video task, there was no indication of
+seconds remaining. In addition, instead of always lasting 30 seconds, the
+consumption tasks varied in length. For a slider task that lasted $s$ seconds,
+there were $s/5-1$ sliders to complete.
+
+After practicing the slider and video tasks, participants completed 30 trials of
+the choice task. This was divided into three groups of ten trials, each of which
+had a new pair of outcomes. The outcomes always lasted 90 seconds in total, and
+for each group there was always one button that
+produced the video task immediately, followed by the slider task, and one that
+produced the slider task immediately, followed by the videos. The reward amounts
+and reward orders of the three groups were as follows:
+
+1. 30s videos/60s sliders vs. 60s sliders/30s videos
+2. 35s videos/55s sliders vs. 65s sliders/25s videos
+3. 25s videos/65s sliders vs. 55s sliders/35s videos
+
+The ordering of the three pairs of outcomes was counterbalanced across
+participants, and the pairing of outcomes the left and right button was
+randomized. Absent discounting, participants should be indifferent between
+the two options in pair 1, and prefer the options with more video time in pairs
+2 and 3. However, we predicted that while amount of video time would also
+matter, participants would display a bias towards selecting the option with the
+immediate video task.
+
+As in Experiments 1 and 2, participants were asked to rate their enjoyment of
+the two consumption tasks following the experiment.
+
+## Results
 
 # Discussion
 
