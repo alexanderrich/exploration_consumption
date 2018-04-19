@@ -1,7 +1,6 @@
 library("dplyr")
 library("ggplot2")
 library("tidyr")
-library("lme4")
 
 exploredata <- read.csv('../data/exploration_data_v2_3.csv')
 consumptiondata <- read.csv('../data/consumption_data_v2_3.csv')
@@ -23,8 +22,6 @@ for (id in levels(exploredata$uniqueid)) {
   exploredata[exploredata$uniqueid == id,"sliderenjoyment"] <- questiondata[questiondata$uniqueid == id, "sliderenjoyment"]
   exploredata[exploredata$uniqueid == id,"instructionloops"] <- questiondata[questiondata$uniqueid == id, "instructionloops_instructions.quiz.html"]
 }
-
-exploredata$enjoymentdiff <- (exploredata$videoenjoyment - exploredata$sliderenjoyment) / 10
 
 exploredata <- exploredata %>%
   mutate(outcome5back=dplyr::lag(outcome, n=5, default=0),
@@ -85,18 +82,20 @@ exploredata$ll <- as.integer(factor(exploredata$uniqueid))
 N <- nrow(exploredata)
 L <- max(exploredata$ll)
 y <- exploredata$response
-currentVal <- exploredata$currentValue_norm
-condition <- as.numeric(as.character(exploredata$condition_norm))
+currentVal <- (exploredata$currentValue - mean(exploredata$currentValue))/sd(exploredata$currentValue)
+condition <- exploredata$condition * 2 - 1
 ll <- exploredata$ll
-lastOutcome <- exploredata$lastoutcome
-standata = c("N", "L", "y", "ll", "currentVal", "condition", "lastOutcome")
+standata = c("N", "L", "y", "ll", "currentVal", "condition")
 
 
-fit <- stan(file="stan_models/regression.stan", data=standata, iter=1000)
-save(fit, file="model_fits/regression.RData")
-extracted=extract(fit, permuted=FALSE, pars=c("intercept_mean", "intercept_sd",
+fit <- stan(file="stan_models/regression_T.stan", data=standata, iter=1000)
+
+save(fit, file="model_fits/regression_T_v23.RData")
+
+extracted=rstan::extract(fit, permuted=FALSE, pars=c("intercept_mean", "intercept_sd",
                                               "currentVal_mean", "currentVal_sd",
                                               "condition_intercept", "condition_slope"))
+
 monitor(extracted, digits_summary=2)
 
 ## load("model_fits/regression.RData")
