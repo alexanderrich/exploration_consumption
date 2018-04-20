@@ -23,6 +23,9 @@ for (id in levels(exploredata$uniqueid)) {
   exploredata[exploredata$uniqueid == id,"instructionloops"] <- questiondata[questiondata$uniqueid == id, "instructionloops_instructions.quiz.html"]
 }
 
+practicedata <- exploredata %>% filter(taskType == "practice")
+exploredata <- exploredata %>% filter(taskType != "practice")
+
 exploredata <- exploredata %>%
   mutate(outcome5back=dplyr::lag(outcome, n=5, default=0),
          outcome1back=dplyr::lag(outcome, n=1, default=0),
@@ -100,11 +103,11 @@ monitor(extracted, digits_summary=2)
 
 ## load("model_fits/regression.RData")
 
-extracted=extract(fit, permuted=TRUE, pars=c("intercept_mean", "intercept_sd",
+extracted=rstan::extract(fit, permuted=TRUE, pars=c("intercept_mean", "intercept_sd",
                                               "currentVal_mean", "currentVal_sd",
                                               "condition_intercept", "condition_slope"))
 
-individuals=extract(fit, permuted=TRUE, pars=c("subj_intercept", "subj_currentVal"))
+individuals=rstan::extract(fit, permuted=TRUE, pars=c("subj_intercept", "subj_currentVal"))
 
 extracted <- lapply(extracted, as.numeric)
 
@@ -118,7 +121,7 @@ cond_slope <- mean(extracted$condition_slope)
 params_w_predictions <- extracted[rep(1:nrow(extracted), each=21), ]
 params_w_predictions <- params_w_predictions %>%
   mutate(x=rep(seq(from=.333, to=1, length.out=21), 2000),
-         x_norm=x-mean(exploredata$currentValue),
+         x_norm=(x-mean(exploredata$currentValue))/sd(exploredata$currentValue),
          cond0=1/(1 + exp(-1 * (intercept_mean - 0.5 * condition_intercept + currentVal_mean * x_norm  - 0.5 * condition_slope * x_norm))),
          cond1=1/(1 + exp(-1 * (intercept_mean + 0.5 * condition_intercept + currentVal_mean * x_norm  + 0.5 * condition_slope * x_norm)))) %>%
   gather(condition, y, cond0, cond1) %>%
@@ -138,7 +141,8 @@ for (i in 1:nrow(questiondata)) {
   subject_params <- subject_params[rep(1:nrow(subject_params), each=21), ]
   subject_params <- subject_params %>%
     mutate(x=rep(seq(from=.333, to=1, length.out=21), 2000),
-           x_norm=x - currentValue_mean,
+           ## x_norm=x - currentValue_mean,
+           x_norm=(x-mean(exploredata$currentValue))/sd(exploredata$currentValue),
            y=1/(1 + exp(-1 * (intercept + slope * x_norm)))) %>%
     group_by(x) %>%
     summarize(subject=first(subject),
@@ -162,7 +166,7 @@ ggplot() + geom_line(data=individuals_w_predictions, aes(x=x, y=y, group=subject
   coord_cartesian(xlim = c(.333, 1))+
   theme(legend.position="bottom")
 
-ggsave(filename="../doc/cogsci2017/figures/exp2results.pdf", width=5, height=3.5, useDingbats=F)
+ggsave(filename="../doc/journal/figures/exp1results.pdf", width=7, height=3.5, useDingbats=F)
 
 
 ## fit <- stan(file="stan_models/regression_lastoutcome.stan", data=standata, iter=1000)

@@ -290,8 +290,25 @@ make choices throughout the experiment that would give them a chance to watch a
 YouTube video instead. The number of remaining work periods in the experiment was shown
 at the top of the screen, as was the number of seconds left in the current work period.
 
+![Examples of the Experiment 1 tasks. (a): an example of the slider task. Participants had to move all
+  sliders to ``50'' in 30 seconds. (b): the video-watching task.
+  Participants had to hold the space bar to watch their chosen video. (c):
+  the decision-making task. Participants had to choose to run the machine with
+  the current spinner or try a new spinner. If their chosen spinner landed on
+  a gold wedge, they performed the video-watching task instead of the
+  slider task.](figures/taskpictures.png){#fig:exp1task}
+
+![The machine display seen by participants. The display allowed participants track
+  the value of each machine and the next time each machine would be ready to
+  make a choice or produce an outcome. Gray arrows have been added to depict the
+  counterclockwise movement of machines around the display after each work
+  period.
+  (a): the display seen by participants in the immediate condition of Experiment 1.
+  (b): the display seen by participants in the delayed condition of
+  Experiment 1.](figures/machinemappictures.png){#fig:exp1machinemap}
+
 The slider task was based of a task previously used by [@Gill2012]. In each
-period of the slider task, five horizontal sliders appeared on the screen (Figure XXX). Each
+period of the slider task, five horizontal sliders appeared on the screen (Figure {@fig:exp1task}a). Each
 started at a random setting between 0 and 100, with the slider's value
 shown to its right, and with a random horizontal offset so that the
 sliders were not aligned. The participant's task was to use the mouse to move
@@ -306,7 +323,7 @@ Before beginning the experiment, participants chose one of four videos available
 on YouTube: an episode of "Planet Earth", and episode of "The Great British
 Bakeoff", and episode of "Mythbusters", or an Ellen Degeneres comedy special.
 The video was embedded in the experiment with all user controls (such as
-skipping ahead) disabled (Figure XXX). When given access to the video, participants had to keep the
+skipping ahead) disabled (Figure {@fig:exp1task}b). When given access to the video, participants had to keep the
 browser window open and hold down the space bar for the video to play. This allowed us to ensure that
 participants maintained engagement with the content.
 
@@ -321,7 +338,7 @@ how to set the machine before each use.
 #### Decision-making task
 Following the initial 10 periods, participants were shown a machine before each
 work period and,
-as shown in Figure XXX, had to select
+as shown in Figure {@fig:exp1task}c, had to select
 between two circular spinners with arrows at the top: the "current spinner"
 (exploit) and the "new spinner" (explore).
 The current spinner was split into
@@ -345,18 +362,13 @@ benefits by improving the current spinner from its initial value.
 
 The experiment's two conditions differed in what occured after the participant spun the spinner.
 In the immediate condition, the machine ran immediately after the choice was made and affected the
-next work period, as shown in Figure XXX and Figure XXX. It then "cooled off" for the
+next work period, as shown in Figure {@fig:exp1machinemap}a. It then "cooled off" for the
 following five periods, as choices were made with the other five machines. In the delayed condition,
 each machine was presented to the participant four work periods before it was scheduled to run, and the participant
-made a choice at that time. The machine then had to "process" for four work periods, thus delaying hte outcome by over
-2 minutes (Figure XXX). The participant then returned to the machine to observe its outcome and either perform the 
+made a choice at that time. The machine then had to "process" for four work periods, thus delaying the outcome by over
+2 minutes (Figure {@fig:exp1machinemap}b). The participant then returned to the machine to observe its outcome and either perform the 
 slider task or watch the video. The machine then cooled off for a single period before being ready for another
 choice. 
-<!-- The timeline for the delayed condition is shown in Figure XXX. -->
-
-The machine ran immediately after the choice was
-made, and affected the next work period, as shown in
-Figure XXX and Figure XXX. 
 
 Finally, in order to induce exploration throughout the entire experiment, the
 six machines would occasionally "reset" after they ran. When this occurred,
@@ -412,23 +424,33 @@ the population-level predictor coefficients, and on the standard
 deviation of the t distributions from which individual-level parameters were drawn, were (truncated)
 normal distributions with a mean of 0 and a standard deviation of 5.
 
+
+![Model-based estimates of participants' probability of choosing a new
+  spinner for different values of the current spinner in Experiment 1. Thick
+  lines and shaded regions indicate the mean and 95\% posterior interval for the
+  population-level parameters, while the thin lines indicate the mean posterior
+  parameters for each of the 40 individual participants. Participants in the
+  delayed-outcome condition were no more
+  likely to explore at a given current-spinner value than those in the
+  immediate-outcome condition.](figures/exp1results.pdf){#fig:exp1results}
+
 The model posterior was estimated using the Stan modeling language
 [@Carpenter2017]. We ran four chains of Hamiltonian Monte Carlo sampling, with
 1000 samples per chain, the first half of which were discarded as burn-in. We
 confirmed convergence using the $\hat{R}$ convergence criterion [@Gelman2014a].
 In the results below, we report 95% credible intervals (CIs) on model
-parameters of interest. An overview of the model posterior is displayed in Figure XXX.
+parameters of interest. An overview of the model posterior is displayed in Figure @fig:exp1results.
 
 Participants were less likely to choose a new spinner when the current spinner
-has a high value, $CI=[-3.49, -2.20]$. However, in this experiment we found no evidence of
-an effect of condition, $CI=[-.48, .65]$. This means that participants were no more likely 
+has a high value, $CI=[-4.13, -2.52]$. However, in this experiment we found no evidence of
+an effect of condition, $CI=[-.58, .73]$. This means that participants were no more likely 
 to explore a new spinner when there
 was a temporal delay imposed between their choices and the received outcomes.
 However, there may have been a small interaction between current spinner value and
 condition, such that participants in the delayed condition were less sensitive
-to the value of the spinner when making their choices $CI=[-.03, 1.25]$. This might indicate that
+to the value of the spinner when making their choices $CI=[-.27, 1.42]$. This might indicate that
 the delayed condition was confusing to some participants, as a few individuals
-(as seen in Figure XXX) changed their behavior very little
+(as seen in Figure @fig:exp1results) changed their behavior very little
 across current-spinner values. 
 
 
@@ -487,69 +509,61 @@ Barratt Impulsiveness scale [@Patton1995] on the computer.
 
 #### Consumption tasks.
 
+![Examples of the Experiment 2 tasks, which resemble the Experiment 1 tasks.
+(a): the slider task. (b): the video task. (c): the decision-making task. After
+making a choice in the decision-making task, the produced outcome was added to
+the work queue, pictured at the bottom of (c).](figures/experiment2tasks.png){#fig:exp2tasks}
+
 Participants were informed that there were two types of tasks, a "slider task"
 and a "video task," that they would complete during 30-second "work periods."
 The number of remaining work periods in the experiment was shown at the top of
 the screen, as was the number of seconds left in the current work period.
 
-The slider task was based of a task previously used by [@Gill2012]. In each
-period of the slider task, five horizontal sliders appeared on the screen
-(Figure XXX). Each started at a random setting between 0 and 100, with the
-slider's value shown to its right, and with a random horizontal offset so that
-the sliders were not aligned. The participant's task was to use the mouse to
-move each slider to "50" before the work period ended. When a participant
-released the mouse at the correct setting, the slider turned green to show it
-had been completed. To ensure that the task took close to the allotted 30
-seconds, at the beginning of the task only the top slider was enabled, and the
-other four were grayed out. Additional sliders were enabled at five-second
-intervals, such that all five sliders were available after 20 seconds. To make
+The slider task was the same as the one described in Experiment 1, and is
+pictured in Figure {@fig:exp2tasks}a. To make
 the slider task more unpleasant, a short static noise was played through the computer
 speakers intermittently at a moderate volume during the task.
 
-The video tasks consisted of simply watching one of four videos: an episode of
+As in Experiment 1, the video tasks consisted of simply watching one of four videos: an episode of
 "Planet Earth", and episode of "The Great British Bakeoff", and episode of
 "Unchained Reactions", or an Ellen Degeneres comedy special. Participants
-watched the video through a player on the computer screen. They were free to
+watched the video through a player on the computer screen. Unlike in Experiment
+1, they did not have to hold down a button to play the video. They were free to
 fast forward or rewind the video at will, and could also switch among the videos
-at any time by clicking one of four tabs above the player.
+at any time by clicking one of four tabs above the player (see Figure {@fig:exp2tasks}b).
 
 To incentivize participants to attend to and perform the slider task, they were
 penalized if they missed more than 10% of the sliders. For each percentage over
 10% of sliders that were not set to 50 over the course of the experiment, $.20
-was deducted from a bonus that started at $5.00. For example, if a participant
-failed to set the sliders to 50 for 18% of sliders, their final bonus would be
-$3.40.
+was deducted from a bonus that started at $5.00. 
 
 #### Choice task.
 
 Participants completed a total of 56 work periods. The first eight were
 automatically spent performing the slider task. For the remaining 48,
 participants made a choice prior to each work period that determined whether the
-work period would be devoted to the slider task or the video task.
+work period would be devoted to the slider task or the video task. This choice
+task resembled the choice task used in Experiment 1.
 
-For the choice task, participants were shown a "machine" that could create
-slider or video tasks. The machine consisted of a black-and-gold "best" spinner and a
+Participants were shown a "machine" that could create
+slider or video tasks (Figure {@fig:exp2tasks}c). The machine consisted of a black-and-gold "best" spinner and a
 panel of possible new spinners. Participants selected either "run best spinner"
 or "run new spinner".
-
 If the participant selected "run best spinner", the spinner would visually
 rotate on the screen. If it landed on gold, the machine created a video task; if
-it landed on black, the machine created a slider task. Thus, the probability of
-producing a video task was equal to the proportion gold of the spinner.
+it landed on black, the machine created a slider task. 
 
 If the participant selected "run new spinner", the new spinners in the panel
 were covered up and randomly shuffled. The participant then clicked one of the
 gray squares, revealing the new spinner underneath. As was explained to the
-particpants, and is visually apparent, one third of the possible new spinners
+particpants, and was visually apparent, one third of the possible new spinners
 are completely black, while the remaining two thirds range from 5% to 100% gold,
 in even increments of 5%.
 
 After revealing a new spinner, it was spun, producing a video or slider task in
-the same manner as the "best spinner". Critically, if the new spinner selected had
+the same manner as the "best spinner". As in Experiment 1, if the new spinner selected had
 a higher proportion gold than the best spinner, it would replace the best
-spinner for future choices. Thus, choosing "run new spinner" was an exploratory
-action that could lead to the discovery of a better option that could be
-exploited in later choices.
+spinner for future choices. 
 
 Participants were also informed that after every work period there was a one in
 six chance that the machine would reset itself. In fact, the experiment was
@@ -571,8 +585,9 @@ during the initial eight slider task work periods, in order to have outcomes
 determined when they reached the ninth and later work periods.
 
 To make this delay intuitive, participants were shown a work queue at the bottom
-of the screen that contained eight tasks. In the Delayed condition, upon making
-a choice a new slider or video task icon was added to the right of the queue,
+of the screen that contained eight tasks (see the bottom of Figure
+{@fig:exp2tasks}c). In the Delayed condition, upon making a choice a 
+new slider or video task icon was added to the right of the queue,
 and then the leftmost task on the queue was performed and removed. In the
 Immediate condition, participants were still shown the cue, but upon adding an
 icon to the right of the queue that outcome was performed immediately. This
@@ -619,7 +634,14 @@ In the results below, we report 95% credible intervals (CIs) on model
 parameters of interest. An overview of the model posterior is displayed in Figure @fig:results
 
 
-![Results](figures/expresults.pdf){#fig:results}
+![Model-based estimates of participants' probability of choosing a new
+  spinner for different values of the current spinner in Experiment 2. Thick
+  lines and shaded regions indicate the mean and 95\% posterior interval for the
+  population-level parameters, while the thin lines indicate the mean posterior
+  parameters for each of the 100 individual participants. Participants in the
+  delayed-outcome condition were no more
+  likely to explore at a given current-spinner value than those in the
+  immediate-outcome condition.](figures/expresults.pdf){#fig:results}
 
 We found a strongly negative effect of current spinner value on participant's
 probability of selecting a new spinner, $CI=[-4.18, -3.08]$. This indicates that
@@ -697,10 +719,14 @@ games [@Millar1984; @Navarick1998].
 
 ### Design and procedure.
 
+![Examples of the Experiment 3 tasks. (a): an example of the slider task, in
+which the numeric timer has been replaced by a red timer bar. (b): an example of
+the video task. (c): an example of the decision-making task.](figures/experiment3tasks.png){#fig:exp3tasks}
+
 As in Experiment 2, the Barratt Impulsiveness Scale was administered prior to
 completing the main task.
 
-In the main task, participants were instructed that they would have to make
+In the main task, shown in Figure {@fig:exp3tasks}c, participants were instructed that they would have to make
 a series of choices between two buttons. They were told that after selecting a
 button they would spend some amount of time performing a boring slider task and
 a fun video task, and that their choice could affect the amount of time spent on
@@ -709,9 +735,11 @@ first two choices they would have to click first one button, then the other, to
 ensure that they had experienced both outcomes, and that occasionally the
 outcomes would change, at which point they would be instructed to try each of
 the two buttons again. On all other trials, they were told to select whichever button
-they preferred.
+they preferred. Participants' previous choice was displayed at the bottom of the
+screen as a memory aid.
 
-The slider and video tasks were very similar to the tasks used in Experiment 2.
+The slider and video tasks were very similar to the tasks used in Experiment 2
+(Figure {@fig:exp3tasks}a/b).
 To prevent participants from explicitly measuring the amount of video and slider
 time following a choice, the timer showing how many seconds remaining in the
 consumption task was removed. For the slider task, it was replaced by horizontal
