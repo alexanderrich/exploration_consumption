@@ -13,7 +13,52 @@ geometry: margin=1in
 
 # Does a present bias influence exploratory choice?
 
-# Exploration outside the lab
+Decision makers that act in uncertain environments frequently face
+dilemmas between exploiting options known to be rewarding and exploring options
+that are uncertain. A kid buying ice cream, for example, must select between
+getting a cone of her favorite flavor and trying something new that might become
+a new favorite but could also be disappointing. Researchers in reinforcement
+learning have created a large body of knowledge about how people and
+animals handle the explore&ndash;exploit dilemma [@Mehlhorn2015] and how the problem
+should be approached computationally [@sutton1998reinforcement].
+
+A key aspect of exploratory decision making is that it is spread over time. With
+a single decision, exploration makes little sense. If, heaven forbid, you only
+have one remaining chance to buy ice cream in your life, you should buy your
+favorite flavor, as that is the flavor you expect to enjoy the most. Exploring
+new flavors has the possibility of introducing you to a new favorite, but it is
+only when there will be many more chances to get that new flavor in the future
+that the risk of a disappointment starts to look worthwhile.
+
+While research on exploratory choice acknowledges that the value of exploration
+depends on its payoffs in the future [@Wilson2014a; @Rich2017], it has not
+addressed how this might interact with the manner in which people value future
+rewards. When considering rewards spread over time, people tend to be present
+biased, overweighting immediate rewards in comparison to delayed rewards
+[@myerson1995discounting; @Frederick2002]. In scenarios with explore&ndash;exploit
+tradeoffs, this could lead to over-exploitation and under-exploration. While lab
+experiments tend to be conducted in short sessions with non-consumable rewards,
+preventing present bias from being a major factor, this preference for immediate
+reward could be a major factor leading to under-exploration in more temporally
+extended, real world settings.
+
+In this paper, we discuss the potential connection between exploratory choice
+and intertemporal choice. We report on a set of experiments using
+directly consumable rewards in an exploratory choice task to test for effects of
+present bias on exploration. While we did not find an effect of present bias on
+exploratory choice, a follow-up experiment revealed that our consumable rewards
+did not in fact produce a reliable present bias, despite evidence that they did
+so in earier studies [@Solnick1980; @Navarick1998]. Nonetheless, we hope that
+this work can serve as an interesting first step towards unifying our
+understanding of exploratory and intertemporal decision making.
+
+# Exploration inside and outside the lab
+
+Many researchers have examined patterns of exploration both in
+naturalistic settings and in the lab. Interestingly, differing findings have
+emerged as to the nature and severity of biases in exploratory choice.
+
+## Exploration outside the lab
 
 Exploration has been studied outside the lab in a wide range of contexts. While
 these domains vary greatly in their superficial characteristics, a bias towards
@@ -49,7 +94,7 @@ out of exploration by exploitation is a concern in organizational behavior as
 well [@March1991; @Levinthal1993], prompting research into organizational
 structures that may preserve exploration [@Fang2010].
 
-# Exploration in the lab
+## Exploration inside the lab
 
 Lab studies of exploratory choice have allowed researchers to fully
 control the reward structure of the environment and precisely measure behavior,
@@ -76,11 +121,10 @@ forms of deviation from optimality are in fact prevalent, though perhaps in
 different settings, and that the seemingly general bias toward under-exploration
 is illusory. An alternative is that there are some important aspects of real-world
 decisions&mdash;or peoples' cognitive and motivational states when making those
-decisions&mdash;that makes differentiate them from decisions in the lab. In the
-current paper, we investigate one potential missing component of lab tests of
-exploratory choice: the distribution of choices and outcomes over time. We
-propose and test the hypothesis that because of people's bias towards immediate
-rewards, the spreading of choices over time may account for a portion of
+decisions&mdash;that makes differentiate them from decisions in the lab.
+One clear possibility is that in real world exploration, choices and outcomes
+are spread out over time in a manner that is rarely found in the lab, and that
+people's bias towards immediate rewards might therefore account for a portion of
 people's tendency to under-explore.
 
 # Temporal discounting
@@ -262,12 +306,25 @@ delayed-reward condition were able to consume more total soda on average,
 suggesting that the temporal delay decreased their present bias and allowed them
 to choose in a manner leading to greater long-term reward.
 
-In the experiment that follows, we use an intervention similar to that of
+In the following two experiments, we use an intervention similar to that of
 @Brown2009 to test for effects of present bias on exploratory choice. As
 indicated in Figure @fig:discounting, if an exploratory choice task is paired
 with immediate consumption we predict present bias to lead to underexploration.
 However, if a temporal delay is introduced between decisions and outcomes, the
 present bias will be decreased, leading to greater exploration.
+
+We used videos as a positive outcome that could produce present bias [@Navarick1998], and a
+boring slider task [@Gill2012],
+along with, in Experiment 2, annoying noises [@Solnick1980], as negative outcomes. It is
+worth noting that we also piloted an experiment using a video game as a positive
+outcome [@Millar1984], but found that participants did not find the video game sufficiently
+enjoyable. Experiment 1 represents a first attempt to test for effects of
+present bias on exploratory choice, and Experiment 2 is a larger, preregistered
+study that improves on Experiment 1 in several ways. After finding no evidence
+of present bias producing an effect in Experiments 1 or 2, in Experiment 3 we
+test directly, using a simpler design, whether our outcome stimuli in fact
+produce a consistent preference towards immediate rewards.
+
 
 # Experiment 1
 
@@ -463,7 +520,7 @@ its effects from being observed. In Experiment 2, we preregistered the design,
 collected a larger sample, and attempted to improve on
 Experiment 1 in several ways.
 
-We conducted Experiment 2 in person, rather than using AMT. This ensures
+We conducted Experiment 2 in person, rather than using AMT. This ensured
 that participants had few distractions from the consumption tasks, potentially
 increasing their motivational effect. We also made the slider task more aversive
 and the video task more pleasant. To do so, we added an intermittent static
@@ -471,10 +528,10 @@ noise during the slider tasks, and allowed people to switch among the four
 videos at will, without having to hold down the space bar to keep the video
 playing.
 
-To simplify and improve the exploratory choice task, in Experiment 2 there is a
+To simplify and improve the exploratory choice task, in Experiment 2 there was a
 single machine, rather than six. Rather than the machine "processing" for four
-trials in the delayed condition, outcomes are added to a "work queue" that
-delays the consumption task by eight trials. This is both simpler and increases
+trials in the delayed condition, outcomes were added to a "work queue" that
+delayed the consumption task by eight trials. This was both simpler and increased
 the delay length. The visual appearance of the exploratory choice task was also
 redesigned to make the statistics of the task more transparent.
 
