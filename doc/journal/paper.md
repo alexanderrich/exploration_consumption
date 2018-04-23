@@ -910,6 +910,57 @@ to use these stimuli for novel research questions.
 
 ## Relating Exploratory and Intertemporal Choice
 
-- Maybe our null result is right: exploration uses other system than intertemporal choice. Curiosity, etc? Ways to belance exploration and exploitation without explicit consideration of the future. Fragility of time.
+While our results in Experiments 1 and 2 do not provide strong evidence against
+present bias influencing exploratory choice, it is still worth considering ways
+in which exploratory choice may, in fact, differ from standard intertemporal
+decision making. In some situations, exploratory decisions can look very much
+like other intertemporal decisions, and thus it would be highly surprising if
+the same qualities of temporal discounting were not involved. This would be
+expected particularly in situations where an extended bout of exploration is
+very likely to produce greater long term rewards. For example, going to college
+and selecting classes could be considered a series of exploratory choice among a
+variety of life paths. In this case, many students are likely highly confident that through
+this exploration they will find a life path more rewarding than those available without
+it, making college a more straightforward tradeoff between up-front costs
+and long-term benefits [@Stange2012].
+
+But while some exploratory choices are in practice very much like intertemporal
+choices, and all exploratory choices *in theory* have aspects of intertemporal
+choice, there are also important differences. Intertemporal choices, as they
+appear in the lab and (sometimes) in real life, present a clear choice between
+rewards now and later. In exploratory choice, the tradeoff between the present
+and future is implicit, with exploring leading to a decreased probability of
+high reward immediately and a greater probability of high reward in later
+choices. While past work shows that people are able to consider these reward
+tradeoffs in some situations[@Wilson2014a; @Rich2017], doing so might not be
+natural or easy in all situations. Even in standard intertemporal choice tasks,
+the effect of time delays on decision making seems to be fragile and sensitive
+to contextual effects [@Ebert2007; @Lempert2015a].
+
+Instead of treating exploratory choice like intertemporal choice, people may
+rely on other motivational and cognitive factors to balance exploration and
+exploitation. Curiosity acts as an innate drive towards information-seeking
+[@Berlyne1966; @Loewenstein1994; @Kidd2015], and some researchers speculate that
+curiousity may in fact have evolved to induce exploration [@Singh2004;
+@Oudeyer2009]. If exploration is inherently rewarding due to its potential to
+reveal information, then its rewards are moved from the future to the present
+and temporal advantage of exploitation is removed. Even in situations where
+people likely have low intrinsic curiousity about outcomes, people still appear
+to have strategies for choosing when to explore that are based on heuristics, 
+exploration "bonuses," or added decision noise, rather than a full consideration
+of the future [@daw2006cortical; @Speekenbrink2015; @Wilson2014a]. To the extent
+that people use these strategies, they may not change their behavior based on
+the timing of rewards, even if doing so would be in line with their preferences.
+
+These considerations of this and the preceding subsection suggest that
+continuing to study exploratory choice in the lab, in order to show that present
+bias simply does or does not exist, may not be most fruitful path for future
+research. A more rewarding route may be to further consider the range of
+exploratory choices in their true, naturalistic settings, and seek to understand
+in when exploratory choice is treated similarly to intertemporal
+choice,and when it is not. While field data do not allow the experimental
+control available in the lab, they would allow researchers to collect data with
+significan temporal spans and where major motivational forces, from present bias
+to curiosity, are at play.
 
 # References
