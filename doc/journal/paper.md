@@ -588,7 +588,8 @@ the screen, as was the number of seconds left in the current work period.
 The slider task was the same as the one described in Experiment 1, and is
 pictured in Figure {@fig:exp2tasks}a. To make
 the slider task more unpleasant, a short static noise was played through the computer
-speakers intermittently at a moderate volume during the task.
+speakers at a moderate volume (78db) at irregular intervals of approximately
+once every three seconds during the task.
 
 As in Experiment 1, the video tasks consisted of simply watching one of four videos: an episode of
 "Planet Earth", and episode of "The Great British Bakeoff", and episode of
@@ -842,8 +843,72 @@ the two consumption tasks following the experiment.
 
 # Discussion
 
-## Reasons our study didn't work...
-- Maybe our null result is wrong: other consumption reward literature has questionable statistics - maybe this really doesn't work that well? Need for new methods on how to quickly determine discount rates for consumption rewards.
+In this study, we set out to test whether people's well-documented bias towards
+immediate rewards affects exploratory choice in a manner similar to other
+intertemporal choices, thus producing a bias towards under-exploration
+[@Frederick2002; @myerson1995discounting]. We
+tested this using a paradigm in which we added a temporal delay to outcomes in
+an exploratory choice task, following the design of many prior intertemporal
+choice tasks [@Kirby1995; @Solnick1980; @Brown2009]. In two experiments we found
+that adding a temporal delay did not affect exploration, suggesting that people
+treat exploratory choices differently from intertemporal choices. However, a
+followup study showed that the rewards used in our task did not consistently
+produce present bias, making it difficult to draw any clear conclusions from our
+earlier results. In this section, we briefly discuss why our rewards may not
+have been motivationally effective, as well as delve into the similarities and
+differences between exploratory and intertemporal choice.
+
+## Revisiting immediately consumable rewards
+
+Experiments 2 and 3 used three types of consumable rewards to try to induce a
+present bias: enjoyable videos, a boring slider task, and an annoying static
+noise. The time difference within which we expected to observe a present bias
+was about five minutes (Experiment 2) or one minute (Experiment 3).
+While the slider task has not been used in the past to produce present bias,
+both videos and static noises have. @Navarick1998 found that 40% of participant
+showed a consistent strong bias towards watching an immediate shorter video, even
+when a longer video could be obtained by waiting 30 seconds. @Solnick1980 found
+that a 90 second cessation of noise was preferred over a 120 second sessation
+with a 60 second wait, but found that this preference flipped when a front-end
+delay of only 30 seconds was added. And in a similar vein, @Millar1984 found
+that people strongly preferred 20 seconds playing a video game followed by a 40 second
+wait to a 40 second wait followed by 20 seconds playing a video game, but that
+this preference shrank when a 60 second front-end delay was added.
+
+Assuming that these past results are indicative of a true underlying present
+bias in the average populations, it may by that our experiment differed from
+past experiments in ways that undermined present bias. For example, The
+experiments of @Navarick1998 and @Millar1984 were conducted in a dark room,
+which might have cut down on external distractions, while ours were not. The
+experiments of @Solnick1980 used louder noises than ours, and were conducted with a distractor task of solving
+math problems which might have caused people to make their choices with more
+impulsivity and less cognitive reflection. We hoped that our combination of
+multiple stimuli (videos, noises and sliders) would overcome any weaknesses in
+the implementation of any one, but this may not have been the case.
+
+It is also worth considering that these older experiments might
+not meet current statistical standards, and the motivational effectiveness of these sorts of
+consumable rewards should be reconsidered. @Navarick1998, in fact, did not
+report present bias at the population level, and focused his analyses on
+individuals. @Solnick1980 and @Millar1984 did make claims of present bias over
+short time scales on a group level, but used between-participant designs with
+quite small groups of 10 to 15 people per condition. Their results in many cases
+appear strong qualitatively but the statistics calculated are not clearly
+reported. Even more recent tests of present bias with consumable rewards reveal
+some statistical weaknesses; in their experiments with soda as a reward,
+@Brown2009 first ran 44 participants and then apparently increased their sample
+size to 55 after reviewing the results, and also only found an effect of delaying
+rewards (by 10 minutes) at the $p<.1$ significance level.
+
+Unfortunately, collecting a large amount of decision-making data with immediately consumable
+rewards is highly time consuming, because each consumption event takes time and
+trials must be temporally distributed to induce temporal discounting. However,
+given our findings in the current study, and the limitations of past studies, we
+would strongly recommend that future researchers endeavor to replicate the
+finding that present bias can be induced for videos or noises before attempting
+to use these stimuli for novel research questions.
+
+## Relating Exploratory and Intertemporal Choice
 
 - Maybe our null result is right: exploration uses other system than intertemporal choice. Curiosity, etc? Ways to belance exploration and exploitation without explicit consideration of the future. Fragility of time.
 
