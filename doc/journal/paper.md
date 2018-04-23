@@ -172,7 +172,7 @@ for appropriate constant $k$ [@myerson1995discounting]. This formulation often f
 difficult to deal with analytically. An alternative is to posit that discounting
 after the present proceeds exponentially, but that there is a one-time drop in
 value when the reward goes from being immediate to being in the future [@Laibson1997]. In this
-model, known as the beta&ndash;delta model, the value of a future reward is
+model, known as the beta&ndash;delta or quasi-hyperbolic model, the value of a future reward is
 
 $$
 V(r, t) = \begin{cases}
@@ -217,7 +217,16 @@ options. Each uncertain option has a 25% chance of producing a payoff of 4, and
 a 75% chance of producing a payoff of 0. Once a high-payoff uncertain option is
 found, it can be selected on every subsequent choice.
 
-![Discounting vis](figures/discounting.pdf){#fig:discounting}
+![Effects of exploration over time for different discount curves in a simple
+exploratory choice task (see text for more details). The top row of panels show
+the degree of discounting at each time step. The bottom row of panels show the
+expected change of undiscounted (gray) and discounted (black) reward at each
+time step from exploring at the *first* action. The left panels shows exponential
+discounting, the center panels show quasi-hyperbolic discounting, and the right
+panels show quasi-hyperbolic discounting with a front-end delay. Exploration
+appears worthwhile to an agent with exponential discounting or quasi-hyperbolic
+discounting with a delay, but not to an agent with quasi-hyperbolic discounting
+and no delay.](figures/discounting.pdf){#fig:discounting}
 
 This scenario presents an explore exploit dilemma because as long as a
 high-payoff option has not been found, the best immediate action is $A$, with an
@@ -632,7 +641,7 @@ ordered.
 
 #### Immediate and delayed conditions.
 
-Participants were pseudorandomly assigned to one of two conditions. In the
+Participants were pseudo-randomly assigned to one of two conditions. In the
 Immediate condition, participants completed the task produced by a choice in the
 work period immediately following the choice. In the Delayed condition,
 participants completed the task produced by a choice after eight intervening

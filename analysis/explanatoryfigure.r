@@ -19,7 +19,7 @@ create_graphs = function(rewardseq, beta, delta, initialrewardtime, maxtime) {
 
   df$discountpoints = ifelse(df$reward != 0, df$discount, NA)
 
-  colors = c('#666666', '#222222')
+  colors = c('#BBBBBB', '#222222')
 
   discountplot = ggplot(df, aes(x=time, y=discount)) + geom_line() +
     geom_point(aes(x=time, y=discountpoints), size=3) +
@@ -28,8 +28,8 @@ create_graphs = function(rewardseq, beta, delta, initialrewardtime, maxtime) {
     ylab("discount factor")
 
   rewardplot = ggplot(df, aes(x=time, y=reward, group=rewardtype, fill=rewardtype,
-                                        width=ifelse(rewardtype=="discounted", .6, .75))) +
-    geom_bar(stat='identity', position='identity') +
+                                        width=ifelse(rewardtype=="discounted", .5, .75))) +
+    geom_bar(stat='identity', position='identity', color="black", size=.3) +
     geom_hline(yintercept=0) +
     scale_fill_manual(name="reward type", values=colors) +
     scale_x_continuous(breaks=c(seq(1, maxtime, 1), maxtime+2),
