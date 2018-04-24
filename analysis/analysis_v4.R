@@ -29,7 +29,60 @@ choicedata$envNum = choicedata$trial %/% 10
 choicedata$waitDiff = 0
 index = list(c(1,2,3), c(1,3,2), c(2,1,3), c(2,3,1), c(3,1,2), c(3,2,1))
 for (i in 1:nrow(choicedata)) {
-  choicedata[i, 'waitDiff'] = c(-5, 0, 5)[index[[choicedata[i, 'condition']]][1+choicedata[i, 'envNum']]]
+  choicedata[i, 'waitDiff'] = c(-5, 0, 5)[index[[1+choicedata[i, 'condition']]][1+choicedata[i, 'envNum']]]
 }
 
 choicedata %>% group_by(waitDiff) %>% summarize(mean(choiceOutcome))
+
+
+waitmeans = choicedata %>% group_by(uniqueid) %>% filter(envTrial > 1) %>% summarize(waitmean=mean(choiceOutcome)) %>% .$waitmean
+
+t.test(waitmeans, mu=.5)
+
+N = nrow(choicedata)
+L = nlevels(choicedata$uniqueid)
+y = 1-choicedata$choiceOutcome
+waitAdd = choicedata$waitDiff / 5
+ll = as.integer(choicedata$uniqueid)
+
+model <- stan_model(file="stan_models/regression_T_v4.stan")
+fit <- sampling(model, data=c("N", "L", "y", "ll", "waitAdd"), chains=4, iter=1000, seed=1234)
+
+print(fit, pars=c("intercept_mean", "intercept_sd",
+                  "waitAdd_mean", "waitAdd_sd"))
+
+extracted = rstan::extract(fit, permuted=TRUE, pars=c('intercept_mean', 'intercept_sd',
+                                                      'waitAdd_mean', 'waitAdd_sd'))
+
+individuals = rstan::extract(fit, permuted=TRUE, pars=c('subj_intercept', 'subj_waitAdd'))
+
+extracted = lapply(extracted, as.numeric)
+extracted = data.frame(extracted)
+extracted$sample = 1:2000
+
+params_w_predictions = extracted[rep(1:nrow(extracted), each=3),]
+params_w_predictions = params_w_predictions %>%
+  mutate(x = rep(c(-1, 0, 1), 2000),
+         y = 1/(1+exp(-1 * (intercept_mean + x * waitAdd_mean)))) %>%
+  group_by(x) %>%
+  summarize(lower=quantile(y, probs=.025),
+            upper=quantile(y, probs=.975),
+            y=mean(y))
+
+individuals_w_predictions = data.frame()
+for (i in 1:max(ll)) {
+  subject_params = cbind.data.frame(subject=rep(i, 2000),
+                                    intercept = as.numeric(individuals$subj_intercept[,i]),
+                                    waitAdd = as.numeric(individuals$subj_waitAdd[,i]))
+  subject_params = subject_params[rep(1:nrow(subject_params), each=3), ]
+  subject_params = subject_params %>%
+    mutate(x=rep(c(-1, 0, 1), 2000),
+           y=1/(1 + exp(-1 * (intercept + waitAdd * x)))) %>%
+    group_by(x) %>%
+    summarize(subject=first(subject), y=mean(y))
+  individuals_w_predictions <- rbind(individuals_w_predictions, subject_params)
+}
+
+ggplot() + geom_line(data=individuals_w_predictions, aes(x=x, y=y, group=subject), size=.5, alpha=.3) +
+  geom_line(data=params_w_predictions, aes(x=x, y=y), size=2) +
+  theme_minimal()
