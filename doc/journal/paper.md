@@ -15,19 +15,19 @@ geometry: margin=1in
 
 Decision makers that act in uncertain environments frequently face
 dilemmas between exploiting options known to be rewarding and exploring options
-that are uncertain. A kid buying ice cream, for example, must select between
+that are uncertain. A child buying ice cream, for example, must select between
 getting a cone of her favorite flavor and trying something new that might become
 a new favorite but could also be disappointing. Researchers in reinforcement
 learning have created a large body of knowledge about how people and
-animals handle the explore&ndash;exploit dilemma [@Mehlhorn2015] and how the problem
+animals handle the explore&ndash;exploit dilemma [@Mehlhorn2015] as well as how the problem
 should be approached computationally [@sutton1998reinforcement].
 
 A key aspect of exploratory decision making is that it is spread over time. With
-a single decision, exploration makes little sense. If, heaven forbid, you only
+only a single decision, exploration makes little sense. If, heaven forbid, you only
 have one remaining chance to buy ice cream in your life, you should buy your
-favorite flavor, as that is the flavor you expect to enjoy the most. Exploring
+favorite flavor, because that is the flavor you expect to enjoy the most. Exploring
 new flavors has the possibility of introducing you to a new favorite, but it is
-only when there will be many more chances to get that new flavor in the future
+only when there will be many more chances to choose that new flavor in the future
 that the risk of a disappointment starts to look worthwhile.
 
 While research on exploratory choice acknowledges that the value of exploration
@@ -49,12 +49,12 @@ present bias on exploration. While we did not find an effect of present bias on
 exploratory choice, a follow-up experiment revealed that our consumable rewards
 did not in fact produce a reliable present bias, despite evidence that they did
 so in earier studies [@Solnick1980; @Navarick1998]. Nonetheless, we hope that
-this work can serve as an interesting first step towards unifying our
+this work can serve as a useful first step towards unifying our
 understanding of exploratory and intertemporal decision making.
 
 # Exploration inside and outside the lab
 
-Many researchers have examined patterns of exploration both in
+Many researchers have examined patterns of exploration, both in
 naturalistic settings and in the lab. Interestingly, differing findings have
 emerged as to the nature and severity of biases in exploratory choice.
 
@@ -158,11 +158,11 @@ or speed-up required to observe preference reversals is usually several days. Wi
 such as the cessation of an annoying noise [@Solnick1980], watching a video
 when bored [@Navarick1998], or drinking soda
 when thirsty [@Brown2009], a bias towards immediate rewards has been observed on the scale of
-minutes or even seconds.
+minutes or seconds.
 
 There is debate about how to formally describe non-exponential discounting. Many
 studies have found that humans and animals appear to discount future rewards at
-a hyperbolic rate, allowing the value of a future reward to be written
+a hyperbolic rate, allowing the value of a future reward to be written as
 
 $$
 V(r, t) = \frac{r}{1+kt}
@@ -207,14 +207,15 @@ because at some point the distant gains from continued exploration are not worth
 their immediate costs [@LeMens2011].
 But as past theoretical work has highlighted, discounting that is too steep or
 that exhibits a present bias can lead to chronic over-exploitation and
-under-exploration [@March1991, @Levinthal1993].
+under-exploration [@March1991; @Levinthal1993].
 
 To understand how patterns of discounting affect exploration, consider a simple
 scenario in which an agent must make a sequence of choices between
 two actions. Action $A$ is to choose a sure-bet option that always provides a
 payoff of 2. Action $B$ is to choose from a large set of uncertain
-options. Each uncertain option has a 25% chance of producing a payoff of 4, and
-a 75% chance of producing a payoff of 0. Once a high-payoff uncertain option is
+options. For each uncertain option, there is a 25% chance that it produces a
+consistent payoff of 4, and a 75% chance that it produces a payoff of 0.
+Once a high-payoff uncertain option is
 found, it can be selected on every subsequent choice.
 
 ![Effects of exploration over time for different discount curves in a simple
@@ -228,9 +229,9 @@ appears worthwhile to an agent with exponential discounting or quasi-hyperbolic
 discounting with a delay, but not to an agent with quasi-hyperbolic discounting
 and no delay.](figures/discounting.pdf){#fig:discounting}
 
-This scenario presents an explore exploit dilemma because as long as a
+This scenario presents an explore&ndash;exploit dilemma because as long as a
 high-payoff option has not been found, the best immediate action is $A$, with an
-expected payoff of $2$, rather than action $B$, with an expected
+expected payoff of $2$, rather than $B$, with an expected
 payoff of $.25\cdot4=1$. Long term payoffs, in contrast, are increased by
 exploring the options available through action $B$, because the agent may find a
 high-payoff option that can be exploited on all future choices.
@@ -239,7 +240,7 @@ Whether the agent decides to forgo the immediate gains of exploiting $A$ in
 order to explore $B$ will depend on how much it values the future. Figure
 @fig:discounting shows the effects of various patterns of discounting on the
 expected rewards over a sequence of five choices. The left column shows the case of
-exponential discounting. The top graph shows the exponential discounting curve,
+exponential discounting with $\delta=.9$. The top graph shows the exponential discounting curve,
 with dots indicating the time and weight of each of the five choices. The bottom
 graph shows the change in expected reward at each choice that is caused by
 selecting action $B$ rather than $A$ at the *first* choice. (This analysis
@@ -249,15 +250,15 @@ over $A$ causes a steep decrease in expected reward, because it trades an
 expected payoff of $2$ for an expected payoff of $1$. At times 2&ndash;5,
 however, the expected payoff goes up; choosing $B$ at time 1 can only increase
 payoffs at later times, by revealing an high-payoff option. At the far right of
-the graph, we see that summed discounted reward, in black, is positive, and thus that the
+the graph, we see that the summed discounted change in reward, in black, is positive, and thus that the
 agent will choose to explore. The undiscounted reward, in gray, is larger, but
 doesn't differ in sign from the reward after mild exponential discounting.
 
 The center column shows the case of beta&ndash;delta, or psuedo-hyperbolic,
-discounting. As the top graph shows, rewards from later time points are weighted
+discounting, with $\delta=.9$ and $\beta=.5$. As the top graph shows, rewards from later time points are weighted
 much less than in exponential discounting. Because of this, the expected gain in
 future reward for choosing $B$ becomes smaller, while the immediate expected
-loss remains the same. The summed discounted reward becomes negative, and the
+loss remains the same. The summed discounted change in reward becomes negative, and the
 agent adopts a completely exploitative policy of choosing $A$ instead of initially exploring the
 uncertain action $B$.
 
@@ -296,7 +297,7 @@ example, found that thirsty participants showed present bias when asked to
 choose between larger and smaller juice rewards separated by a few minutes. In
 other cases, the choice between a smaller-sooner and larger-later reward is
 offered repeatedly, but without explicit description, and participants are
-allowed to build a preference through experience. Using this, researchers have
+allowed to build a preference through experience. Using this approach, researchers have
 found present biases on the scale of seconds for playing a video game, watching a movie, or relief from
 an annoying noise [@Navarick1998; @Millar1984; @Solnick1980].
 
@@ -339,11 +340,14 @@ produce a consistent preference towards immediate rewards.
 
 ## Methods
 
-### Participants
+### Participants.
 Forty participants completed the experiment, which was conducted over
 Amazon Mechanical Turk (AMT) using the psiTurk framework [@Gureckis2015a].
+The participants had a mean age of 37.7 (SD=10.6). Twenty eight self-reported female, twelve male.
 Participants were paid $5.00 for their participation, with a performance-based
-bonus of up to $3.00. All participants received the full $3.00 bonus.
+bonus of up to $3.00. The experiment and all following experiments were approved
+by the Institutional Review Board at New York University. 
+All participants received the full $3.00 bonus.
 Participants were pseudo-randomly counterbalanced across two conditions.
 
 
@@ -401,7 +405,7 @@ allowing the participant to watch their chosen video instead. However, the
 machines did not always function, and participants had to make a decision about
 how to set the machine before each use.
 
-#### Decision-making task
+#### Decision-making task and conditions.
 Following the initial 10 periods, participants were shown a machine before each
 work period and,
 as shown in Figure {@fig:exp1task}c, had to select
@@ -466,7 +470,8 @@ slider task and of the video-watching task on a 1 to 7 scale.
 
 ## Results
 
-Participants rated the video as more enjoyable on average (5.65 out of 7) than the
+As a basic check of our consumption tasks, we confirmed that participants rated
+the video as more enjoyable on average (5.65 out of 7) than the
 slider task (3.13 out of 7), $t(39)=9.26$, $p<.001$.
 
 To analyze participants' trial-by-trial decision-making, we conducted a hierarchical
@@ -547,7 +552,7 @@ redesigned to make the statistics of the task more transparent.
 Finally, we measured participants' impulsivity, a potentially important
 covariate, using the Barratt Impulsiveness Scale [@Patton1995]. There is
 evidence that this scale correlates with present-focused behavior in repeated
-choice tasks [@Otto2012], though other studies have not found a relation [@Brown2009].
+choice tasks [@Otto2012], though other studies have not found a relationship [@Brown2009].
 
 ## Methods
 
@@ -561,8 +566,7 @@ at New York University. The participants had a mean age of 23.9 (SD=6.1). Fifty
 eight self-reported female, forty one male. Participants received $10 for
 taking part in the study, which lasted approximately one hour, and received a
 performance-based bonus of up to $5. All but one participant received a bonus of
-$5, with the remaining participant receiving $4.4. The experiment was approved
-by the Institutional Review Board at New York University. Participants who
+$5, with the remaining participant receiving $4.4. Participants who
 failed a post-instructions questionnaire more than twice were excluded from
 further analyses. Ten participants were excluded in this manner.
 
@@ -598,11 +602,6 @@ watched the video through a player on the computer screen. Unlike in Experiment
 1, they did not have to hold down a button to play the video. They were free to
 fast forward or rewind the video at will, and could also switch among the videos
 at any time by clicking one of four tabs above the player (see Figure {@fig:exp2tasks}b).
-
-To incentivize participants to attend to and perform the slider task, they were
-penalized if they missed more than 10% of the sliders. For each percentage over
-10% of sliders that were not set to 50 over the course of the experiment, $.20
-was deducted from a bonus that started at $5.00. 
 
 #### Choice task.
 
@@ -661,11 +660,17 @@ icon to the right of the queue that outcome was performed immediately. This
 means that in the Immediate condition the queue acted simply as a history of the
 past eight outcomes.
 
-#### Post-task questions.
+#### Training, incentives, and post-task questions.
 
-Following the final work period, participants were asked to rate their enjoyment
-of the slider task and of the video task on a scale from 1 to 7, where 1
-indicated extremely unenjoyable and 7 indicated extremely enjoyable.
+As in Experiment 1, participants had opportunities to practice the decision
+making and consumption tasks prior to the main task, and rated their enjoyment
+of the slider and video tasks on a scale from 1 to 7.
+
+To incentivize participants to attend to and perform the slider task, they were
+penalized if they missed more than 10% of the sliders. For each percentage over
+10% of sliders that were not set to 50 over the course of the experiment, $.20
+was deducted from a bonus that started at $5.00. 
+
 
 ## Results
 
@@ -755,8 +760,8 @@ main effect of delay still included zero, $CI=[-.08, .72]$.
 In both Experiments 1 and 2, we found no evidence that delaying rewards affected
 the degree of exploratory behavior, and thus no evidence that exploratory choice
 is influenced by present bias. Experiment 2 attempted to fix several flaws of
-Experiment 1: collecting data in person, making the consumption tasks more
-pleasant and aversive, increasing the reward delay, and simplifying the
+Experiment 1 by collecting data in person, making the consumption tasks more
+pleasant or more aversive, increasing the reward delay, and simplifying the
 exploratory choice task. This may indicate that there is truly no effect of
 present bias on exploratory choice, but it remains possible that this null
 effect is due to a weakness in our experiment design.
@@ -776,8 +781,9 @@ It may be that the consumption
 tasks and setting we used did not, in fact induce present bias, which would mean
 that inducing a delay would have no predicted effect. Therefore, in Experiment 3
 we conducted a simple follow-up experiment using the two consumption tasks to
-test whether people have a present bias for watching the video immediately,
-based on past experiments which studied time preferences for videos or video
+test whether people have a present bias for watching the videos and avoiding the
+slider task and static noises,
+based on the design of past experiments which studied time preferences for videos or video
 games [@Millar1984; @Navarick1998].
 
 ## Methods
@@ -837,9 +843,12 @@ matter, participants would display a bias towards selecting the option with the
 immediate video task.
 
 As in Experiments 1 and 2, participants were asked to rate their enjoyment of
-the two consumption tasks following the experiment.
+the two consumption tasks following the experiment. They were also penalized for
+missing sliders using the same scoring method as Experiment 2.
 
 ## Results
+
+ASSUME THEY'RE VERY NULL
 
 # Discussion
 
@@ -853,7 +862,7 @@ choice tasks [@Kirby1995; @Solnick1980; @Brown2009]. In two experiments we found
 that adding a temporal delay did not affect exploration, suggesting that people
 treat exploratory choices differently from intertemporal choices. However, a
 followup study showed that the rewards used in our task did not consistently
-produce present bias, making it difficult to draw any clear conclusions from our
+produce present bias, making it difficult to draw clear conclusions from our
 earlier results. In this section, we briefly discuss why our rewards may not
 have been motivationally effective, as well as delve into the similarities and
 differences between exploratory and intertemporal choice.
@@ -887,14 +896,14 @@ multiple stimuli (videos, noises and sliders) would overcome any weaknesses in
 the implementation of any one, but this may not have been the case.
 
 It is also worth considering that these older experiments might
-not meet current statistical standards, and the motivational effectiveness of these sorts of
+not meet current statistical standards, and that the motivational effectiveness of these sorts of
 consumable rewards should be reconsidered. @Navarick1998, in fact, did not
 report present bias at the population level, and focused his analyses on
 individuals. @Solnick1980 and @Millar1984 did make claims of present bias over
 short time scales on a group level, but used between-participant designs with
 quite small groups of 10 to 15 people per condition. Their results in many cases
 appear strong qualitatively but the statistics calculated are not clearly
-reported. Even more recent tests of present bias with consumable rewards reveal
+reported. More recent tests of present bias with consumable rewards also reveal
 some statistical weaknesses; in their experiments with soda as a reward,
 @Brown2009 first ran 44 participants and then apparently increased their sample
 size to 55 after reviewing the results, and also only found an effect of delaying
@@ -952,15 +961,15 @@ of the future [@daw2006cortical; @Speekenbrink2015; @Wilson2014a]. To the extent
 that people use these strategies, they may not change their behavior based on
 the timing of rewards, even if doing so would be in line with their preferences.
 
-These considerations of this and the preceding subsection suggest that
+The considerations of this discussion suggest that
 continuing to study exploratory choice in the lab, in order to show that present
 bias simply does or does not exist, may not be most fruitful path for future
 research. A more rewarding route may be to further consider the range of
 exploratory choices in their true, naturalistic settings, and seek to understand
-in when exploratory choice is treated similarly to intertemporal
+when exploratory choice is treated similarly to intertemporal
 choice,and when it is not. While field data do not allow the experimental
 control available in the lab, they would allow researchers to collect data with
-significan temporal spans and where major motivational forces, from present bias
+significant temporal spans and in situations where major motivational forces, from present bias
 to curiosity, are at play.
 
 # References
