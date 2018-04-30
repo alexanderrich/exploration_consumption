@@ -790,6 +790,13 @@ games [@Millar1984; @Navarick1998].
 
 ### Participants.
 
+XXX undergraduate students at New York University took part in the study
+for extra credit. The participants had a mean age of XX (SD=XX). XX
+self-reported female, XX male. Participants received a performance-based bonus
+of up to $5. All participants received the full $5 bonus. Participants who
+failed a post-instructions questionnaire more than twice were excluded from
+further analyses. No participant was excluded in this manner.
+
 ### Design and procedure.
 
 ![Examples of the Experiment 3 tasks. (a): an example of the slider task, in
@@ -848,7 +855,43 @@ missing sliders using the same scoring method as Experiment 2.
 
 ## Results
 
-ASSUME THEY'RE VERY NULL
+![Model-based estimates of participants' probability of choosing the
+immediate-video option when that option provides 10 seconds less than, the same
+as, or 10 seconds more than the delayed-video option. The thick line and shaded
+region indicates the mean and 95% posterior interval for the population-level
+parameters, while the thin lines indicate the mean posterior parameters for each
+of the individual participants. Participants showed neither a preference for
+immediate video not a clear preference for greater video amounts.
+](figures/exp3results.pdf){#fig:exp3results}
+
+As in Experiments 1 and 2, participants self-reported liking the video task more
+than the slider task, $t(XX)=XX$, $p<.001$. They rated the videos XX out of 7, on average, and the
+sliders XX out of 7, on average.
+
+To test whether this preference was expressed in the participants choice
+behavior, and whether participants preferred watching the video immediately, we
+conducted a hierarchical Bayesian logistic regression on trial-by-trial choices.
+We included individual-level parameters for over-all preference for immediate
+reward and for the effect of the difference in video time between the immediate
+and delayed options. The option difference was coded as $-1$ for the 25 second
+immediate video, $0$ for the 30 second immediate video, and $1$ for the 35
+second immediate video. As in earlier analyses, participants' parameters were assumed to be drawn from a
+t distribution with $df=5$. The priors on the
+the population-level predictor coefficients, and on the standard
+deviation of the t distributions from which individual-level parameters were drawn, were (truncated)
+normal distributions with a mean of 0 and a standard deviation of 5. We
+estimated the model using the Stan modeling language using the same procedure as
+Experiments 1 and 2 [@Carpenter2017].
+
+The model results are plotted in Figure @fig:exp3results. We found that
+participants were not very sensitive to our experimental manipulations. While
+some individual participants appeared to prefer either the immediate or the
+delayed option, the population as a whole showed no average preference, $CI=[XX,
+XX]$. Participants also showed almost no sensitivity to which option produced
+more video time, $CI=[XX, XX]$, even though choosing the superior option in the
+two non-equal-time groups of trials would have allowed them to watch 10 seconds
+more video and perform two fewer sliders on each trial. It may be that this
+manipulation was too subtle for many participants to become aware of it.
 
 # Discussion
 
@@ -891,9 +934,12 @@ experiments of @Navarick1998 and @Millar1984 were conducted in a dark room,
 which might have cut down on external distractions, while ours were not. The
 experiments of @Solnick1980 used louder noises than ours, and were conducted with a distractor task of solving
 math problems which might have caused people to make their choices with more
-impulsivity and less cognitive reflection. We hoped that our combination of
+impulsivity and less cognitive reflection. 
+We hoped that our combination of
 multiple stimuli (videos, noises and sliders) would overcome any weaknesses in
-the implementation of any one, but this may not have been the case.
+the implementation of any one, but this may not have been the case. Additionally, the setup of Experiment 3 could
+have lead some participants to purposely adopt negative discount rates, saving
+the positive experience for last, as has been found in some past experiments [@Loewenstein1987].
 
 It is also worth considering that these older experiments might
 not meet current statistical standards, and that the motivational effectiveness of these sorts of

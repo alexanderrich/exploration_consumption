@@ -24,6 +24,11 @@ choicedata <- choicedata %>% filter(!(uniqueid %in% excluded_ids))
 questiondata <- questiondata %>% filter(!(uniqueid %in% excluded_ids))
 choicedata$uniqueid <- factor(choicedata$uniqueid)
 
+questiondata$enjoymentdiff <- questiondata$videoenjoyment - questiondata$sliderenjoyment
+mean(questiondata$videoenjoyment)
+mean(questiondata$sliderenjoyment)
+t.test(questiondata$enjoymentdiff)
+
 choicedata$envNum = choicedata$trial %/% 10
 
 choicedata$waitDiff = 0
@@ -42,19 +47,19 @@ t.test(waitmeans, mu=.5)
 N = nrow(choicedata)
 L = nlevels(choicedata$uniqueid)
 y = 1-choicedata$choiceOutcome
-waitAdd = choicedata$waitDiff / 5
+immAdd = -choicedata$waitDiff / 5
 ll = as.integer(choicedata$uniqueid)
 
 model <- stan_model(file="stan_models/regression_T_v4.stan")
-fit <- sampling(model, data=c("N", "L", "y", "ll", "waitAdd"), chains=4, iter=1000, seed=1234)
+fit <- sampling(model, data=c("N", "L", "y", "ll", "immAdd"), chains=4, iter=1000, seed=1234)
 
 print(fit, pars=c("intercept_mean", "intercept_sd",
-                  "waitAdd_mean", "waitAdd_sd"))
+                  "immAdd_mean", "immAdd_sd"))
 
 extracted = rstan::extract(fit, permuted=TRUE, pars=c('intercept_mean', 'intercept_sd',
-                                                      'waitAdd_mean', 'waitAdd_sd'))
+                                                      'immAdd_mean', 'immAdd_sd'))
 
-individuals = rstan::extract(fit, permuted=TRUE, pars=c('subj_intercept', 'subj_waitAdd'))
+individuals = rstan::extract(fit, permuted=TRUE, pars=c('subj_intercept', 'subj_immAdd'))
 
 extracted = lapply(extracted, as.numeric)
 extracted = data.frame(extracted)
@@ -63,7 +68,7 @@ extracted$sample = 1:2000
 params_w_predictions = extracted[rep(1:nrow(extracted), each=3),]
 params_w_predictions = params_w_predictions %>%
   mutate(x = rep(c(-1, 0, 1), 2000),
-         y = 1/(1+exp(-1 * (intercept_mean + x * waitAdd_mean)))) %>%
+         y = 1/(1+exp(-1 * (intercept_mean + x * immAdd_mean)))) %>%
   group_by(x) %>%
   summarize(lower=quantile(y, probs=.025),
             upper=quantile(y, probs=.975),
@@ -73,11 +78,11 @@ individuals_w_predictions = data.frame()
 for (i in 1:max(ll)) {
   subject_params = cbind.data.frame(subject=rep(i, 2000),
                                     intercept = as.numeric(individuals$subj_intercept[,i]),
-                                    waitAdd = as.numeric(individuals$subj_waitAdd[,i]))
+                                    immAdd = as.numeric(individuals$subj_immAdd[,i]))
   subject_params = subject_params[rep(1:nrow(subject_params), each=3), ]
   subject_params = subject_params %>%
     mutate(x=rep(c(-1, 0, 1), 2000),
-           y=1/(1 + exp(-1 * (intercept + waitAdd * x)))) %>%
+           y=1/(1 + exp(-1 * (intercept + immAdd * x)))) %>%
     group_by(x) %>%
     summarize(subject=first(subject), y=mean(y))
   individuals_w_predictions <- rbind(individuals_w_predictions, subject_params)
@@ -85,4 +90,10 @@ for (i in 1:max(ll)) {
 
 ggplot() + geom_line(data=individuals_w_predictions, aes(x=x, y=y, group=subject), size=.5, alpha=.3) +
   geom_line(data=params_w_predictions, aes(x=x, y=y), size=2) +
-  theme_minimal()
+  geom_ribbon(data=params_w_predictions, aes(x=x, ymin=lower, ymax=upper), alpha=.3) +
+  theme_minimal() +
+  xlab("immediate video minus delayed video (seconds)") +
+  ylab("Proportion immediate video choices") +
+  scale_x_continuous(breaks=c(-1, 0, 1), labels=c("-10", "0", "+10"))
+
+ggsave(filename="../doc/journal/figures/exp3results.pdf", width=5, height=3.5, useDingbats=F)
