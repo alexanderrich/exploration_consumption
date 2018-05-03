@@ -11,22 +11,25 @@ header-includes:
 geometry: margin=1in
 ---
 
-# Does a present bias influence exploratory choice?
+\hl{Abstract?}
 
-Decision makers that act in uncertain environments frequently face
-dilemmas between exploiting options known to be rewarding and exploring options
-that are uncertain. A child buying ice cream, for example, must select between
+# Does a bias for the present influence exploratory choice?
+
+Decision makers acting in uncertain environments frequently face the
+dilemma between choosing options known to be rewarding (i.e., exploitation) and 
+choosing options
+that are unknown or uncertain (i.e., exploration). A child buying ice cream, for example, must select between
 getting a cone of her favorite flavor and trying something new that might become
-a new favorite but could also be disappointing. Researchers in reinforcement
+a favorite but could also be disappointing. Researchers in reinforcement
 learning have created a large body of knowledge about how people and
-animals handle the explore&ndash;exploit dilemma [@Mehlhorn2015] as well as how the problem
+animals balance this ``explore&ndash;exploit dilemma'' [@Mehlhorn2015] as well as how the problem
 should be approached computationally [@sutton1998reinforcement].
 
 A key aspect of exploratory decision making is that it is spread over time. With
-only a single decision, exploration makes little sense. If, heaven forbid, you only
-have one remaining chance to buy ice cream in your life, you should buy your
-favorite flavor, because that is the flavor you expect to enjoy the most. Exploring
-new flavors has the possibility of introducing you to a new favorite, but it is
+only a single decision, exploration makes little sense. If a decision making knew
+with certainty they only had one remaining chance to buy ice cream in their life, they 
+should buy their favorite flavor, because that is the flavor they expect to enjoy the most. 
+Exploring new flavors has the possibility of introducing you to a new favorite, but it is
 only when there will be many more chances to choose that new flavor in the future
 that the risk of a disappointment starts to look worthwhile.
 
@@ -77,9 +80,16 @@ experienced events affects the development of learned helplessness
 @Teodorescu2014a]. In the case of depression, interventions aimed at increasing
 the exploration of activities that might be rewarding have been found to be as
 effective as those with a more cognitive orientation [@Jacobson1996].
+\hl{Is learned helplessness really a phenomena from outside the lab?  Seems to me
+more like a model established in the lab that people analogize to things like
+depression.}
 
 Under-exploration also seems to occur in the development of complex skills, such
-as flying a plane or playing a sport [@Gopher1989]. In these settings, an "emphasis
+as flying a plane or playing a sport [@Gopher1989]. 
+\hl{There is a Wai-tat Fu/Wayne Gray paper about how people get trapped doing
+complex menu-driving interfaces when there are faster shortcuts available?  i think
+this is based on some solid experiments in the UI/UX literature.  seems related}
+In these settings, an "emphasis
 change" training method that encourages people to continually explore the
 performance space leads to greater performance gains than unguided practice or more complex
 training methods.  Without this intervention, people often enter a "local
@@ -93,6 +103,10 @@ increase inter-group contact reduce stereotypes [@Shook2008]. The crowding
 out of exploration by exploitation is a concern in organizational behavior as
 well [@March1991; @Levinthal1993], prompting research into organizational
 structures that may preserve exploration [@Fang2010].
+
+\hl{There is some recent Brad Love stuff on exploration in supermarket
+shopping it might be nice to mention here.  Also find maladaptive exploration
+if I remember right}
 
 ## Exploration inside the lab
 
@@ -116,7 +130,7 @@ have been obtained within and across a variety of other studies and paradigms
 @Sang2011].
 
 These experimental studies raise the question of why under-exploration appears
-more widespread in the field, but not in the lab. One possibility is that both
+more widespread outside the lab, but not in the lab. One possibility is that both
 forms of deviation from optimality are in fact prevalent, though perhaps in
 different settings, and that the seemingly general bias toward under-exploration
 is illusory. An alternative is that there are some important aspects of real-world
@@ -126,6 +140,10 @@ One clear possibility is that in real world exploration, choices and outcomes
 are spread out over time in a manner that is rarely found in the lab, and that
 people's bias towards immediate rewards might therefore account for a portion of
 people's tendency to under-explore.
+\hl{One possibility we discuss in Juni is also that costs are often not
+easy to measure and control in real world... so for instance they fact that 
+most people date 0-1 people before marriage might be explained in terms of
+the high cost for most people of dating.}
 
 # Temporal discounting
 
@@ -139,6 +157,7 @@ $$
 V(r,t) = re^{-t\delta}
 $$
 
+\hl{should definve V?}
 In exponential discounting, each additional unit of waiting time decreases the
 value of a reward by an equal proportion [@samuelson1937note, @Frederick2002]. This means that the
 relative values of an early and a late rewards are the same no matter what time point they
@@ -183,8 +202,8 @@ $$
 
 where $\delta$ is the rate of exponential discounting and $\beta$ is the degree
 of present bias. This model suffers from ambiguity in when exactly the "present"
-ends and the future begins. (E.g., should the value of reward received in 30
-seconds be discounted by $\beta$, or should it be considered immediate?)
+ends and the future begins (e.g., should the value of reward received in 30
+seconds be discounted by $\beta$, or should it be considered immediate?).
 However, it captures in a simple and tractible way many of the qualities of
 human intertemporal choice, and for this reason we will adopt it for our
 additional analyses below.
@@ -276,7 +295,7 @@ the exploratory action.
 
 ## Capturing present bias in exploratory choice
 
-As alluded to earlier, several approached have been used to study present bias
+As alluded to earlier, several approaches have been used to study present bias
 in the lab. Many studies use monetary rewards, and offer participants various
 one-off choices between different quantities of money at different delays to
 determine their discounting curve [@myerson1995discounting]. However,
@@ -360,10 +379,10 @@ make choices throughout the experiment that would give them a chance to watch a
 YouTube video instead. The number of remaining work periods in the experiment was shown
 at the top of the screen, as was the number of seconds left in the current work period.
 
-![Examples of the Experiment 1 tasks. (a): an example of the slider task. Participants had to move all
-  sliders to ``50'' in 30 seconds. (b): the video-watching task.
+![Examples of the Experiment 1 tasks. (a): The slider task. Participants had to move all
+  sliders to ``50'' in 30 seconds. (b): The video-watching task.
   Participants had to hold the space bar to watch their chosen video. (c):
-  the decision-making task. Participants had to choose to run the machine with
+  The decision-making task. Participants had to choose to run the machine with
   the current spinner or try a new spinner. If their chosen spinner landed on
   a gold wedge, they performed the video-watching task instead of the
   slider task.](figures/taskpictures.png){#fig:exp1task}
@@ -377,7 +396,7 @@ at the top of the screen, as was the number of seconds left in the current work 
   (b): the display seen by participants in the delayed condition of
   Experiment 1.](figures/machinemappictures.png){#fig:exp1machinemap}
 
-The slider task was based of a task previously used by [@Gill2012]. In each
+The slider task was based on a task previously used by [@Gill2012]. In each
 period of the slider task, five horizontal sliders appeared on the screen (Figure {@fig:exp1task}a). Each
 started at a random setting between 0 and 100, with the slider's value
 shown to its right, and with a random horizontal offset so that the
@@ -391,7 +410,7 @@ all five sliders were available after 20 seconds.
 
 Before beginning the experiment, participants chose one of four videos available
 on YouTube: an episode of "Planet Earth", and episode of "The Great British
-Bakeoff", and episode of "Mythbusters", or an Ellen Degeneres comedy special.
+Bakeoff", and episode of "Mythbusters", or an "Ellen Degeneres comedy special".
 The video was embedded in the experiment with all user controls (such as
 skipping ahead) disabled (Figure {@fig:exp1task}b). When given access to the video, participants had to keep the
 browser window open and hold down the space bar for the video to play. This allowed us to ensure that
@@ -732,7 +751,7 @@ to the current value of the spinner.
 Our preregistered analyses provided no support for our hypotheses. As an
 additional, exploratory analysis, we re-ran the Bayesian model replacing
 participants' BIS scores with their ratings difference between the slider task
-and the video task in post-experiment questionnaire. Over all, participants rated
+and the video task in post-experiment questionnaire. Overall, participants rated
 the video task as more enjoyable (6.37 out of 7 on average) than the slider task,
 (3.43 out of 7), $t(89)=16.3, p<.001$. Our intuition was that
 participants who rated the video task much higher than the slider task may have
@@ -929,7 +948,7 @@ this preference shrank when a 60 second front-end delay was added.
 
 Assuming that these past results are indicative of a true underlying present
 bias in the average populations, it may by that our experiment differed from
-past experiments in ways that undermined present bias. For example, The
+past experiments in ways that undermined present bias. For example, the
 experiments of @Navarick1998 and @Millar1984 were conducted in a dark room,
 which might have cut down on external distractions, while ours were not. The
 experiments of @Solnick1980 used louder noises than ours, and were conducted with a distractor task of solving
@@ -987,7 +1006,7 @@ rewards now and later. In exploratory choice, the tradeoff between the present
 and future is implicit, with exploring leading to a decreased probability of
 high reward immediately and a greater probability of high reward in later
 choices. While past work shows that people are able to consider these reward
-tradeoffs in some situations[@Wilson2014a; @Rich2017], doing so might not be
+tradeoffs in some situations [@Wilson2014a; @Rich2017], doing so might not be
 natural or easy in all situations. Even in standard intertemporal choice tasks,
 the effect of time delays on decision making seems to be fragile and sensitive
 to contextual effects [@Ebert2007; @Lempert2015a].
