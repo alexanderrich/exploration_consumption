@@ -11,7 +11,7 @@ header-includes:
 geometry: margin=1in
 ---
 
-\hl{Abstract?}
+<!-- \hl{Abstract?} -->
 
 # Does a bias for the present influence exploratory choice?
 
@@ -72,7 +72,8 @@ been described as an example of insufficient exploration. In learned
 helplessness, an organism experiences the absence of control over the
 environment, learns that the environment is uncontrollable, and thus ceases to
 take actions that might allow it to discover that it can in fact exert control.
-Learned helplessness has been proposed to underly some forms of depression
+While the initial discovery of learned helplessness occurred in the lab [@Maier1976], it has
+since been proposed to underly forms of depression
 [@Abramson1978; @Abramson1989] as well as problems ranging from difficulties in
 school [@Diener1978] to poverty [@Evans2005]. While the cognitive appraisal of
 experienced events affects the development of learned helplessness
@@ -80,33 +81,24 @@ experienced events affects the development of learned helplessness
 @Teodorescu2014a]. In the case of depression, interventions aimed at increasing
 the exploration of activities that might be rewarding have been found to be as
 effective as those with a more cognitive orientation [@Jacobson1996].
-\hl{Is learned helplessness really a phenomena from outside the lab?  Seems to me
-more like a model established in the lab that people analogize to things like
-depression.}
 
 Under-exploration also seems to occur in the development of complex skills, such
-as flying a plane or playing a sport [@Gopher1989]. 
-\hl{There is a Wai-tat Fu/Wayne Gray paper about how people get trapped doing
-complex menu-driving interfaces when there are faster shortcuts available?  i think
-this is based on some solid experiments in the UI/UX literature.  seems related}
-In these settings, an "emphasis
-change" training method that encourages people to continually explore the
-performance space leads to greater performance gains than unguided practice or more complex
-training methods.  Without this intervention, people often enter a "local
+as flying a plane or playing a sport [@Gopher1989].  In these settings, an "emphasis change"
+training method that encourages people to continually explore the performance
+space leads to greater performance gains than unguided practice or more complex
+training methods. Without this intervention, people often enter a "local
 maximum" in which exploration decreases and performance plateaus [@Yechiam2001].
 
 In many other areas under-exploration is less clearly
 established, but is suspected to play a role in maladaptive behavior.
+A recent analysis of supermarket shopping behavior showed that people engage
+in long runs of exploitative behavior that were inconsistent with optimal behavior [@Riefer2017].
 Insufficient exploratory interaction with outgroups may be one cause of
 stereotypes and prejudice [@Denrell2005most], and interventions that
 increase inter-group contact reduce stereotypes [@Shook2008]. The crowding
 out of exploration by exploitation is a concern in organizational behavior as
 well [@March1991; @Levinthal1993], prompting research into organizational
 structures that may preserve exploration [@Fang2010].
-
-\hl{There is some recent Brad Love stuff on exploration in supermarket
-shopping it might be nice to mention here.  Also find maladaptive exploration
-if I remember right}
 
 ## Exploration inside the lab
 
@@ -140,24 +132,23 @@ One clear possibility is that in real world exploration, choices and outcomes
 are spread out over time in a manner that is rarely found in the lab, and that
 people's bias towards immediate rewards might therefore account for a portion of
 people's tendency to under-explore.
-\hl{One possibility we discuss in Juni is also that costs are often not
-easy to measure and control in real world... so for instance they fact that 
-most people date 0-1 people before marriage might be explained in terms of
-the high cost for most people of dating.}
+<!-- \hl{One possibility we discuss in Juni is also that costs are often not -->
+<!-- easy to measure and control in real world... so for instance they fact that  -->
+<!-- most people date 0-1 people before marriage might be explained in terms of -->
+<!-- the high cost for most people of dating.} -->
 
 # Temporal discounting
 
 Temporal discounting refers to the underweighting of temporally distant rewards
 relative to close ones, and is a ubiquitous phenomenon across decision-making
 agents including people, animals, and organizations. Temporal discounting is
-rational if it occurs at an exponential rate $\delta$, where the value of a reward $r$
+rational if it occurs at an exponential rate $\delta$, where the value $V$ of a reward $r$
 at time $t$ is
 
 $$
 V(r,t) = re^{-t\delta}
 $$
 
-\hl{should definve V?}
 In exponential discounting, each additional unit of waiting time decreases the
 value of a reward by an equal proportion [@samuelson1937note, @Frederick2002]. This means that the
 relative values of an early and a late rewards are the same no matter what time point they
@@ -970,17 +961,19 @@ quite small groups of 10 to 15 people per condition. Their results in many cases
 appear strong qualitatively but the statistics calculated are not clearly
 reported. More recent tests of present bias with consumable rewards also reveal
 some statistical weaknesses; in their experiments with soda as a reward,
-@Brown2009 first ran 44 participants and then apparently increased their sample
-size to 55 after reviewing the results, and also only found an effect of delaying
-rewards (by 10 minutes) at the $p<.1$ significance level.
+@Brown2009 first ran 44 participants and then increased their sample
+size to 55 after reviewing the results, and also found an effect of delaying
+rewards (by 10 minutes) only at the $p<.1$ significance level
+(both of which are clearly acknowledged in their paper).
 
-Unfortunately, collecting a large amount of decision-making data with immediately consumable
+Unfortunately, as discussed by @Brown2009, collecting a large amount of decision-making 
+data with immediately consumable
 rewards is highly time consuming, because each consumption event takes time and
 trials must be temporally distributed to induce temporal discounting. However,
 given our findings in the current study, and the limitations of past studies, we
 would strongly recommend that future researchers endeavor to replicate the
-finding that present bias can be induced for videos or noises before attempting
-to use these stimuli for novel research questions.
+finding that present bias can be induced for videos, noises, or any stimuli of interest before attempting
+to use those stimuli for novel research questions.
 
 ## Relating Exploratory and Intertemporal Choice
 
@@ -1030,7 +1023,8 @@ The considerations of this discussion suggest that
 continuing to study exploratory choice in the lab, in order to show that present
 bias simply does or does not exist, may not be most fruitful path for future
 research. A more rewarding route may be to further consider the range of
-exploratory choices in their true, naturalistic settings, and seek to understand
+exploratory choices in their true, naturalistic settings, such as daily shopping habits 
+[@Riefer2017], and seek to understand
 when exploratory choice is treated similarly to intertemporal
 choice,and when it is not. While field data do not allow the experimental
 control available in the lab, they would allow researchers to collect data with
