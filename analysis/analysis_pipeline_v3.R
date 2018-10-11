@@ -123,16 +123,17 @@ for (i in 1:nrow(individuals_df)) {
 individuals_w_predictions$condition = factor(individuals_w_predictions$condition, levels=c(-1, 1), labels=c('immediate', 'delayed'))
 
 
-ggplot() + geom_line(data=individuals_w_predictions, aes(x=x, y=y, group=subject, color=condition), size=.5, alpha=.3) +
-geom_line(data=params_w_predictions, aes(x=x, y=y, color=condition), size=2) +
+ggplot() +
+  geom_line(data=individuals_w_predictions, aes(x=x, y=y, group=subject, color=condition), size=.3, alpha=.3) +
+  geom_ribbon(data=params_w_predictions, aes(x=x, ymin=lower, ymax=upper, group=condition), alpha=.3) +
+  geom_line(data=params_w_predictions, aes(x=x, y=y, color=condition), size=1.5) +
   theme_minimal() +
   xlab("current spinner value") +
   ylab("p(choose new spinner)") +
-  geom_ribbon(data=params_w_predictions, aes(x=x, ymin=lower, ymax=upper, group=condition), alpha=.3) +
   theme(legend.position="bottom") +
   scale_x_continuous(breaks=c(0, 0.25, 0.5, .75, 1), labels=c("0%", "25%", "50%", "75%", "100%"))
 
-ggsave(filename="../doc/journal/figures/expresults.pdf", width=10, height=4, useDingbats=F)
+ggsave(filename="../doc/journal/figures/expresults.pdf", width=6, height=3, useDingbats=F)
 
 summary(colMeans(individuals$subj_slope))
 

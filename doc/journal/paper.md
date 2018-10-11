@@ -26,7 +26,7 @@ animals balance this ``explore&ndash;exploit dilemma'' [@Mehlhorn2015] as well a
 should be approached computationally [@sutton1998reinforcement].
 
 A key aspect of exploratory decision making is that it is spread over time. With
-only a single decision, exploration makes little sense. If a decision making knew
+only a single decision, exploration makes little sense. If a decision maker knew
 with certainty they only had one remaining chance to buy ice cream in their life, they 
 should buy their favorite flavor, because that is the flavor they expect to enjoy the most. 
 Exploring new flavors has the possibility of introducing you to a new favorite, but it is
@@ -51,7 +51,7 @@ directly consumable rewards in an exploratory choice task to test for effects of
 present bias on exploration. While we did not find an effect of present bias on
 exploratory choice, a follow-up experiment revealed that our consumable rewards
 did not in fact produce a reliable present bias, despite evidence that they did
-so in earier studies [@Solnick1980; @Navarick1998]. Nonetheless, we hope that
+so in earlier studies [@Solnick1980; @Navarick1998]. Nonetheless, we hope that
 this work can serve as a useful first step towards unifying our
 understanding of exploratory and intertemporal decision making.
 
@@ -77,7 +77,7 @@ since been proposed to underly forms of depression
 [@Abramson1978; @Abramson1989] as well as problems ranging from difficulties in
 school [@Diener1978] to poverty [@Evans2005]. While the cognitive appraisal of
 experienced events affects the development of learned helplessness
-[@Abramson1978], patterns of exploration clearly play a role as well [@Huys2009,
+[@Abramson1978], patterns of exploration clearly play a role as well [@Huys2009;
 @Teodorescu2014a]. In the case of depression, interventions aimed at increasing
 the exploration of activities that might be rewarding have been found to be as
 effective as those with a more cognitive orientation [@Jacobson1996].
@@ -112,9 +112,9 @@ or less exploration, including aspiration levels [@Wulff2015], uncertainty
 Interestingly, under-exploration has not emerged as a clear pattern in lab
 experiments. Instead, results are mixed with people sometimes under-exploring,
 sometimes over-exploring, and sometimes exploring close to an optimal amount. To
-take two illustrative examples, [@Zwick2003] found that in a sequential
+take two illustrative examples, @Zwick2003 found that in a sequential
 search task people under-searched when there were no information costs but
-over-searched when there were information costs, and [@Teodorescu2014]
+over-searched when there were information costs, and @Teodorescu2014
 found that people explored unknown alternatives too often or not often enough
 depending on whether rare outcomes were positive or negative. Similar results
 have been obtained within and across a variety of other studies and paradigms
@@ -150,7 +150,7 @@ V(r,t) = re^{-t\delta}
 $$
 
 In exponential discounting, each additional unit of waiting time decreases the
-value of a reward by an equal proportion [@samuelson1937note, @Frederick2002]. This means that the
+value of a reward by an equal proportion [@samuelson1937note; @Frederick2002]. This means that the
 relative values of an early and a late rewards are the same no matter what time point they
 are considered from, or equivalently that their relative values are unaffected by
 adding an additional waiting time to both.
@@ -177,7 +177,6 @@ a hyperbolic rate, allowing the value of a future reward to be written as
 $$
 V(r, t) = \frac{r}{1+kt}
 $$
-
 for appropriate constant $k$ [@myerson1995discounting]. This formulation often fits data well, but is
 difficult to deal with analytically. An alternative is to posit that discounting
 after the present proceeds exponentially, but that there is a one-time drop in
@@ -190,12 +189,11 @@ r & \text{if }t=0\\
 \beta r e^{-t\delta} & \text{if }t>0
 \end{cases}
 $$
-
 where $\delta$ is the rate of exponential discounting and $\beta$ is the degree
 of present bias. This model suffers from ambiguity in when exactly the "present"
 ends and the future begins (e.g., should the value of reward received in 30
 seconds be discounted by $\beta$, or should it be considered immediate?).
-However, it captures in a simple and tractible way many of the qualities of
+However, it captures in a simple and tractable way many of the qualities of
 human intertemporal choice, and for this reason we will adopt it for our
 additional analyses below.
 
@@ -264,7 +262,7 @@ the graph, we see that the summed discounted change in reward, in black, is posi
 agent will choose to explore. The undiscounted reward, in gray, is larger, but
 doesn't differ in sign from the reward after mild exponential discounting.
 
-The center column shows the case of beta&ndash;delta, or psuedo-hyperbolic,
+The center column shows the case of beta&ndash;delta, or pseudo-hyperbolic,
 discounting, with $\delta=.9$ and $\beta=.5$. As the top graph shows, rewards from later time points are weighted
 much less than in exponential discounting. Because of this, the expected gain in
 future reward for choosing $B$ becomes smaller, while the immediate expected
@@ -274,12 +272,12 @@ uncertain action $B$.
 
 To preview our experimental manipulation, the right column shows a case of
 beta&ndash;delta discounting considered from a temporal distance. Now, the first
-choice is at time 6, while the last is at time 5. Suppose the agent was given
+choice is at time 6, while the last is at time 10. Suppose the agent was given
 the opportunity to commit to a first action from time 1. As shown in the bottom
 graph, the sequence of rewards viewed from this distance is highly discounted,
 but is no longer heavily biased towards the first outcome. Instead, the expected
 discounted reward sequence is now a scaled version of the exponentially
-discounted rewards, since beta&ndash;delta discounding is identical to
+discounted rewards, since beta&ndash;delta discounting is identical to
 exponential discounting after the present. The summed expected rewards for
 exploration are greater than those for exploitation, so the agent will choose
 the exploratory action.
@@ -342,15 +340,15 @@ enjoyable. Experiment 1 represents a first attempt to test for effects of
 present bias on exploratory choice, and Experiment 2 is a larger, preregistered
 study that improves on Experiment 1 in several ways. After finding no evidence
 of present bias producing an effect in Experiments 1 or 2, in Experiment 3 we
-test directly, using a simpler design, whether our outcome stimuli in fact
-produce a consistent preference towards immediate rewards.
+tested directly, using a simpler design, whether our outcome stimuli in fact
+produced a consistent preference towards immediate rewards.
 
 
 # Experiment 1
 
 ## Methods
 
-### Participants.
+### Participants
 Forty participants completed the experiment, which was conducted over
 Amazon Mechanical Turk (AMT) using the psiTurk framework [@Gureckis2015a].
 The participants had a mean age of 37.7 (SD=10.6). Twenty eight self-reported female, twelve male.
@@ -363,7 +361,7 @@ Participants were pseudo-randomly counterbalanced across two conditions.
 
 ### Design and procedure
 
-#### Consumption tasks
+#### Consumption tasks.
 Participants were informed that their job was to perform a monotonous slider task that
 would be split into 30-second "work periods," but that they would be able to
 make choices throughout the experiment that would give them a chance to watch a
@@ -378,7 +376,7 @@ at the top of the screen, as was the number of seconds left in the current work 
   a gold wedge, they performed the video-watching task instead of the
   slider task.](figures/taskpictures.png){#fig:exp1task}
 
-![The machine display seen by participants. The display allowed participants track
+![The machine display seen by participants. The display allowed participants to track
   the value of each machine and the next time each machine would be ready to
   make a choice or produce an outcome. Gray arrows have been added to depict the
   counterclockwise movement of machines around the display after each work
@@ -387,7 +385,7 @@ at the top of the screen, as was the number of seconds left in the current work 
   (b): the display seen by participants in the delayed condition of
   Experiment 1.](figures/machinemappictures.png){#fig:exp1machinemap}
 
-The slider task was based on a task previously used by [@Gill2012]. In each
+The slider task was based on a task previously used by @Gill2012. In each
 period of the slider task, five horizontal sliders appeared on the screen (Figure {@fig:exp1task}a). Each
 started at a random setting between 0 and 100, with the slider's value
 shown to its right, and with a random horizontal offset so that the
@@ -401,7 +399,7 @@ all five sliders were available after 20 seconds.
 
 Before beginning the experiment, participants chose one of four videos available
 on YouTube: an episode of "Planet Earth", and episode of "The Great British
-Bakeoff", and episode of "Mythbusters", or an "Ellen Degeneres comedy special".
+Bakeoff", and episode of "Mythbusters", or an Ellen Degeneres comedy special.
 The video was embedded in the experiment with all user controls (such as
 skipping ahead) disabled (Figure {@fig:exp1task}b). When given access to the video, participants had to keep the
 browser window open and hold down the space bar for the video to play. This allowed us to ensure that
@@ -440,7 +438,7 @@ updated to the new spinner.  This created an explore&ndash;exploit tradeoff in w
 choosing a new spinner carried immediate risk, but could carry long-term
 benefits by improving the current spinner from its initial value.
 
-The experiment's two conditions differed in what occured after the participant spun the spinner.
+The experiment's two conditions differed in what occurred after the participant spun the spinner.
 In the immediate condition, the machine ran immediately after the choice was made and affected the
 next work period, as shown in Figure {@fig:exp1machinemap}a. It then "cooled off" for the
 following five periods, as choices were made with the other five machines. In the delayed condition,
@@ -458,7 +456,7 @@ Participants were informed that this would occur randomly on
 machines would reset on each cycle through the machines, and no machine would be
 reset on two consecutive uses.
 
-#### Training, incentives, and post-experiment questions
+#### Training, incentives, and post-experiment questions.
 Before beginning the full experiment, participants completed two
 practice phases. First, they performed several trials of practice using the
 machines, with the actual work periods removed. Then, they performed two work
@@ -499,10 +497,10 @@ condition; current spinner value was rescaled to have zero mean
 and unit variance across participants. We assumed that individuals could vary in their overall tendency
 to explore (i.e., intercept) as well as their responsiveness to current spinner
 value (slope). Participants' individual-level parameters were assumed to be
-drawn from a t distribution with $df=5$, making our population level estimates
+drawn from a t-distribution with $df=5$, making our population level estimates
 robust to potential outliers. The priors on the
 the population-level predictor coefficients, and on the standard
-deviation of the t distributions from which individual-level parameters were drawn, were (truncated)
+deviation of the t-distributions from which individual-level parameters were drawn, were (truncated)
 normal distributions with a mean of 0 and a standard deviation of 5.
 
 
@@ -569,20 +567,20 @@ choice tasks [@Otto2012], though other studies have not found a relationship [@B
 The experiment was preregistered through the Open Science Framework. The
 preregistration can be found at: osf.io/3r9ke.
 
-### Participants.
+### Participants
 
 One hundred people from the general community took part in the study in person
 at New York University. The participants had a mean age of 23.9 (SD=6.1). Fifty
 eight self-reported female, forty one male. Participants received $10 for
 taking part in the study, which lasted approximately one hour, and received a
 performance-based bonus of up to $5. All but one participant received a bonus of
-$5, with the remaining participant receiving $4.4. Participants who
+$5, with the remaining participant receiving $4.40. Participants who
 failed a post-instructions questionnaire more than twice were excluded from
 further analyses. Ten participants were excluded in this manner.
 
-### Design and procedure.
+### Design and procedure
 
-#### Barratt Impulsiveness Scale
+#### Barratt Impulsiveness Scale.
 
 Prior to reading the experiment instructions, participants completed the 30-item
 Barratt Impulsiveness scale [@Patton1995] on the computer. 
@@ -602,11 +600,11 @@ the screen, as was the number of seconds left in the current work period.
 The slider task was the same as the one described in Experiment 1, and is
 pictured in Figure {@fig:exp2tasks}a. To make
 the slider task more unpleasant, a short static noise was played through the computer
-speakers at a moderate volume (78db) at irregular intervals of approximately
+speakers at a moderate volume (78dB) at irregular intervals of approximately
 once every three seconds during the task.
 
 As in Experiment 1, the video tasks consisted of simply watching one of four videos: an episode of
-"Planet Earth", and episode of "The Great British Bakeoff", and episode of
+"Planet Earth", an episode of "The Great British Bakeoff", an episode of
 "Unchained Reactions", or an Ellen Degeneres comedy special. Participants
 watched the video through a player on the computer screen. Unlike in Experiment
 1, they did not have to hold down a button to play the video. They were free to
@@ -632,7 +630,7 @@ it landed on black, the machine created a slider task.
 If the participant selected "run new spinner", the new spinners in the panel
 were covered up and randomly shuffled. The participant then clicked one of the
 gray squares, revealing the new spinner underneath. As was explained to the
-particpants, and was visually apparent, one third of the possible new spinners
+participants, and was visually apparent, one third of the possible new spinners
 are completely black, while the remaining two thirds range from 5% to 100% gold,
 in even increments of 5%.
 
@@ -646,7 +644,7 @@ six chance that the machine would reset itself. In fact, the experiment was
 designed so that there was exactly one reset in every set of 6 trials (i.e.,
 trials 1&ndash;6, 7&ndash;12, etc.). When the machine reset, the "best
 spinner" was set to a new starting value. The starting values following resets
-(including the intial starting value) were {20%, 25%, &hellip; 55%, 60%}, randomly
+(including the initial starting value) were {20%, 25%, &hellip; 55%, 60%}, randomly
 ordered.
 
 #### Immediate and delayed conditions.
@@ -693,7 +691,7 @@ explore less and show a bigger difference in exploration between the delayed and
 immediate conditions.
 
 We tested these predictions via hierarchical Bayesian logistic regression on
-participant choices. All aspects of this analyses were preregistered prior to
+participant choices. All aspects of this analysis were preregistered prior to
 data collection. We included predictors for the value of the current spinner,
 the participant's BIS score, the participant's condition, and interactions
 between condition and current spinner value and condition and BIS score.
@@ -702,10 +700,10 @@ condition; current spinner value and BIS score were rescaled to have zero mean
 and unit variance across participants. We assumed that individuals could vary in their overall tendency
 to explore (i.e., intercept) as well as their responsiveness to current spinner
 value (slope). Participants' individual-level parameters were assumed to be
-drawn from a t distribution with $df=5$, making our population level estimates
+drawn from a t-distribution with $df=5$, making our population level estimates
 robust to potential outliers. The priors on the
 the population-level predictor coefficients, and on the standard
-deviation of the t distributions from which individual-level parameters were drawn, were (truncated)
+deviation of the t-distributions from which individual-level parameters were drawn, were (truncated)
 normal distributions with a mean of 0 and a standard deviation of 5.
 
 The model posterior was estimated using the Stan modeling language
@@ -798,16 +796,16 @@ games [@Millar1984; @Navarick1998].
 
 ## Methods
 
-### Participants.
+### Participants
 
-XXX undergraduate students at New York University took part in the study
-for extra credit. The participants had a mean age of XX (SD=XX). XX
-self-reported female, XX male. Participants received a performance-based bonus
+Thirty undergraduate students at New York University took part in the study
+for extra credit. The participants had a mean age of 19.1 (SD=1.0). Twenty
+self-reported female, ten male. Participants received a performance-based bonus
 of up to $5. All participants received the full $5 bonus. Participants who
 failed a post-instructions questionnaire more than twice were excluded from
-further analyses. No participant was excluded in this manner.
+further analyses. One participant was excluded in this manner.
 
-### Design and procedure.
+### Design and procedure
 
 ![Examples of the Experiment 3 tasks. (a): an example of the slider task, in
 which the numeric timer has been replaced by a red timer bar. (b): an example of
@@ -875,8 +873,8 @@ immediate video not a clear preference for greater video amounts.
 ](figures/exp3results.pdf){#fig:exp3results}
 
 As in Experiments 1 and 2, participants self-reported liking the video task more
-than the slider task, $t(XX)=XX$, $p<.001$. They rated the videos XX out of 7, on average, and the
-sliders XX out of 7, on average.
+than the slider task, $t(28)=6.03$, $p<.001$. They rated the videos 5.0 out of 7, on average, and the
+sliders 2.8 out of 7, on average.
 
 To test whether this preference was expressed in the participants choice
 behavior, and whether participants preferred watching the video immediately, we
@@ -886,9 +884,9 @@ reward and for the effect of the difference in video time between the immediate
 and delayed options. The option difference was coded as $-1$ for the 25 second
 immediate video, $0$ for the 30 second immediate video, and $1$ for the 35
 second immediate video. As in earlier analyses, participants' parameters were assumed to be drawn from a
-t distribution with $df=5$. The priors on the
+t-distribution with $df=5$. The priors on the
 the population-level predictor coefficients, and on the standard
-deviation of the t distributions from which individual-level parameters were drawn, were (truncated)
+deviation of the t-distributions from which individual-level parameters were drawn, were (truncated)
 normal distributions with a mean of 0 and a standard deviation of 5. We
 estimated the model using the Stan modeling language using the same procedure as
 Experiments 1 and 2 [@Carpenter2017].
@@ -896,9 +894,9 @@ Experiments 1 and 2 [@Carpenter2017].
 The model results are plotted in Figure @fig:exp3results. We found that
 participants were not very sensitive to our experimental manipulations. While
 some individual participants appeared to prefer either the immediate or the
-delayed option, the population as a whole showed no average preference, $CI=[XX,
-XX]$. Participants also showed almost no sensitivity to which option produced
-more video time, $CI=[XX, XX]$, even though choosing the superior option in the
+delayed option, the population as a whole showed no average preference, $CI=[-.41,
+.27]$. Participants also showed almost no sensitivity to which option produced
+more video time, $CI=[-.16, .41]$, even though choosing the superior option in the
 two non-equal-time groups of trials would have allowed them to watch 10 seconds
 more video and perform two fewer sliders on each trial. It may be that this
 manipulation was too subtle for many participants to become aware of it.
@@ -930,7 +928,7 @@ While the slider task has not been used in the past to produce present bias,
 both videos and static noises have. @Navarick1998 found that 40% of participant
 showed a consistent strong bias towards watching an immediate shorter video, even
 when a longer video could be obtained by waiting 30 seconds. @Solnick1980 found
-that a 90 second cessation of noise was preferred over a 120 second sessation
+that a 90 second cessation of noise was preferred over a 120 second cessation
 with a 60 second wait, but found that this preference flipped when a front-end
 delay of only 30 seconds was added. And in a similar vein, @Millar1984 found
 that people strongly preferred 20 seconds playing a video game followed by a 40 second
@@ -985,7 +983,7 @@ like other intertemporal decisions, and thus it would be highly surprising if
 the same qualities of temporal discounting were not involved. This would be
 expected particularly in situations where an extended bout of exploration is
 very likely to produce greater long term rewards. For example, going to college
-and selecting classes could be considered a series of exploratory choice among a
+and selecting classes could be considered a series of exploratory choices among a
 variety of life paths. In this case, many students are likely highly confident that through
 this exploration they will find a life path more rewarding than those available without
 it, making college a more straightforward tradeoff between up-front costs
@@ -1008,11 +1006,11 @@ Instead of treating exploratory choice like intertemporal choice, people may
 rely on other motivational and cognitive factors to balance exploration and
 exploitation. Curiosity acts as an innate drive towards information-seeking
 [@Berlyne1966; @Loewenstein1994; @Kidd2015], and some researchers speculate that
-curiousity may in fact have evolved to induce exploration [@Singh2004;
+curiosity may in fact have evolved to induce exploration [@Singh2004;
 @Oudeyer2009]. If exploration is inherently rewarding due to its potential to
 reveal information, then its rewards are moved from the future to the present
 and temporal advantage of exploitation is removed. Even in situations where
-people likely have low intrinsic curiousity about outcomes, people still appear
+people likely have low intrinsic curiosity about outcomes, people still appear
 to have strategies for choosing when to explore that are based on heuristics, 
 exploration "bonuses," or added decision noise, rather than a full consideration
 of the future [@daw2006cortical; @Speekenbrink2015; @Wilson2014a]. To the extent
