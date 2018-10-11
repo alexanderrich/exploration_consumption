@@ -11,7 +11,20 @@ header-includes:
 geometry: margin=1in
 ---
 
-<!-- \hl{Abstract?} -->
+# Abstract
+
+Time is a central aspect of exploratory choice. People must balance the
+immediate rewards of exploiting known alternatives against the long term rewards
+of exploring uncertain alternatives. However, little research has investigated
+how this temporal aspect affects the exploratory decisions people make. In other
+intertemporal choices, people display a bias towards immediate rewards. We
+hypothesize that in exploratory choice, this present bias will cause them to
+under-explore. Across three experiments, including a preregistered design, we
+find no evidence that present bias influences exploratory choice, but also
+conclude that our stimuli may not effectively induce present bias. We discuss
+how present bias might better be investigated, and possible reasons that present
+bias may not affect exploratory choice.
+
 
 # Does a bias for the present influence exploratory choice?
 
